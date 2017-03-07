@@ -120,7 +120,6 @@ public class Ship {
 	 * @return 
 	 * 		  The Y position of this ship.
 	 * 		  |result == this.posY
-	 * 	
 	 */
 	public double getPosY(){
 		return this.posY;
@@ -143,12 +142,33 @@ public class Ship {
 	private double velY;
 	private double speedLimit = 300000;
 	
+	/**
+	 * Returns the velocity in the X direction of this ship.
+	 * 
+	 * @return
+	 * 		  Returns the velocity in the X direction of this ship.
+	 * 		  |result == this.velX
+	 */
 	public double getVelX(){
 		return this.velX;
 	}
 	
+	/**
+	 * Sets the velocity in the X direction of this ship to a given velocity.
+	 * 
+	 * @param newVel
+	 * 		  The new velocity of this ship.
+	 * @post
+	 * 		If the total new speed does not exceed the speed limit, 
+	 * 		the speed in the velocity in the X direction is set to newVel.
+	 * 		Otherwise, the velocity in the X direction is set in such a way that the
+	 * 		total new speed is equal to the speed limit.
+	 * 		|if((Math.sqrt(Math.pow(newVel,2) + Math.pow(this.getVelY(),2)))>speedLimit) then
+	 * 		| new.getVelX() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2))
+	 * 		|else then new.getVelX() == newVel 
+	 */
 	public void setVelX(double newVel){
-		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(this.getVelY(), 2));
+		double totalSpeed = Math.sqrt(Math.pow(newVel, 2) + Math.pow(this.getVelY(), 2));
 		if(totalSpeed>speedLimit)
 			this.velX = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2));
 		else 
@@ -160,7 +180,7 @@ public class Ship {
 	}
 	
 	public void setVelY(double newVel){
-		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(this.getVelY(), 2));
+		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(newVel, 2));
 		if(totalSpeed>speedLimit)
 			this.velY = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2));
 		else 
@@ -169,6 +189,16 @@ public class Ship {
 	
 	public double orientation;
 	
+	/**
+	 * Checks if a given orientation is a valid orientation.
+	 * 
+	 * @param orient
+	 * 		The orientation of which is checked if it is a valid orientation.
+	 * @return
+	 * 		Returns true if the orientation is greater or equal then zero and
+	 * 		smaller or equal then 2*PI.
+	 * 		|result == ((orient>=0) && (orient<=2*Math.PI))
+	 */
 	private static boolean isValidOrientation(double orient){
 		return ((orient>=0) && (orient<=2*Math.PI));
 	}
@@ -177,6 +207,18 @@ public class Ship {
 		return this.orientation;
 	}
 	
+	/**
+	 * Sets the orientation of this ship to a new given orientation.
+	 * 
+	 * @param newOrientation
+	 * 		The new orientation of this ship.
+	 * @pre 
+	 * 		The orientation is a valid orientation.
+	 * 		|isValidOrientation(newOrientation)
+	 * @post
+	 * 		The new orientation of this ship is equal to the given orientation.
+	 * 		|new.getOrientation() == newOrientation
+	 */
 	public void setOrientation(double newOrientation){
 		assert isValidOrientation(newOrientation);
 		this.orientation = newOrientation;
