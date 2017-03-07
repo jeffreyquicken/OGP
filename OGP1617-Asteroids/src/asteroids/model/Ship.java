@@ -200,19 +200,58 @@ public class Ship {
 			this.radius = newRadius;
 	}
 	
+	/**
+	 * Moves this ship around for a given amount of time.
+	 * 
+	 * @param time
+	 * 		  The amount of time this ship is moving.
+	 * @throws IllegalArgumentException
+	 * 		   The time is a negative number.
+	 * 		   |(time<0)
+	 * @effect this.setPosX(this.getPosX() + this.getVelX()*time)
+	 * @effect this.setPosY(this.getPosY() + this.getVelY()*time)
+	 */
 	public void move(double time)throws IllegalArgumentException {
 		if(time<0)
 			throw new IllegalArgumentException();
 		else
-			this.setPosX(this.getPosX() + this.getVelX()*time);
-			this.setPosY(this.getPosY() + this.getVelY()*time);
+			try{this.setPosX(this.getPosX() + this.getVelX()*time);}
+			catch(IllegalArgumentException e){
+				throw e;
+			}
+			try{this.setPosY(this.getPosY() + this.getVelY()*time);}
+			catch(IllegalArgumentException d){
+				throw d;
+			}
 	}
 	
+	/**
+	 * Increases the orientation of this ship with a given angle.
+	 * 
+	 * @param angle
+	 * 		  	   The angle to be added to the current angle of this ship.
+	 * @pre 
+	 * 		The sum of the current orientation and the added angle is a valid orientation.
+	 * 		|isValidOrientation(this.getOrientation()+angle)
+	 *@post 
+	 *		The orientation of this ship is set to the sum of the current orientation and the added angle.
+	 *		|new.getOrientation() == (this.getOrientation() + angle)
+	 */
 	public void turn(double angle){
 		assert isValidOrientation(this.getOrientation()+angle);
 		this.setOrientation(this.getOrientation()+angle);
 	}
 	
+	/**
+	 * Thrusts this ship forward with a given acceleration.
+	 * @param acceleration
+	 * 		  The amount of acceleration of this ship.
+	 * @post If the acceleration is a negative number, the acceleration is set to zero.
+	 * 		 Then the X-velocity and Y-velocity of this ship is increased with a given amount of acceleration.
+	 * 		 |if(acceleration<0) then acceleration = 0
+	 * @effect this.setVelX(this.getVelX()+acceleration*Math.cos(this.getOrientation()))
+	 * @effect this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()))
+	 */
 	public void thrust(double acceleration){
 		if(acceleration < 0)
 			acceleration = 0;
@@ -246,6 +285,7 @@ public class Ship {
 	 * 		  The ship of which must be checked if it overlaps with this ship.
 	 * @return 
 	 * 		  Returns true if the ship overlaps with the given ship or the given ship is equal to the given ship.
+	 * 		  |result == (this.getDistanceBetween(ship)<=this.getRadius())||(this.getDistanceBetween(ship)<=ship.getRadius())
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -304,6 +344,7 @@ public class Ship {
 	 * 		  The second 2-dimensional vector
 	 * @return 
 	 * 		  Returns the scalar product of the 2-dimensional vectors.
+	 * 		  result == vect1[0]*vect2[0] + vect1[1]*vect2[1]
 	 */
 	private double scalarProduct(double[] vect1, double[] vect2){
 		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
@@ -317,6 +358,9 @@ public class Ship {
 	 * @return 
 	 * 		   Returns an array of the X and Y coordinate where this ship and the given ship will collide.
 	 * 		   Returns null if the ships will never collide.
+	 * 		   |if(this.getTimeToCollision(ship) == Double.POSITIVE_INFINITY) then (result == null)
+	 * 		   |else result == {this.getPos(x)+this.getTimeToCollision(ship)*this.getVelX(),
+	 * 		   |                this.getPosY()+this.getTimeToCollision(ship)*this.getVelY()}
 	 * @throws NullPointerException
 	 *  	   The ship doesn't exist.
 	 * 		   |(ship == null)

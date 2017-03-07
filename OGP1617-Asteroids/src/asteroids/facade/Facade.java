@@ -40,8 +40,11 @@ public class Facade implements IFacade {
 		return ship.getOrientation();
 	}
 	
-	public void move(Ship ship, double dt){
-		ship.move(dt);
+	public void move(Ship ship, double dt) throws ModelException{
+		try{ship.move(dt);}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
 	}
 	
 	public void thrust(Ship ship,double amount){
@@ -50,16 +53,34 @@ public class Facade implements IFacade {
 	public void turn(Ship ship, double angle){
 		ship.turn(angle);
 	}
-	public double getDistanceBetween(Ship ship1, Ship ship2){
-		return ship1.getDistanceBetween(ship2);
+	public double getDistanceBetween(Ship ship1, Ship ship2) throws ModelException{
+		try{return ship1.getDistanceBetween(ship2);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
 	}
-	public boolean overlap(Ship ship1, Ship ship2){
-		return ship1.overlaps(ship2);
+	public boolean overlap(Ship ship1, Ship ship2) throws ModelException{
+		try{return ship1.overlaps(ship2);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
 	}
-	public double getTimeToCollision(Ship ship1, Ship ship2){
-		return ship1.getTimeToCollision(ship2);
+	public double getTimeToCollision(Ship ship1, Ship ship2) throws ModelException{
+		try{return ship1.getTimeToCollision(ship2);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
-	public double[] getCollisionPosition(Ship ship1, Ship ship2){
-		return ship1.getCollisionPosition(ship2);
+	public double[] getCollisionPosition(Ship ship1, Ship ship2) throws ModelException{
+		try{return ship1.getCollisionPosition(ship2);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
 }
