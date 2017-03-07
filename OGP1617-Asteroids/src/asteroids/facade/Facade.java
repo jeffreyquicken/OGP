@@ -6,7 +6,8 @@ import asteroids.part1.facade.IFacade;
 public class Facade implements IFacade {
 	
 	public double[] getShipPosition(Ship ship){
-		return [ship.getPosX(),ship.getPosY()];
+		double [] positionArray = {ship.getPosX(),ship.getPosY()};
+		return positionArray;
 	}
 
 }

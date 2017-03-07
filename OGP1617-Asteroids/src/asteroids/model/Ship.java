@@ -7,18 +7,42 @@ public class Ship {
 	/**
 	 * 
 	 * @param x
+	 * 		  The initial X-coordinate of this ship.
 	 * @param y
+	 * 		  The initial Y-coordinate of this ship.
 	 * @param xVelocity
+	 * 		  The initial velocity in the X direction of this ship.
 	 * @param yVelocity
+	 * 		  The initial velocity in the Y direction of this ship.
 	 * @param radius
+	 * 		  The initial radius of this ship.
 	 * @param orientation
+	 * 		  The initial orientation of this ship.
 	 * 
 	 * @effect setPosX(x)
 	 * @effect setPosY(y)
+	 * @effect setVelX(xVelocity)
+	 * @effect setVelY(yVelocity)
+	 * @effect setRadius(radius)
+	 * @effect setOrientation(orientation)
+	 * 
 	 */
-	public Ship(double x, double y, double xVelocity, double yVelocity, double radius, double orientation){
-		this.setPosX(x);
-		this.setPosY(y);
+	public Ship(double x, double y, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalArgumentException{
+		try{this.setPosX(x);}
+		catch(IllegalArgumentException e){
+			throw e;
+		}
+		try{this.setPosY(y);}
+		catch(IllegalArgumentException d){
+			throw d;
+		}
+		this.setVelX(xVelocity);
+		this.setVelY(yVelocity);
+		try{this.setRadius(radius);}
+		catch(IllegalArgumentException f){
+			throw f;
+		}
+		this.setOrientation(orientation);
 	}
 	
 	private double posX;
@@ -27,7 +51,7 @@ public class Ship {
 	/**
 	 * 
 	 * @param newPos
-	 * 		  The new X position for the ship.
+	 * 		   The new X position for the ship.
 	 * @throws IllegalArgumentException
 	 * 		   The given newPos is not a valid position.
 	 * 		   |!isValidPos(newPos)
@@ -53,7 +77,7 @@ public class Ship {
 	/**
 	 * 
 	 * @param newPos
-	 * 		  The new Y position for the ship.
+	 * 		   The new Y position for the ship.
 	 * @throws IllegalArgumentException
 	 * 		   The given newPos is not a valid position.
 	 * 		   |!isValidPos(newPos)
@@ -177,7 +201,7 @@ public class Ship {
 	 * @param ship 
 	 * 		  The ship between which the distance must be calculated.
 	 * @return 
-	 * 		  The distance in kilometers between the center of this ship and the center of the given ship.
+	 * 		  Returns the distance in kilometers between the center of this ship and the center of the given ship.
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -196,7 +220,7 @@ public class Ship {
 	 * @param ship 
 	 * 		  The ship of which must be checked if it overlaps with this ship.
 	 * @return 
-	 * 		  True if the ship overlaps with the given ship or the given ship is equal to the given ship.
+	 * 		  Returns true if the ship overlaps with the given ship or the given ship is equal to the given ship.
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -214,9 +238,13 @@ public class Ship {
 	}
 	
 	/**
+	 * Calculates the time when this ship and a given ship will collide.
 	 * 
 	 * @param ship
+	 * 		  The ship of which the collision time with this ship is calculated.
 	 * @return 
+	 * 		   Returns the time in seconds when this ship and the given ship will collide.
+	 * 		   Returns Double.POSITIVE_INFINITY if the ships will never collide.
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -250,18 +278,26 @@ public class Ship {
 	 * @param vect2 
 	 * 		  The second 2-dimensional vector
 	 * @return 
-	 * 		  The scalar product of the 2-dimensional vectors.
+	 * 		  Returns the scalar product of the 2-dimensional vectors.
 	 */
 	private double scalarProduct(double[] vect1, double[] vect2){
 		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
 	}
 	
 	/**
+	 * Calculates the coordinates (an array) where this ship and the given ship will collide.
 	 * 
 	 * @param ship
-	 * @return
+	 * 		   The ship of which the collision coordinates with this ship are calculated.
+	 * @return 
+	 * 		   Returns an array of the X and Y coordinate where this ship and the given ship will collide.
+	 * 		   Returns null if the ships will never collide.
 	 * @throws NullPointerException
+	 *  	   The ship doesn't exist.
+	 * 		   |(ship == null)
 	 * @throws IllegalArgumentException
+	 * 		   The given ship overlaps with this ship.
+	 * 		   |this.overlaps(ship)
 	 */
 	public double[] getCollisionPosition(Ship ship) throws NullPointerException, IllegalArgumentException{
 		if(ship == null)
