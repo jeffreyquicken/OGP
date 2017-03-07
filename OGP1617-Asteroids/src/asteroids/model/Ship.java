@@ -191,10 +191,11 @@ public class Ship {
 		}
 	}
 	
-	public double getTimeToCollision(Ship ship) throws NullPointerException{
-		if(ship == null){
+	public double getTimeToCollision(Ship ship) throws NullPointerException, IllegalArgumentException{
+		if(ship == null)
 			throw new NullPointerException();
-		}
+		else if(this.overlaps(ship))
+			throw new IllegalArgumentException();
 		double[] deltaV = {this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY()};
 		double[] deltaR = {this.getPosX()-ship.getPosX(),this.getPosY()-ship.getPosY()};
 		double totalSigma = Math.pow(this.getRadius(), 2) + Math.pow(ship.getRadius(), 2);
@@ -212,11 +213,18 @@ public class Ship {
 		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
 	}
 	
-	public double getCollisionPosition(Ship ship) throws NullPointerException{
-		if(ship == null){
+	public double[] getCollisionPosition(Ship ship) throws NullPointerException, IllegalArgumentException{
+		if(ship == null)
 			throw new NullPointerException();
+		else if(this.overlaps(ship))
+			throw new IllegalArgumentException();
+		double deltaT = this.getTimeToCollision(ship);
+		if(deltaT == Double.POSITIVE_INFINITY)
+			return null;
+		else{
+			double[] collisionPosition = {this.getPosX()+deltaT*this.getVelX(),this.getPosY()+deltaT*this.getVelY()};
+			return collisionPosition;
 		}
-		
 	}
 	
 
