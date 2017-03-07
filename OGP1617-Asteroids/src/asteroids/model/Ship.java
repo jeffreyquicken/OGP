@@ -2,9 +2,27 @@ package asteroids.model;
 import be.kuleuven.cs.som.taglet.*;
 import be.kuleuven.cs.som.annotate.*;
 
+/**
+ * A class of ships.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ * 
+ * @invar The X-coordinate of the ship is a valid coordinate.
+ * 		  |isValidPos(posX)
+ * @invar The Y-coordinate of the ship is a valid coordinate.
+ * 		  |isValidPos(posY)
+ * @invar The total velocity of the ship does not exceed the speedLimit.
+ * 		  |speedLimit>=(Math.sqrt(Math.pow(velX,2)+Math.pow(velY,2)))
+ * @invar The radius of the ship is a valid radius.
+ * 		  |isValidRadius(radius)
+ * @invar The orientation of the ship is a valid orientation.
+ * 		  |isValidOrientation(orientation)
+ *
+ */
 public class Ship {
 	
 	/**
+	 * Initializes a Ship with a given x-coordinate,y-coordinate,x-velocity,y-velocity,radius and orientation.
 	 * 
 	 * @param x
 	 * 		  The initial X-coordinate of this ship.
@@ -49,6 +67,7 @@ public class Ship {
 	private double posY;
 	
 	/**
+	 * Sets the X-coordinate of this ship to a given coordinate.
 	 * 
 	 * @param newPos
 	 * 		   The new X position for the ship.
@@ -66,18 +85,22 @@ public class Ship {
 	}
 	
 	/**
+	 * Returns the X-coordinate of this ship.
 	 * 
-	 * @return The X position of the ship.
-	 * 	
+	 * @return 
+	 * 		  The X position of this ship.
+	 * 		  |result == this.posX
+	 * 		
 	 */
 	public double getPosX(){
 		return this.posX;
 	}
 	
 	/**
+	 * Sets the Y-coordinate of this ship to a given coordinate.
 	 * 
 	 * @param newPos
-	 * 		   The new Y position for the ship.
+	 * 		   The new Y position for this ship.
 	 * @throws IllegalArgumentException
 	 * 		   The given newPos is not a valid position.
 	 * 		   |!isValidPos(newPos)
@@ -92,8 +115,11 @@ public class Ship {
 	}
 	
 	/**
+	 * Returns the Y-coordinate of this ship.
 	 * 
-	 * @return The Y position of the ship.
+	 * @return 
+	 * 		  The Y position of this ship.
+	 * 		  |result == this.posY
 	 * 	
 	 */
 	public double getPosY(){
@@ -101,14 +127,17 @@ public class Ship {
 	}
 	
 	/**
+	 * Checks if a given position is a valid position.
 	 * 
-	 * @param pos The position to be validated
-	 * @return True if the position is greater then or equal to zero.
+	 * @param pos 
+	 * 		  The position to be validated
+	 * @return 
+	 * 		   Returns true if the position is greater then or equal to zero.
 	 * 		   | result == (pos>=0)
 	 */
-	public static boolean isValidPos(double pos){
+	private static boolean isValidPos(double pos){
 		return (pos>=0);
-	}
+		}
 	
 	private double velX;
 	private double velY;
@@ -120,9 +149,7 @@ public class Ship {
 	
 	public void setVelX(double newVel){
 		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(this.getVelY(), 2));
-		if(newVel <0)
-			this.velX = 0;
-		else if(totalSpeed>speedLimit)
+		if(totalSpeed>speedLimit)
 			this.velX = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2));
 		else 
 			this.velX = newVel;
@@ -134,9 +161,7 @@ public class Ship {
 	
 	public void setVelY(double newVel){
 		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(this.getVelY(), 2));
-		if(newVel <0)
-			this.velY = 0;
-		else if(totalSpeed>speedLimit)
+		if(totalSpeed>speedLimit)
 			this.velY = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2));
 		else 
 			this.velY = newVel;
@@ -144,7 +169,7 @@ public class Ship {
 	
 	public double orientation;
 	
-	public static boolean isValidOrientation(double orient){
+	private static boolean isValidOrientation(double orient){
 		return ((orient>=0) && (orient<=2*Math.PI));
 	}
 	
@@ -164,7 +189,7 @@ public class Ship {
 		return this.radius;
 	}
 	
-	public static boolean isValidRadius(double rad){
+	private static boolean isValidRadius(double rad){
 		return (rad>=minRadius);
 	}
 	
@@ -259,7 +284,7 @@ public class Ship {
 			throw new IllegalArgumentException();
 		double[] deltaV = {this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY()};
 		double[] deltaR = {this.getPosX()-ship.getPosX(),this.getPosY()-ship.getPosY()};
-		double totalSigma = Math.pow(this.getRadius(), 2) + Math.pow(ship.getRadius(), 2);
+		double totalSigma = Math.pow(this.getRadius()+ship.getRadius(),2);
 		double d = Math.pow(scalarProduct(deltaV,deltaR),2)-scalarProduct(deltaV,deltaV)*
 				(scalarProduct(deltaR,deltaR)-totalSigma);
 		if(scalarProduct(deltaV,deltaR)>=0)
