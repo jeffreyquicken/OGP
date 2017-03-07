@@ -171,6 +171,17 @@ public class Ship {
 		this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()));
 	}
 	
+	/**
+	 * Calculates the distance between this ship and the given ship.
+	 * 
+	 * @param ship 
+	 * 		  The ship between which the distance must be calculated.
+	 * @return 
+	 * 		  The distance in kilometers between the center of this ship and the center of the given ship.
+	 * @throws NullPointerException
+	 * 		   The ship doesn't exist.
+	 * 		   |(ship == null)
+	 */
 	public double getDistanceBetween(Ship ship) throws NullPointerException{
 		if(ship == null){
 			throw new NullPointerException();
@@ -179,6 +190,17 @@ public class Ship {
 			return Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+Math.pow(this.getPosY()-ship.getPosY(), 2));
 	}
 	
+	/**
+	 * Checks if this ship overlaps with a given ship.
+	 * 
+	 * @param ship 
+	 * 		  The ship of which must be checked if it overlaps with this ship.
+	 * @return 
+	 * 		  True if the ship overlaps with the given ship or the given ship is equal to the given ship.
+	 * @throws NullPointerException
+	 * 		   The ship doesn't exist.
+	 * 		   |(ship == null)
+	 */
 	public boolean overlaps (Ship ship) throws NullPointerException{
 		if(ship == null){
 			throw new NullPointerException();
@@ -191,6 +213,17 @@ public class Ship {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param ship
+	 * @return 
+	 * @throws NullPointerException
+	 * 		   The ship doesn't exist.
+	 * 		   |(ship == null)
+	 * @throws IllegalArgumentException
+	 * 		   The given ship overlaps with this ship.
+	 * 		   |this.overlaps(ship)
+	 */
 	public double getTimeToCollision(Ship ship) throws NullPointerException, IllegalArgumentException{
 		if(ship == null)
 			throw new NullPointerException();
@@ -209,10 +242,27 @@ public class Ship {
 			return -(scalarProduct(deltaV,deltaR)+Math.sqrt(d))/scalarProduct(deltaV,deltaV);
 	}
 	
+	/**
+	 * Calculates the scalar product of two 2-dimensional vectors.
+	 * 
+	 * @param vect1 
+	 * 		  The first 2-dimensional vector
+	 * @param vect2 
+	 * 		  The second 2-dimensional vector
+	 * @return 
+	 * 		  The scalar product of the 2-dimensional vectors.
+	 */
 	private double scalarProduct(double[] vect1, double[] vect2){
 		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
 	}
 	
+	/**
+	 * 
+	 * @param ship
+	 * @return
+	 * @throws NullPointerException
+	 * @throws IllegalArgumentException
+	 */
 	public double[] getCollisionPosition(Ship ship) throws NullPointerException, IllegalArgumentException{
 		if(ship == null)
 			throw new NullPointerException();
