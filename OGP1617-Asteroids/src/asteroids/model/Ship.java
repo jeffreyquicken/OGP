@@ -99,7 +99,7 @@ public class Ship {
 		if(newVel <0)
 			this.velX = 0;
 		else if(totalSpeed>speedLimit)
-			this.velX = Math.sqrt(Math.pow(speedLimit, 2)+Math.pow(this.getVelY(), 2));
+			this.velX = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2));
 		else 
 			this.velX = newVel;
 	}
@@ -113,7 +113,7 @@ public class Ship {
 		if(newVel <0)
 			this.velY = 0;
 		else if(totalSpeed>speedLimit)
-			this.velY = Math.sqrt(Math.pow(speedLimit, 2)+Math.pow(this.getVelX(), 2));
+			this.velY = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2));
 		else 
 			this.velY = newVel;
 	}
@@ -171,6 +171,53 @@ public class Ship {
 		this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()));
 	}
 	
+	public double getDistanceBetween(Ship ship) throws NullPointerException{
+		if(ship == null){
+			throw new NullPointerException();
+		}
+		else 
+			return Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+Math.pow(this.getPosY()-ship.getPosY(), 2));
+	}
+	
+	public boolean overlaps (Ship ship) throws NullPointerException{
+		if(ship == null){
+			throw new NullPointerException();
+		}
+		else{
+			try{return ((this.getDistanceBetween(ship)<=this.getRadius())||(this.getDistanceBetween(ship)<=ship.getRadius()));}
+			catch (NullPointerException e){
+				throw e;
+			}
+		}
+	}
+	
+	public double getTimeToCollision(Ship ship) throws NullPointerException{
+		if(ship == null){
+			throw new NullPointerException();
+		}
+		double[] deltaV = {this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY()};
+		double[] deltaR = {this.getPosX()-ship.getPosX(),this.getPosY()-ship.getPosY()};
+		double totalSigma = Math.pow(this.getRadius(), 2) + Math.pow(ship.getRadius(), 2);
+		double d = Math.pow(scalarProduct(deltaV,deltaR),2)-scalarProduct(deltaV,deltaV)*
+				(scalarProduct(deltaR,deltaR)-totalSigma);
+		if(scalarProduct(deltaV,deltaR)>=0)
+			return Double.POSITIVE_INFINITY;
+		else if(d<=0)
+			return Double.POSITIVE_INFINITY;
+		else
+			return -(scalarProduct(deltaV,deltaR)+Math.sqrt(d))/scalarProduct(deltaV,deltaV);
+	}
+	
+	private double scalarProduct(double[] vect1, double[] vect2){
+		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
+	}
+	
+	public double getCollisionPosition(Ship ship) throws NullPointerException{
+		if(ship == null){
+			throw new NullPointerException();
+		}
+		
+	}
 	
 
 
