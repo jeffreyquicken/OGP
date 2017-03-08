@@ -3,7 +3,7 @@ package asteroids.tests;
 import static org.junit.Assert.*;
 
 import org.junit.*;
-import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import asteroids.model.Ship;
 /**
@@ -17,7 +17,13 @@ public class ShipTests {
 	 * Variable referencing a ship with standard values.
 	 */
 	private static Ship standardValueShip;
+	private static Ship collisionShip1;
+	private static Ship collisionShip2;
+	private static Ship nullShip;
 	
+	@Rule
+	public final ExpectedException exception = ExpectedException.none();
+
 	/**
 	 * Set up a mutable test fixture
 	 * 
@@ -27,6 +33,8 @@ public class ShipTests {
 	@Before
 	public void setUpMutableFixture(){
 		standardValueShip = new Ship(0,0,0,0,10,0);
+		collisionShip1 = new Ship(10,30,10,10,10,0);
+		collisionShip2 = new Ship(20,40,10,10,10,2);
 	}
 	
 	@Test
@@ -196,5 +204,43 @@ public class ShipTests {
 		standardValueShip.thrust(-10);
 		assertEquals(0, standardValueShip.getVelX());
 		assertEquals(0, standardValueShip.getVelY());
+	}
+	
+	@Test
+	public void getDistanceBetween_LegalCase(){
+		assertEquals(Math.sqrt(200),collisionShip1.getDistanceBetween(collisionShip2));
+	}
+	
+	@Test
+	public void getDistanceBetween_NullCase(){
+		exception.expect(NullPointerException.class);
+		collisionShip1.getDistanceBetween(nullShip);
+	}
+	
+	@Test
+	public void overlaps_LegalCase(){
+		collisionShip1.setPosX(0);
+		collisionShip1.setPosY(0);
+		collisionShip2.setPosX(0);
+		collisionShip2.setPosY(0);
+		assertTrue(collisionShip1.overlaps(collisionShip2));
+	}
+	
+	@Test
+	public void overlaps_NullCase(){
+		exception.expect(NullPointerException.class);
+		collisionShip1.overlaps(nullShip);
+	}
+	
+	@Test
+	public void getTimeToCollision_NullCase(){
+		exception.expect(NullPointerException.class);
+		collisionShip1.getTimeToCollision(nullShip);
+	}
+	
+	@Test
+	public void getTimeToCollision_IllegalArgumentCase(){
+		exception.expect(IllegalArgumentException.class);
+		collisionShip1.getTimeToCollision(nullShip);
 	}
 }
