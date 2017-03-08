@@ -175,10 +175,31 @@ public class Ship {
 			this.velX = newVel;
 	}
 	
+	/**
+	 * Returns the velocity in the Y direction of this ship.
+	 * 
+	 * @return
+	 * 		  Returns the velocity in the Y direction of this ship.
+	 * 		  |result == this.velY
+	 */
 	public double getVelY(){
 		return this.velY;
 	}
 	
+	/**
+	 * Sets the velocity in the Y direction of this ship to a given velocity.
+	 * 
+	 * @param newVel
+	 * 		  The new velocity of this ship.
+	 * @post
+	 * 		If the total new speed does not exceed the speed limit, 
+	 * 		the speed in the velocity in the Y direction is set to newVel.
+	 * 		Otherwise, the velocity in the Y direction is set in such a way that the
+	 * 		total new speed is equal to the speed limit.
+	 * 		|if((Math.sqrt(Math.pow(newVel,2) + Math.pow(this.getVelX(),2)))>speedLimit) then
+	 * 		| new.getVelY() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2))
+	 * 		|else then new.getVelY() == newVel 
+	 */
 	public void setVelY(double newVel){
 		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(newVel, 2));
 		if(totalSpeed>speedLimit)
@@ -203,6 +224,13 @@ public class Ship {
 		return ((orient>=0) && (orient<=2*Math.PI));
 	}
 	
+	/**
+	 * Returns the orientation of this ship.
+	 * 
+	 * @return
+	 * 		  Returns the orientation of this ship.
+	 * 		  |result == this.orientation
+	 */
 	public double getOrientation(){
 		return this.orientation;
 	}
@@ -227,14 +255,41 @@ public class Ship {
 	private double radius;
 	private static double minRadius = 10;
 	
+	/**
+	 * Returns the radius of this ship.
+	 * 
+	 * @return
+	 * 		  Returns the radius of this ship.
+	 * 		  |result == this.radius
+	 */
 	public double getRadius(){
 		return this.radius;
 	}
 	
+	/**
+	 * Checks if a given radius is a valid radius.
+	 * 
+	 * @param rad
+	 * 		The radius of which is checked if it is a valid radius.
+	 * @return
+	 * 		Returns true if the radius is greater or equal then the minimal radius.
+	 * 		|result == (rad>=minRadius)
+	 */
 	private static boolean isValidRadius(double rad){
 		return (rad>=minRadius);
 	}
 	
+	/**
+	 * Sets the radius of this ship to a given radius.
+	 * 
+	 * @param newRadius
+	 * 		   The new radius for the ship.
+	 * @throws IllegalArgumentException
+	 * 		   The given newRadius is not a valid radius.
+	 * 		   |!isValidRadius(newRadius)
+	 * @post   If the newRadius is a valid radius , radius will be set to newRadius.
+	 * 		   |new.getRadius() == newRadius
+	 */
 	public void setRadius(double newRadius) throws IllegalArgumentException {
 		if(!isValidRadius(newRadius))
 			throw new IllegalArgumentException();
