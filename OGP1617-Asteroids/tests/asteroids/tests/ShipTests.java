@@ -245,13 +245,6 @@ public class ShipTests {
 		collisionShip1.overlaps(nullShip);
 	}
 	 
-	@Test 
-	public void getTimeToCollision_ScalarProdGreaterthan0(){
-		distanceShip1.setVelY(10);
-		distanceShip2.setVelY(10);
-		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
-	}
-	
 	@Test
 	public void getTimeToCollision_LegalCase(){
 		distanceShip1.setPosY(0);
@@ -260,6 +253,13 @@ public class ShipTests {
 		distanceShip2.setVelY(0);
 		distanceShip1.setVelX(5);
 		assertEquals(1, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
+	}
+
+	@Test 
+	public void getTimeToCollision_ScalarProdGreaterthan0(){
+		distanceShip1.setVelY(10);
+		distanceShip2.setVelY(10);
+		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
 	}
 	
 	@Test
@@ -285,5 +285,40 @@ public class ShipTests {
 	public void getTimeToCollision_IllegalArgumentCase(){
 		exception.expect(IllegalArgumentException.class);
 		collisionShip1.getTimeToCollision(collisionShip1);
+	}
+	
+	@Test
+	public void getCollisionPosition_LegalCase(){
+		distanceShip1.setVelX(5);
+		distanceShip1.setVelY(0);
+		distanceShip2.setVelX(0);
+		distanceShip2.setVelY(0);
+		distanceShip1.setPosX(0);
+		distanceShip1.setPosY(0);
+		distanceShip2.setPosX(25);
+		distanceShip2.setPosY(0);
+		assertEquals(15,distanceShip1.getCollisionPosition(distanceShip2)[0],EPSILON);
+		assertEquals(0,distanceShip1.getCollisionPosition(distanceShip2)[1],EPSILON);
+	}
+	
+	@Test
+	public void getCollisionPosition_deltaTInfinity(){
+		distanceShip1.setVelX(0);
+		distanceShip1.setVelY(10);
+		distanceShip2.setVelX(0);
+		distanceShip2.setVelY(10);
+		assertNull(distanceShip1.getCollisionPosition(distanceShip2));
+	}
+	
+	@Test
+	public void getCollisionPosition_IllegalCase(){
+		exception.expect(IllegalArgumentException.class);
+		collisionShip1.getCollisionPosition(collisionShip1);
+	}
+	
+	@Test
+	public void getCollisionPosition_NullCase(){
+		exception.expect(NullPointerException.class);
+		collisionShip1.getCollisionPosition(nullShip);
 	}
 }
