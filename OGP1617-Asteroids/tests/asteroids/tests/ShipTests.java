@@ -245,6 +245,11 @@ public class ShipTests {
 		collisionShip1.overlaps(nullShip);
 	}
 	
+	@Test 
+	public void getTimeToCollision_ScalarProdGreaterthan0(){
+		
+	}
+	
 	@Test
 	public void getTimeToCollision_NullCase(){
 		exception.expect(NullPointerException.class);
