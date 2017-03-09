@@ -27,6 +27,7 @@ public class Facade implements IFacade {
 		return positionArray;
 	}
 	
+	
 	public double[] getShipVelocity(Ship ship){
 		double[] velocityArray = {ship.getVelX(),ship.getVelY()};
 		return velocityArray;
