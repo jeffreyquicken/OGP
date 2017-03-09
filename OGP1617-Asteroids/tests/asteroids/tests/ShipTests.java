@@ -244,9 +244,7 @@ public class ShipTests {
 		exception.expect(NullPointerException.class);
 		collisionShip1.overlaps(nullShip);
 	}
-	
-<<<<<<< HEAD
-=======
+	 
 	@Test 
 	public void getTimeToCollision_ScalarProdGreaterthan0(){
 		distanceShip1.setVelY(10);
@@ -277,7 +275,6 @@ public class ShipTests {
 		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
 	}
 	
->>>>>>> origin/master
 	@Test
 	public void getTimeToCollision_NullCase(){
 		exception.expect(NullPointerException.class);
@@ -289,13 +286,4 @@ public class ShipTests {
 		exception.expect(IllegalArgumentException.class);
 		collisionShip1.getTimeToCollision(collisionShip1);
 	}
-<<<<<<< HEAD
-
-=======
-	
-	@Test
-	public void collisionPosition_LegalCas(){
-		
-	}
->>>>>>> origin/master
 }
