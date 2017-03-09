@@ -38,11 +38,23 @@ public class Ship {
 	 * 		  The initial orientation of this ship.
 	 * 
 	 * @effect setPosX(x)
+	 * 		   Sets the X-coordinates of this ship to x. It may also throw an IllegalExceptionError if the position is not a
+	 * 		   valid position.
 	 * @effect setPosY(y)
+	 * 		   Sets the Y-coordinates of this ship to y. It may also throw an IllegalExceptionError if the position is not a
+	 * 		   valid position.
 	 * @effect setVelX(xVelocity)
+	 * 		   Sets the velocity in the X direction of this ship to xVelocity.
 	 * @effect setVelY(yVelocity)
+	 * 		   Sets the velocity in the Y direction of this ship to yVelocity.
 	 * @effect setRadius(radius)
+	 * 		   Sets the radius of this ship to radius. It may also throw an IllegalExceptionError if the radius is not a
+	 * 		   valid radius.
 	 * @effect setOrientation(orientation)
+	 * 		   Sets the orientation of this ship to orientation.
+	 * @throws IllegalArgumentException
+	 * 		   Throws IllegalArgumentException if the x coordinate,y coordinate or the radius are not valid.
+	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
 	 * 
 	 */
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalArgumentException{
@@ -61,6 +73,21 @@ public class Ship {
 			throw f;
 		}
 		this.setOrientation(orientation);
+	}
+	
+	/**
+	 * Initializes a default Ship with a default position, velocity, radius and orientation.
+	 * 
+	 * @effect Ship(0,0,0,0,minRadius,0)
+	 * 		   Creates a new ship with x-coordinate 0 , y-coordinate 0, x-velocity 0 , y-velocity 0, radius minRadius, orientation 0.
+	 * 
+	 */
+	public Ship() throws IllegalArgumentException{
+		try{new Ship(0,0,0,0,minRadius,0);}
+		catch(IllegalArgumentException e){
+			throw e;
+		}
+		
 	}
 	
 	private double posX;
@@ -306,7 +333,9 @@ public class Ship {
 	 * 		   The time is a negative number.
 	 * 		   |(time<0)
 	 * @effect this.setPosX(this.getPosX() + this.getVelX()*time)
+	 * 		   Sets the X position to sum of the current x position and the added distance in the x direction. 
 	 * @effect this.setPosY(this.getPosY() + this.getVelY()*time)
+	 * 		   Sets the Y position to sum of the current y position and the added distance in the y direction.
 	 */
 	public void move(double time)throws IllegalArgumentException {
 		if(time<0)
@@ -363,6 +392,8 @@ public class Ship {
 	 * 		  The ship between which the distance must be calculated.
 	 * @return 
 	 * 		  Returns the distance in kilometers between the center of this ship and the center of the given ship.
+	 * 		  |result == Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+
+	 * 		  |			 Math.pow(this.getPosY()-ship.getPosY(), 2))-this.getRadius()-ship.getRadius()
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -372,7 +403,7 @@ public class Ship {
 			throw new NullPointerException();
 		}
 		else 
-			return Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+Math.pow(this.getPosY()-ship.getPosY(), 2));
+			return (Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+Math.pow(this.getPosY()-ship.getPosY(), 2))-this.getRadius()-ship.getRadius());
 	}
 	
 	/**
@@ -382,7 +413,7 @@ public class Ship {
 	 * 		  The ship of which must be checked if it overlaps with this ship.
 	 * @return 
 	 * 		  Returns true if the ship overlaps with the given ship or the given ship is equal to the given ship.
-	 * 		  |result == (this.getDistanceBetween(ship)<=this.getRadius())||(this.getDistanceBetween(ship)<=ship.getRadius())
+	 * 		  |result == this.getDistanceBetween(ship)<=0
 	 * @throws NullPointerException
 	 * 		   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -392,7 +423,7 @@ public class Ship {
 			throw new NullPointerException();
 		}
 		else{
-			try{return ((this.getDistanceBetween(ship)<=this.getRadius())||(this.getDistanceBetween(ship)<=ship.getRadius()));}
+			try{return (this.getDistanceBetween(ship)<=0);}
 			catch (NullPointerException e){
 				throw e;
 			}

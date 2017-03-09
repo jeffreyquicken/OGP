@@ -8,7 +8,7 @@ public class Facade implements IFacade {
 	
 	public Ship createShip()
 			throws ModelException{
-		try{return new Ship(0,0,0,0,0,0);}
+		try{return new Ship();}
 		catch(IllegalArgumentException e){
 			throw new ModelException(e);
 		}
