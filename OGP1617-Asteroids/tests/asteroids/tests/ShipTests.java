@@ -245,6 +245,39 @@ public class ShipTests {
 		collisionShip1.overlaps(nullShip);
 	}
 	
+<<<<<<< HEAD
+=======
+	@Test 
+	public void getTimeToCollision_ScalarProdGreaterthan0(){
+		distanceShip1.setVelY(10);
+		distanceShip2.setVelY(10);
+		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
+	}
+	
+	@Test
+	public void getTimeToCollision_LegalCase(){
+		distanceShip1.setPosY(0);
+		distanceShip2.setPosY(0);
+		distanceShip1.setVelY(0);
+		distanceShip2.setVelY(0);
+		distanceShip1.setVelX(5);
+		assertEquals(1, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
+	}
+	
+	@Test
+	public void getTimeToCollision_dSmallerThen0(){
+		distanceShip1.setVelX(10);
+		distanceShip1.setVelY(10);
+		distanceShip2.setVelX(0);
+		distanceShip2.setVelY(20);
+		distanceShip1.setPosX(20);
+		distanceShip1.setPosY(101);
+		distanceShip2.setPosX(10);
+		distanceShip2.setPosY(1);
+		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
+	}
+	
+>>>>>>> origin/master
 	@Test
 	public void getTimeToCollision_NullCase(){
 		exception.expect(NullPointerException.class);
@@ -256,5 +289,13 @@ public class ShipTests {
 		exception.expect(IllegalArgumentException.class);
 		collisionShip1.getTimeToCollision(collisionShip1);
 	}
+<<<<<<< HEAD
 
+=======
+	
+	@Test
+	public void collisionPosition_LegalCas(){
+		
+	}
+>>>>>>> origin/master
 }
