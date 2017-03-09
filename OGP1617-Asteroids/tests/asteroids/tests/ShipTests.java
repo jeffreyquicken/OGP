@@ -52,7 +52,7 @@ public class ShipTests {
 	@Test
 	public void setPosX_NegativeValue(){
 		exception.expect(IllegalArgumentException.class);
-		standardValueShip.setPosX(-20);
+		standardValueShip.setPosX(Double.NaN);
 		assertEquals(20, standardValueShip.getPosX(),EPSILON);
 	}
 	
@@ -65,7 +65,7 @@ public class ShipTests {
 	@Test
 	public void setPosY_NegativeValue(){
 		exception.expect(IllegalArgumentException.class);
-		standardValueShip.setPosY(-20);
+		standardValueShip.setPosY(Double.NaN);
 		assertEquals(20, standardValueShip.getPosY(),EPSILON);
 	}
 	
@@ -245,11 +245,6 @@ public class ShipTests {
 		collisionShip1.overlaps(nullShip);
 	}
 	
-	@Test 
-	public void getTimeToCollision_ScalarProdGreaterthan0(){
-		
-	}
-	
 	@Test
 	public void getTimeToCollision_NullCase(){
 		exception.expect(NullPointerException.class);
@@ -261,4 +256,5 @@ public class ShipTests {
 		exception.expect(IllegalArgumentException.class);
 		collisionShip1.getTimeToCollision(collisionShip1);
 	}
+
 }

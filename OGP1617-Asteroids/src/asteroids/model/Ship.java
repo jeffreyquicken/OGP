@@ -57,6 +57,7 @@ public class Ship {
 	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
 	 * 
 	 */
+	@Raw
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalArgumentException{
 		try{this.setPosX(x);}
 		catch(IllegalArgumentException e){
@@ -82,6 +83,7 @@ public class Ship {
 	 * 		   Creates a new ship with x-coordinate 0 , y-coordinate 0, x-velocity 0 , y-velocity 0, radius minRadius, orientation 0.
 	 * 
 	 */
+	@Raw
 	public Ship() throws IllegalArgumentException{
 		try{new Ship(0,0,0,0,minRadius,0);}
 		catch(IllegalArgumentException e){
@@ -104,6 +106,7 @@ public class Ship {
 	 * @post   If the newPos is a valid position , posX will be set to newPos.
 	 * 		   |new.getPosX() == newPos
 	 */
+	@Basic
 	public void setPosX(double newPos) throws IllegalArgumentException{
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
@@ -119,6 +122,7 @@ public class Ship {
 	 * 		  |result == this.posX
 	 * 		
 	 */
+	@Basic
 	public double getPosX(){
 		return this.posX;
 	}
@@ -134,6 +138,7 @@ public class Ship {
 	 * @post   If the newPos is a valid position , posY will be set to newPos.
 	 * 		   |new.getPosY() == newPos
 	 */
+	@Basic
 	public void setPosY(double newPos) throws IllegalArgumentException{
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
@@ -148,6 +153,7 @@ public class Ship {
 	 * 		  The Y position of this ship.
 	 * 		  |result == this.posY
 	 */
+	@Basic
 	public double getPosY(){
 		return this.posY;
 	}
@@ -159,10 +165,10 @@ public class Ship {
 	 * 		  The position to be validated
 	 * @return 
 	 * 		   Returns true if the position is greater then or equal to zero.
-	 * 		   | result == (pos>=0)
+	 * 		   | result == (pos!= Double.NaN)
 	 */
 	private static boolean isValidPos(double pos){
-		return (pos>=0);
+		return ((pos<=0) || (pos>=0)) ;
 		}
 	
 	private double velX;
@@ -176,6 +182,7 @@ public class Ship {
 	 * 		  Returns the velocity in the X direction of this ship.
 	 * 		  |result == this.velX
 	 */
+	@Basic
 	public double getVelX(){
 		return this.velX;
 	}
@@ -194,6 +201,7 @@ public class Ship {
 	 * 		| new.getVelX() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2))
 	 * 		|else then new.getVelX() == newVel 
 	 */
+	@Basic
 	public void setVelX(double newVel){
 		double totalSpeed = Math.sqrt(Math.pow(newVel, 2) + Math.pow(this.getVelY(), 2));
 		if(totalSpeed>speedLimit)
@@ -209,6 +217,7 @@ public class Ship {
 	 * 		  Returns the velocity in the Y direction of this ship.
 	 * 		  |result == this.velY
 	 */
+	@Basic
 	public double getVelY(){
 		return this.velY;
 	}
@@ -227,6 +236,7 @@ public class Ship {
 	 * 		| new.getVelY() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2))
 	 * 		|else then new.getVelY() == newVel 
 	 */
+	@Basic
 	public void setVelY(double newVel){
 		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(newVel, 2));
 		if(totalSpeed>speedLimit)
@@ -258,6 +268,7 @@ public class Ship {
 	 * 		  Returns the orientation of this ship.
 	 * 		  |result == this.orientation
 	 */
+	@Basic
 	public double getOrientation(){
 		return this.orientation;
 	}
@@ -274,6 +285,7 @@ public class Ship {
 	 * 		The new orientation of this ship is equal to the given orientation.
 	 * 		|new.getOrientation() == newOrientation
 	 */
+	@Basic
 	public void setOrientation(double newOrientation){
 		assert isValidOrientation(newOrientation);
 		this.orientation = newOrientation;
@@ -289,6 +301,7 @@ public class Ship {
 	 * 		  Returns the radius of this ship.
 	 * 		  |result == this.radius
 	 */
+	@Basic
 	public double getRadius(){
 		return this.radius;
 	}
@@ -317,6 +330,7 @@ public class Ship {
 	 * @post   If the newRadius is a valid radius , radius will be set to newRadius.
 	 * 		   |new.getRadius() == newRadius
 	 */
+	@Basic
 	public void setRadius(double newRadius) throws IllegalArgumentException {
 		if(!isValidRadius(newRadius))
 			throw new IllegalArgumentException();
@@ -487,8 +501,8 @@ public class Ship {
 	 * 		   Returns an array of the X and Y coordinate where this ship and the given ship will collide.
 	 * 		   Returns null if the ships will never collide.
 	 * 		   |if(this.getTimeToCollision(ship) == Double.POSITIVE_INFINITY) then (result == null)
-	 * 		   |else result == {this.getPos(x)+this.getTimeToCollision(ship)*this.getVelX(),
-	 * 		   |                this.getPosY()+this.getTimeToCollision(ship)*this.getVelY()}
+	 * 		   |else result ==  {(((this.getPosX()+deltaT*this.getVelX())*ship.getRadius())+(ship.getPosX()+deltaT*ship.getVelX())*this.getRadius())/(this.getRadius()+ship.getRadius()),
+	 *						     (((this.getPosY()+deltaT*this.getVelY())*ship.getRadius())+(ship.getPosY()+deltaT*ship.getVelY())*this.getRadius())/(this.getRadius()+ship.getRadius())}
 	 * @throws NullPointerException
 	 *  	   The ship doesn't exist.
 	 * 		   |(ship == null)
@@ -505,7 +519,8 @@ public class Ship {
 		if(deltaT == Double.POSITIVE_INFINITY)
 			return null;
 		else{
-			double[] collisionPosition = {this.getPosX()+deltaT*this.getVelX(),this.getPosY()+deltaT*this.getVelY()};
+			double[] collisionPosition = {(((this.getPosX()+deltaT*this.getVelX())*ship.getRadius())+(ship.getPosX()+deltaT*ship.getVelX())*this.getRadius())/(this.getRadius()+ship.getRadius()),
+										  (((this.getPosY()+deltaT*this.getVelY())*ship.getRadius())+(ship.getPosY()+deltaT*ship.getVelY())*this.getRadius())/(this.getRadius()+ship.getRadius())};
 			return collisionPosition;
 		}
 	}
