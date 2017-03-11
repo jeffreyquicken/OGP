@@ -164,8 +164,8 @@ public class Ship {
 	 * @param pos 
 	 * 		  The position to be validated
 	 * @return 
-	 * 		   Returns true if the position is greater then or equal to zero.
-	 * 		   | result == (pos!= Double.NaN)
+	 * 		   Returns true if the position is a number.
+	 * 		   | result == ((pos<=0) || (pos>=0))
 	 */
 	private static boolean isValidPos(double pos){
 		return ((pos<=0) || (pos>=0)) ;
