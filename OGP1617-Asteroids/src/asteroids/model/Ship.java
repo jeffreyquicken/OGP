@@ -338,6 +338,18 @@ public class Ship {
 			this.radius = newRadius;
 	}
 	
+	private double mass;
+	private static double minDensity = 1.42E12;
+	
+	public void setMass(double newMass){
+		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity)
+			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity;
+	}
+	
+	public double getMass(){
+		return this.getMass();
+	}
+	
 	/**
 	 * Moves this ship around for a given amount of time.
 	 * 
@@ -420,6 +432,14 @@ public class Ship {
 			return (Math.sqrt(Math.pow(this.getPosX()-ship.getPosX(),2)+Math.pow(this.getPosY()-ship.getPosY(), 2))-this.getRadius()-ship.getRadius());
 	}
 	
+	public double getDistanceBetween(Bullet bullet) throws NullPointerException{
+		if(bullet == null){
+			throw new NullPointerException();
+		}
+		else 
+			return (Math.sqrt(Math.pow(this.getPosX()-bullet.getPosX(),2)+Math.pow(this.getPosY()-bullet.getPosY(), 2))-this.getRadius()-bullet.getRadius());
+	}
+	
 	/**
 	 * Checks if this ship overlaps with a given ship.
 	 * 
@@ -438,6 +458,18 @@ public class Ship {
 		}
 		else{
 			try{return (this.getDistanceBetween(ship)<=0);}
+			catch (NullPointerException e){
+				throw e;
+			}
+		}
+	}
+	
+	public boolean overlaps (Bullet bullet) throws NullPointerException{
+		if(bullet == null){
+			throw new NullPointerException();
+		}
+		else{
+			try{return (this.getDistanceBetween(bullet)<=0);}
 			catch (NullPointerException e){
 				throw e;
 			}
