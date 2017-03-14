@@ -524,6 +524,7 @@ public class Ship {
 			return collisionPosition;
 		}
 	}
+	TEST
 	
 
 
