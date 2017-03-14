@@ -92,6 +92,16 @@ public class Ship {
 		
 	}
 	
+	private boolean terminated = false;
+	
+	public void terminate(){
+		this.terminated = true;
+	}
+	
+	public boolean isTerminated(){
+		return this.terminated;
+	}
+	
 	private double posX;
 	private double posY;
 	
@@ -344,10 +354,12 @@ public class Ship {
 	public void setMass(double newMass){
 		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity)
 			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity;
+		else
+			this.mass = newMass;
 	}
 	
 	public double getMass(){
-		return this.getMass();
+		return this.mass;
 	}
 	
 	/**

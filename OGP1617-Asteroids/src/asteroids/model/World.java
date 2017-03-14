@@ -60,6 +60,13 @@ public class World {
 		return new HashSet<Bullet>(this.bullets.values());
 	}
 	
+	public Set<Object> getWorldEntities(){
+		Set<Object> entitySet = new HashSet<Object>();
+		entitySet.addAll(this.ships.values());
+		entitySet.addAll(this.bullets.values());
+		return entitySet;
+	}
+	
 	public void add(Ship newShip) throws NullPointerException,IllegalArgumentException{
 		if(newShip == null)
 			throw new NullPointerException();
