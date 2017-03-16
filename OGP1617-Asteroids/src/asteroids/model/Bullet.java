@@ -1,22 +1,12 @@
 package asteroids.model;
 
-public class Bullet {
+public class Bullet extends Circle {
 	
-	private double posX;
-	private double posY;
-	
-	public double getPosX(){
-		return this.posX;
+	public Bullet(double x, double y, double xVelocity, double yVelocity, double radius){
+		super(x,y,xVelocity,yVelocity,radius,minRadius);
 	}
 	
-	public double getPosY(){
-		return this.posY;
-	}
+	private static double minRadius =1;
 	
-	private double radius;
-	
-	public double getRadius(){
-		return this.radius;
-	}
 
 }

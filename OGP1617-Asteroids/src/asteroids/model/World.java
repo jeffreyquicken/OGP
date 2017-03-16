@@ -42,14 +42,9 @@ public class World {
 	private HashMap<double[],Ship> ships = new HashMap<>();
 	private HashMap<double[],Bullet> bullets = new HashMap<>();
 	
-	private boolean isWithinWorldBounds(Ship ship){
-		return ((ship.getPosX()-ship.getRadius()>=0)&&(ship.getPosX()+ship.getRadius()<=this.width)&&
-				(ship.getPosY()-ship.getRadius()>=0)&&(ship.getPosY()+ship.getRadius()<=this.height));
-	}
-	
-	private boolean isWithinWorldBounds(Bullet bullet){
-		return ((bullet.getPosX()-bullet.getRadius()>=0)&&(bullet.getPosX()+bullet.getRadius()<=this.width)&&
-				(bullet.getPosY()-bullet.getRadius()>=0)&&(bullet.getPosY()+bullet.getRadius()<=this.height));
+	private boolean isWithinWorldBounds(Circle circle){
+		return ((circle.getPosX()-circle.getRadius()>=0)&&(circle.getPosX()+circle.getRadius()<=this.width)&&
+				(circle.getPosY()-circle.getRadius()>=0)&&(circle.getPosY()+circle.getRadius()<=this.height));
 	}
 	
 	public Set<Ship> getWorldShips(){
@@ -67,61 +62,38 @@ public class World {
 		return entitySet;
 	}
 	
-	public void add(Ship newShip) throws NullPointerException,IllegalArgumentException{
-		if(newShip == null)
+	public void add(Circle newCircle) throws NullPointerException,IllegalArgumentException{
+		if(newCircle == null)
 			throw new NullPointerException();
-		else if(!this.isWithinWorldBounds(newShip))
+		else if(!this.isWithinWorldBounds(newCircle))
 			throw new IllegalArgumentException();
-		else if(newShip.isTerminated())
+		else if(newCircle.isTerminated())
 			throw new IllegalArgumentException();
 		for(Ship ship:this.getWorldShips()){
-			if(ship.overlaps(newShip))
+			if(ship.overlaps(newCircle))
 				throw new IllegalArgumentException();
 		}
 		for(Bullet bullet:this.getWorldBullets()){
-			if(newShip.overlaps(bullet))
+			if(newCircle.overlaps(bullet))
 				throw new IllegalArgumentException();
 		}
-		double[] posArray = {newShip.getPosX(),newShip.getPosY()};
-		this.ships.put(posArray, newShip);
+		double[] posArray = {newCircle.getPosX(),newCircle.getPosY()};
+		if(newCircle instanceof Ship)
+			this.ships.put(posArray, (Ship)newCircle);
+		else if(newCircle instanceof Bullet)
+			this.bullets.put(posArray, (Bullet)newCircle);
 	}
 	
-	public void add(Bullet newBullet) throws NullPointerException,IllegalArgumentException{
-		if(newBullet == null)
+	public void remove(Circle circle) throws NullPointerException,IllegalArgumentException{
+		if(circle == null)
 			throw new NullPointerException();
-		else if(!this.isWithinWorldBounds(newBullet))
-			throw new IllegalArgumentException();
-		else if(newBullet.isTerminated())
-			throw new IllegalArgumentException();
-		for(Ship ship:this.getWorldShips()){
-			if(ship.overlaps(newBullet))
-				throw new IllegalArgumentException();
-		}
-		for(Bullet bullet:this.getWorldBullets()){
-			if(newBullet.overlaps(bullet))
-				throw new IllegalArgumentException();
-		}
-		double[] posArray = {newBullet.getPosX(),newBullet.getPosY()};
-		this.bullets.put(posArray, newBullet);
-	}
-	
-	public void remove(Ship ship) throws NullPointerException,IllegalArgumentException{
-		if(ship == null)
-			throw new NullPointerException();
-		if(this.getWorldShips().contains(ship)){
-			double[] posArray = {ship.getPosX(),ship.getPosY()};
-			this.ships.remove(posArray);
-			ship.terminate();
-		}
-		}
-	
-	public void remove(Bullet bullet) throws NullPointerException,IllegalArgumentException{
-		if(bullet == null)
-			throw new NullPointerException();
-		if(this.getWorldBullets().contains(bullet)){
-			double[] posArray = {bullet.getPosX(),bullet.getPosY()};
-			this.bullets.remove(posArray);
-			bullet.terminate();
+		if(this.getWorldEntities().contains(circle)){
+			double[] posArray = {circle.getPosX(),circle.getPosY()};
+			if(circle instanceof Ship)
+				this.ships.remove(posArray);
+			else if(circle instanceof Bullet)
+				this.bullets.remove(posArray);
+			circle.terminate();
 		}
 		}
 	
