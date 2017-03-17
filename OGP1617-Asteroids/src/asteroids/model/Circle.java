@@ -141,7 +141,7 @@ public abstract class Circle {
 	 * 		   | result == ((pos<=0) || (pos>=0))
 	 */
 	private static boolean isValidPos(double pos){
-		return ((pos<=0) || (pos>=0)) ;
+		return (pos>=0) ;
 		}
 	
 	private double velX;
@@ -263,7 +263,7 @@ public abstract class Circle {
 			throw new IllegalArgumentException();
 		else
 			this.radius = newRadius;
-	}
+	} 
 	
 	/**
 	 * Moves this circle around for a given amount of time.

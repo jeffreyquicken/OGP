@@ -120,6 +120,12 @@ public class Ship extends Circle {
 		return this.mass;
 	}
 	
+	private World world;
+	
+	public World getWorld(){
+		return this.world;
+	}
+	
 	/**
 	 * Increases the orientation of this ship with a given angle.
 	 * 

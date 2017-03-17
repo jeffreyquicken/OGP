@@ -98,9 +98,9 @@ public class World {
 		}
 	
 	public Object getEntityAtPos(double x, double y){
-		if((x<0) || (x>maxWidth))
+		if((x<0) || (x>this.getWidth()))
 			return null;
-		if((y<0) || (y>maxHeight))
+		if((y<0) || (y>this.getHeight()))
 			return null;
 		double[] posArray = {x,y};
 		if(ships.containsKey(posArray))
@@ -109,6 +109,10 @@ public class World {
 			return bullets.get(posArray);
 		else
 			return null;
+	}
+	
+	public void evolve(double dt){
+		
 	}
 
 }
