@@ -273,14 +273,8 @@ public abstract class Circle {
 		if(time<0)
 			throw new IllegalArgumentException();
 		else
-			try{this.setPosX(this.getPosX() + this.getVelX()*time);}
-			catch(IllegalArgumentException e){
-				throw e;
-			}
-			try{this.setPosY(this.getPosY() + this.getVelY()*time);}
-			catch(IllegalArgumentException d){
-				throw d;
-			}
+			this.setPosX(this.getPosX() + this.getVelX()*time);
+			this.setPosY(this.getPosY() + this.getVelY()*time);
 	}
 	
 	/**
@@ -304,14 +298,6 @@ public abstract class Circle {
 			return (Math.sqrt(Math.pow(this.getPosX()-circle.getPosX(),2)+Math.pow(this.getPosY()-circle.getPosY(), 2))-this.getRadius()-circle.getRadius());
 	}
 	
-	public double getDistanceBetween(Bullet bullet) throws NullPointerException{
-		if(bullet == null){
-			throw new NullPointerException();
-		}
-		else 
-			return (Math.sqrt(Math.pow(this.getPosX()-bullet.getPosX(),2)+Math.pow(this.getPosY()-bullet.getPosY(), 2))-this.getRadius()-bullet.getRadius());
-	}
-	
 	/**
 	 * Checks if this circle overlaps with a given circle.
 	 * 
@@ -329,10 +315,7 @@ public abstract class Circle {
 			throw new NullPointerException();
 		}
 		else{
-			try{return (this.getDistanceBetween(circle)<=0);}
-			catch (NullPointerException e){
-				throw e;
-			}
+			return (this.getDistanceBetween(circle)<=0);
 		}
 	}
 	
@@ -341,10 +324,7 @@ public abstract class Circle {
 			throw new NullPointerException();
 		}
 		else{
-			try{return (this.getDistanceBetween(bullet)<=0);}
-			catch (NullPointerException e){
-				throw e;
-			}
+			return (this.getDistanceBetween(bullet)<=0);
 		}
 	}
 	
@@ -427,6 +407,77 @@ public abstract class Circle {
 										  (((this.getPosY()+deltaT*this.getVelY())*circle.getRadius())+(circle.getPosY()+deltaT*circle.getVelY())*this.getRadius())/(this.getRadius()+circle.getRadius())};
 			return collisionPosition;
 		}
+	}
+
+	
+	public double getDistanceBetween(World world){
+		double distance = 0;
+		double angle = Math.atan2(this.getVelY(), this.getVelX());
+		Direction direction = this.getCollisionDirection(world);
+		switch(direction){
+		case RIGHT:
+			distance = ((world.getWidth()-this.getPosX())/Math.cos(angle))-this.getRadius();
+		case UP:
+			distance = ((world.getHeight()-this.getPosY())/Math.sin(angle))-this.getRadius();
+		case LEFT:
+			distance = ((this.getPosX())/Math.cos(angle))-this.getRadius();
+		case DOWN:
+			distance = ((this.getPosY())/Math.sin(angle))-this.getRadius();
+		}
+		return distance;
+	}
+	
+	private Direction getCollisionDirection(World world){
+		double angle = Math.atan2(this.getVelY(), this.getVelX());
+		Direction direction = Direction.UP;
+		if(isBetween(angle,-Math.PI/4,Math.PI/4))
+			direction =  Direction.RIGHT;
+		else if(isBetween(angle,Math.PI/4,3*Math.PI))
+			direction = Direction.UP;
+		else if(isBetween(angle,-3*Math.PI/4,3*Math.PI/4))
+			direction = Direction.LEFT;
+		else if(isBetween(angle,-3*Math.PI/4,-Math.PI/4))
+			direction = Direction.DOWN;
+		return direction;
+	}
+	
+	public double getTimeToCollision(World world){
+		if((this.getVelX() == 0) && (this.getVelY() ==0 ))
+				return Double.POSITIVE_INFINITY;
+		if (world == null)
+			return Double.POSITIVE_INFINITY;
+		
+		return this.getDistanceBetween(world)/this.speed();
+	}
+	
+	public double[]  getCollisionPosition(World world){
+		double time = this.getTimeToCollision(world);
+		if(time == Double.POSITIVE_INFINITY)
+			return null;
+		double[] posArray = {this.getPosX()+this.getVelX()*time,this.getPosY()+this.getVelY()*time};
+		return posArray;
+	}
+	
+	public void bounce(World world){
+		Direction direction = this.getCollisionDirection(world);
+		switch(direction){
+		case RIGHT:
+			this.setVelX(-this.getVelX());
+		case UP:
+			this.setVelY(-this.getVelY());
+		case LEFT:
+			this.setVelX(-this.getVelX());
+		case DOWN:
+			this.setVelY(-this.getVelY());
+		}
+	}
+	
+	private boolean isBetween(double value, double lower, double higher){
+		return ((value>=lower)&&(value<=higher));
+	}
+	
+	private double speed(){
+		return Math.sqrt(Math.pow(this.getVelX(),2)+Math.pow(this.getVelY(), 2));
 	}
 	
 

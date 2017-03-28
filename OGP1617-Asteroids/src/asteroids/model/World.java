@@ -39,8 +39,7 @@ public class World {
 		return this.width;
 	}
 	
-	private HashMap<double[],Ship> ships = new HashMap<>();
-	private HashMap<double[],Bullet> bullets = new HashMap<>();
+	private HashMap<double[],Circle> circles = new HashMap<>();
 	
 	private boolean isWithinWorldBounds(Circle circle){
 		return ((circle.getPosX()-circle.getRadius()>=0)&&(circle.getPosX()+circle.getRadius()<=this.width)&&
@@ -48,17 +47,25 @@ public class World {
 	}
 	
 	public Set<Ship> getWorldShips(){
-		return new HashSet<Ship>(this.ships.values());
+		Set<Ship> ships = new HashSet<>();
+		for(Circle circle: circles.values())
+			if(circle instanceof Ship)
+				ships.add((Ship)circle);
+		return ships;
+				
 	}
 	
 	public Set<Bullet> getWorldBullets(){
-		return new HashSet<Bullet>(this.bullets.values());
+		Set<Bullet> bullets = new HashSet<>();
+		for(Circle circle: circles.values())
+			if(circle instanceof Bullet)
+				bullets.add((Bullet)circle);
+		return bullets;
 	}
 	
 	public Set<Object> getWorldEntities(){
 		Set<Object> entitySet = new HashSet<Object>();
-		entitySet.addAll(this.ships.values());
-		entitySet.addAll(this.bullets.values());
+		entitySet.addAll(this.circles.values());
 		return entitySet;
 	}
 	
@@ -69,19 +76,12 @@ public class World {
 			throw new IllegalArgumentException();
 		else if(newCircle.isTerminated())
 			throw new IllegalArgumentException();
-		for(Ship ship:this.getWorldShips()){
-			if(ship.overlaps(newCircle))
-				throw new IllegalArgumentException();
-		}
-		for(Bullet bullet:this.getWorldBullets()){
-			if(newCircle.overlaps(bullet))
+		for(Circle circle:circles.values()){
+			if(circle.overlaps(newCircle))
 				throw new IllegalArgumentException();
 		}
 		double[] posArray = {newCircle.getPosX(),newCircle.getPosY()};
-		if(newCircle instanceof Ship)
-			this.ships.put(posArray, (Ship)newCircle);
-		else if(newCircle instanceof Bullet)
-			this.bullets.put(posArray, (Bullet)newCircle);
+		circles.put(posArray, newCircle);
 	}
 	
 	public void remove(Circle circle) throws NullPointerException,IllegalArgumentException{
@@ -89,10 +89,7 @@ public class World {
 			throw new NullPointerException();
 		if(this.getWorldEntities().contains(circle)){
 			double[] posArray = {circle.getPosX(),circle.getPosY()};
-			if(circle instanceof Ship)
-				this.ships.remove(posArray);
-			else if(circle instanceof Bullet)
-				this.bullets.remove(posArray);
+			circles.remove(posArray);
 			circle.terminate();
 		}
 		}
@@ -103,16 +100,45 @@ public class World {
 		if((y<0) || (y>this.getHeight()))
 			return null;
 		double[] posArray = {x,y};
-		if(ships.containsKey(posArray))
-			return ships.get(posArray);
-		else if(bullets.containsKey(posArray))
-			return bullets.get(posArray);
-		else
-			return null;
+		return circles.get(posArray);
 	}
 	
 	public void evolve(double dt){
+		double shortest = Double.POSITIVE_INFINITY;
+		Circle collisionCircle1;
+		Circle collisionCircle2;
+		Set<Circle> checkedCircles = new HashSet<>();
+		for(Circle circle:circles.values()){
+			double worldCollisionTime = circle.getDistanceBetween(this);
+			if(worldCollisionTime<shortest){
+				shortest = worldCollisionTime;
+				collisionCircle1 = circle;
+				collisionCircle2 = null;
+			}
+			checkedCircles.add(circle);
+			for(Circle secondCircle:circles.values()){
+				if(!checkedCircles.contains(circle)){
+					double time = circle.getTimeToCollision(secondCircle);
+					if(time<shortest){
+						shortest = time;
+						collisionCircle1 = circle;
+						collisionCircle2 = secondCircle;
+					}
+				}
+			}
+		}
+		if(shortest<=dt){
+			for(Circle circle:circles.values()){
+				circle.move(shortest);
+			}
+			///////////////////////COLLISION CODE/////////////////////////////////////////
+			evolve(dt-shortest);
+		}
 		
+		for(Circle circle:circles.values()){
+			circle.move(dt);
+		}
+			
 	}
 
 }
