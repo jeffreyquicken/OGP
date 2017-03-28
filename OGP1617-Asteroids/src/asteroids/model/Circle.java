@@ -39,20 +39,11 @@ public abstract class Circle {
 	@Raw
 	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius,double minRadius) throws IllegalArgumentException{
 		this.minRadius = minRadius;
-		try{this.setPosX(x);}
-		catch(IllegalArgumentException e){
-			throw e;
-		}
-		try{this.setPosY(y);}
-		catch(IllegalArgumentException d){
-			throw d;
-		}
+		this.setPosX(x);
+		this.setPosY(y);
 		this.setVelX(xVelocity);
 		this.setVelY(yVelocity);
-		try{this.setRadius(radius);}
-		catch(IllegalArgumentException f){
-			throw f;
-		}
+		this.setRadius(radius);
 	}
 	
 	private boolean terminated = false;
