@@ -105,23 +105,23 @@ public class World {
 	
 	public void evolve(double dt){
 		double shortest = Double.POSITIVE_INFINITY;
-		Circle collisionCircle1;
-		Circle collisionCircle2;
+		Object collisionObject1;
+		Object collisionObject2;
 		Set<Circle> uncheckedCircles = new HashSet<>(this.circles.values());
 		for(Circle circle:circles.values()){
 			double worldCollisionTime = circle.getDistanceBetween(this);
 			if(worldCollisionTime<shortest){
 				shortest = worldCollisionTime;
-				collisionCircle1 = circle;
-				collisionCircle2 = null;
+				collisionObject1 = circle;
+				collisionObject2 = this;
 			}
 			uncheckedCircles.remove(circle);
 			for(Circle secondCircle:uncheckedCircles){
 				double time = circle.getTimeToCollision(secondCircle);
 				if(time<shortest){
 					shortest = time;
-					collisionCircle1 = circle;
-					collisionCircle2 = secondCircle;
+					collisionObject1 = circle;
+					collisionObject2 = secondCircle;
 				}
 			}
 		}
