@@ -107,7 +107,7 @@ public class World {
 		double shortest = Double.POSITIVE_INFINITY;
 		Circle collisionCircle1;
 		Circle collisionCircle2;
-		Set<Circle> checkedCircles = new HashSet<>();
+		Set<Circle> uncheckedCircles = new HashSet<>(this.circles.values());
 		for(Circle circle:circles.values()){
 			double worldCollisionTime = circle.getDistanceBetween(this);
 			if(worldCollisionTime<shortest){
@@ -115,15 +115,13 @@ public class World {
 				collisionCircle1 = circle;
 				collisionCircle2 = null;
 			}
-			checkedCircles.add(circle);
-			for(Circle secondCircle:circles.values()){
-				if(!checkedCircles.contains(circle)){
-					double time = circle.getTimeToCollision(secondCircle);
-					if(time<shortest){
-						shortest = time;
-						collisionCircle1 = circle;
-						collisionCircle2 = secondCircle;
-					}
+			uncheckedCircles.remove(circle);
+			for(Circle secondCircle:uncheckedCircles){
+				double time = circle.getTimeToCollision(secondCircle);
+				if(time<shortest){
+					shortest = time;
+					collisionCircle1 = circle;
+					collisionCircle2 = secondCircle;
 				}
 			}
 		}
