@@ -1,4 +1,0 @@
-Position will be stored in two variables: pos_X and pos_Y
-Speed will be stored as: speed_X, speed_Y
-Orientation will be stored as: orientation, with values ranging from 0 to 2, PI will be added in calculations but won't be stored in orientation
-Radius will be stored as: radius, this will be a final variable
