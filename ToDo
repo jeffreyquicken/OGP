@@ -1,6 +1,4 @@
-- thruster
-- Get/set thruster & acceleration
-- thruster speed collision
-- apparently collide
+- add mass with bullet
+- mass ship
 - test cases
 - update facade 
