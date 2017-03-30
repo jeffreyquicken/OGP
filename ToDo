@@ -1,6 +1,7 @@
-<ul>
-  <li>Overlaps with interval</li>
-  <li></li>
-  <li></li>
-  <li></li>
-</ul>
+- overlaps with interval
+- thruster
+- Get/set thruster & acceleration
+- apparently collide
+- resolving collisions
+- test cases
+- update facade 
