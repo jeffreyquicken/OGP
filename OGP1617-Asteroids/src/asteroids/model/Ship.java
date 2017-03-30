@@ -153,11 +153,10 @@ public class Ship extends Circle {
 	 * @effect this.setVelX(this.getVelX()+acceleration*Math.cos(this.getOrientation()))
 	 * @effect this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()))
 	 */
-	public void thrust(double acceleration){
-		if(acceleration < 0)
-			acceleration = 0;
-		this.setVelX(this.getVelX()+acceleration*Math.cos(this.getOrientation()));
-		this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()));
+	public void thrust(double amount){
+		if(amount < 0)
+			amount = 0;
+		this.setVel(this.getVelX()+amount*Math.cos(this.getOrientation()), this.getVelY()+amount*Math.sin(this.getOrientation()));
 	}
 	
 

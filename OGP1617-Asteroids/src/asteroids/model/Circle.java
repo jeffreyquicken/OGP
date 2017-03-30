@@ -56,8 +56,7 @@ public abstract class Circle {
 		return this.terminated;
 	}
 	
-	private double posX;
-	private double posY;
+	private Vector2D position;
 	
 	/**
 	 * Sets the X-coordinate of this circle to a given coordinate.
@@ -75,7 +74,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			posX = newPos;
+			position.setX(newPos);
 	}
 	
 	/**
@@ -88,7 +87,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getPosX(){
-		return this.posX;
+		return position.getX();
 	}
 	
 	/**
@@ -107,7 +106,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			posY = newPos;
+			position.setY(newPos);
 	}
 	
 	/**
@@ -119,7 +118,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getPosY(){
-		return this.posY;
+		return position.getY();
 	}
 	
 	/**
@@ -135,8 +134,7 @@ public abstract class Circle {
 		return (pos>=0) ;
 		}
 	
-	private double velX;
-	private double velY;
+	private Vector2D velocity;
 	private double speedLimit = 300000;
 	
 	/**
@@ -148,7 +146,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getVelX(){
-		return this.velX;
+		return velocity.getX();
 	}
 	
 	/**
@@ -166,12 +164,15 @@ public abstract class Circle {
 	 * 		|else then new.getVelX() == newVel 
 	 */
 	@Basic
-	public void setVelX(double newVel){
-		double totalSpeed = Math.sqrt(Math.pow(newVel, 2) + Math.pow(this.getVelY(), 2));
-		if(totalSpeed>speedLimit)
-			this.velX = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2));
+	public void setVel(double newVelX, double newVelY){
+		double totalSpeed = Math.sqrt(Math.pow(newVelX, 2) + Math.pow(newVelY, 2));
+		if(totalSpeed>speedLimit){
+			this.velocity.setX(speedLimit*newVelX/totalSpeed);
+			this.velocity.setY(speedLimit*newVelY/totalSpeed);
+		}
 		else 
-			this.velX = newVel;
+			this.velocity.setX(newVelX);
+			this.velocity.setY(newVelY);
 	}
 	
 	/**
@@ -183,30 +184,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getVelY(){
-		return this.velY;
-	}
-	
-	/**
-	 * Sets the velocity in the Y direction of this circle to a given velocity.
-	 * 
-	 * @param newVel
-	 * 		  The new velocity of this circle.
-	 * @post
-	 * 		If the total new speed does not exceed the speed limit, 
-	 * 		the speed in the velocity in the Y direction is set to newVel.
-	 * 		Otherwise, the velocity in the Y direction is set in such a way that the
-	 * 		total new speed is equal to the speed limit.
-	 * 		|if((Math.sqrt(Math.pow(newVel,2) + Math.pow(this.getVelX(),2)))>speedLimit) then
-	 * 		| new.getVelY() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2))
-	 * 		|else then new.getVelY() == newVel 
-	 */
-	@Basic
-	public void setVelY(double newVel){
-		double totalSpeed = Math.sqrt(Math.pow(this.getVelX(), 2) + Math.pow(newVel, 2));
-		if(totalSpeed>speedLimit)
-			this.velY = Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelX(), 2));
-		else 
-			this.velY = newVel;
+		return velocity.getY();
 	}
 	
 	private double radius;
@@ -319,15 +297,6 @@ public abstract class Circle {
 		}
 	}
 	
-	public boolean overlaps (Bullet bullet) throws NullPointerException{
-		if(bullet == null){
-			throw new NullPointerException();
-		}
-		else{
-			return (this.getDistanceBetween(bullet)<=0);
-		}
-	}
-	
 	/**
 	 * Calculates the time when this circle and a given circle will collide.
 	 * 
@@ -348,32 +317,17 @@ public abstract class Circle {
 			throw new NullPointerException();
 		else if(this.overlaps(circle))
 			throw new IllegalArgumentException();
-		double[] deltaV = {this.getVelX()-circle.getVelX(),this.getVelY()-circle.getVelY()};
-		double[] deltaR = {this.getPosX()-circle.getPosX(),this.getPosY()-circle.getPosY()};
+		Vector2D deltaV = new Vector2D (this.getVelX()-circle.getVelX(),this.getVelY()-circle.getVelY());
+		Vector2D deltaR = new Vector2D (this.getPosX()-circle.getPosX(),this.getPosY()-circle.getPosY());
 		double totalSigma = Math.pow(this.getRadius()+circle.getRadius(),2);
-		double d = Math.pow(scalarProduct(deltaV,deltaR),2)-scalarProduct(deltaV,deltaV)*
-				(scalarProduct(deltaR,deltaR)-totalSigma);
-		if(scalarProduct(deltaV,deltaR)>=0)
+		double d = Math.pow(deltaV.scalarProduct(deltaR),2)-deltaV.scalarProduct(deltaV)*
+				(deltaR.scalarProduct(deltaR)-totalSigma);
+		if(deltaV.scalarProduct(deltaR)>=0)
 			return Double.POSITIVE_INFINITY;
 		else if(d<=0)
 			return Double.POSITIVE_INFINITY;
 		else
-			return -(scalarProduct(deltaV,deltaR)+Math.sqrt(d))/scalarProduct(deltaV,deltaV);
-	}
-	
-	/**
-	 * Calculates the scalar product of two 2-dimensional vectors.
-	 * 
-	 * @param vect1 
-	 * 		  The first 2-dimensional vector
-	 * @param vect2 
-	 * 		  The second 2-dimensional vector
-	 * @return 
-	 * 		  Returns the scalar product of the 2-dimensional vectors.
-	 * 		  result == vect1[0]*vect2[0] + vect1[1]*vect2[1]
-	 */
-	private double scalarProduct(double[] vect1, double[] vect2){
-		return vect1[0]*vect2[0] + vect1[1]*vect2[1];
+			return -(deltaV.scalarProduct(deltaR)+Math.sqrt(d))/deltaV.scalarProduct(deltaV);
 	}
 	
 	/**
