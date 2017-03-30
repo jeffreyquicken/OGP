@@ -41,8 +41,7 @@ public abstract class Circle {
 		this.minRadius = minRadius;
 		this.setPosX(x);
 		this.setPosY(y);
-		this.setVelX(xVelocity);
-		this.setVelY(yVelocity);
+		this.setVel(xVelocity, yVelocity);
 		this.setRadius(radius);
 	}
 	
@@ -234,6 +233,21 @@ public abstract class Circle {
 			this.radius = newRadius;
 	} 
 	
+	private World world;
+	
+	public World getWorld(){
+		return this.world;
+	}
+	
+	public void setWorld(World newWorld){
+		if(this.canHaveAsWorld(newWorld))
+			this.world = newWorld;
+	}
+	
+	private boolean canHaveAsWorld(World newWorld){
+		return true;
+	}
+	
 	/**
 	 * Moves this circle around for a given amount of time.
 	 * 
@@ -272,6 +286,8 @@ public abstract class Circle {
 		if(circle == null){
 			throw new NullPointerException();
 		}
+		else if(circle == this)
+			return 0;
 		else 
 			return (Math.sqrt(Math.pow(this.getPosX()-circle.getPosX(),2)+Math.pow(this.getPosY()-circle.getPosY(), 2))-this.getRadius()-circle.getRadius());
 	}
@@ -292,8 +308,10 @@ public abstract class Circle {
 		if(circle == null){
 			throw new NullPointerException();
 		}
+		else if(circle == this)
+			return true;
 		else{
-			return (this.getDistanceBetween(circle)<=0);
+			return (this.getDistanceBetween(circle)+this.getRadius()+circle.getRadius()<=0.99*(this.getRadius()+circle.getRadius()));
 		}
 	}
 	
@@ -367,32 +385,15 @@ public abstract class Circle {
 	public double getDistanceBetween(World world){
 		double distance = 0;
 		double angle = Math.atan2(this.getVelY(), this.getVelX());
-		Direction direction = this.getCollisionDirection(world);
-		switch(direction){
-		case RIGHT:
+		if((angle>=-Math.PI/4) && (angle<=Math.PI/4))
 			distance = ((world.getWidth()-this.getPosX())/Math.cos(angle))-this.getRadius();
-		case UP:
+		if((angle>=Math.PI/4) && (angle<=3*Math.PI/4))
 			distance = ((world.getHeight()-this.getPosY())/Math.sin(angle))-this.getRadius();
-		case LEFT:
+		if((angle>=3*Math.PI/4)&&(angle<=-3*Math.PI/4))
 			distance = ((this.getPosX())/Math.cos(angle))-this.getRadius();
-		case DOWN:
+		if((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4))
 			distance = ((this.getPosY())/Math.sin(angle))-this.getRadius();
-		}
 		return distance;
-	}
-	
-	private Direction getCollisionDirection(World world){
-		double angle = Math.atan2(this.getVelY(), this.getVelX());
-		Direction direction = Direction.UP;
-		if(isBetween(angle,-Math.PI/4,Math.PI/4))
-			direction =  Direction.RIGHT;
-		else if(isBetween(angle,Math.PI/4,3*Math.PI))
-			direction = Direction.UP;
-		else if(isBetween(angle,-3*Math.PI/4,3*Math.PI/4))
-			direction = Direction.LEFT;
-		else if(isBetween(angle,-3*Math.PI/4,-Math.PI/4))
-			direction = Direction.DOWN;
-		return direction;
 	}
 	
 	public double getTimeToCollision(World world){
@@ -401,7 +402,7 @@ public abstract class Circle {
 		if (world == null)
 			return Double.POSITIVE_INFINITY;
 		
-		return this.getDistanceBetween(world)/this.speed();
+		return this.getDistanceBetween(world)/this.velocity.length();
 	}
 	
 	public double[]  getCollisionPosition(World world){
@@ -413,26 +414,15 @@ public abstract class Circle {
 	}
 	
 	public void bounce(World world){
-		Direction direction = this.getCollisionDirection(world);
-		switch(direction){
-		case RIGHT:
-			this.setVelX(-this.getVelX());
-		case UP:
-			this.setVelY(-this.getVelY());
-		case LEFT:
-			this.setVelX(-this.getVelX());
-		case DOWN:
-			this.setVelY(-this.getVelY());
-		}
+		double angle = this.velocity.angle();
+		if(((angle>=-Math.PI/4) && (angle<=Math.PI/4)) || ((angle>=3*Math.PI/4)&&(angle<=-3*Math.PI/4)))
+			this.setVel(-this.getVelX(), this.getVelY());
+		if(((angle>=Math.PI/4) && (angle<=3*Math.PI/4)) || ((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4)))
+			this.setVel(this.getVelX(), -this.getVelY());
 	}
 	
-	private boolean isBetween(double value, double lower, double higher){
-		return ((value>=lower)&&(value<=higher));
-	}
-	
-	private double speed(){
-		return Math.sqrt(Math.pow(this.getVelX(),2)+Math.pow(this.getVelY(), 2));
-	}
+	public abstract void collision(Bullet bullet);
+	public abstract void collision(Ship ship);
 	
 
 }

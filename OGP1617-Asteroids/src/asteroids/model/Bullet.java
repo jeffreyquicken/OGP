@@ -27,10 +27,32 @@ public class Bullet extends Circle {
 		this.amountOfBounces = newAmount;
 	}
 	
-	public void bounce(){
+	public void increaseAmountOfBounces(){
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
 		if(this.getAmountOfBounces()>=this.maxBounces)
 			this.terminate();
+	}
+	
+	public Ship getOwner(){
+		return this.owner;
+	}
+	
+	public void collision(Bullet bullet){
+		if(bullet == null){
+			throw new NullPointerException();
+		}
+		else if (bullet == this)
+			throw new IllegalArgumentException();
+		else{
+			if(this.overlaps(bullet)){
+				this.terminate();
+				bullet.terminate();
+			}
+		}
+	}
+	
+	public void collision(Ship ship){
+		ship.collision(this);
 	}
 	
 }

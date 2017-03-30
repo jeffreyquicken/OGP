@@ -1,6 +1,7 @@
 package asteroids.model;
 import be.kuleuven.cs.som.taglet.*;
 import be.kuleuven.cs.som.annotate.*;
+import java.util.*;
 
 /**
  * A class of ships.
@@ -120,11 +121,6 @@ public class Ship extends Circle {
 		return this.mass;
 	}
 	
-	private World world;
-	
-	public World getWorld(){
-		return this.world;
-	}
 	
 	/**
 	 * Increases the orientation of this ship with a given angle.
@@ -145,11 +141,11 @@ public class Ship extends Circle {
 	
 	/**
 	 * Thrusts this ship forward with a given acceleration.
-	 * @param acceleration
+	 * @param amount
 	 * 		  The amount of acceleration of this ship.
-	 * @post If the acceleration is a negative number, the acceleration is set to zero.
+	 * @post If the amount is a negative number, the amount is set to zero.
 	 * 		 Then the X-velocity and Y-velocity of this ship is increased with a given amount of acceleration.
-	 * 		 |if(acceleration<0) then acceleration = 0
+	 * 		 |if(amount<0) then amount = 0
 	 * @effect this.setVelX(this.getVelX()+acceleration*Math.cos(this.getOrientation()))
 	 * @effect this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()))
 	 */
@@ -159,6 +155,71 @@ public class Ship extends Circle {
 		this.setVel(this.getVelX()+amount*Math.cos(this.getOrientation()), this.getVelY()+amount*Math.sin(this.getOrientation()));
 	}
 	
+	private boolean thrusterActive = false;
+	
+	public void thrustOn(){
+		this.thrusterActive = true;
+	}
+	
+	public void thrustOff(){
+		this.thrusterActive = false;
+	}
+	
+	private final double thrusterForce = 1.1E21;
+	
+	public boolean getThrusterStatus(){
+		return thrusterActive;
+	}
+	
+	public double getAcceleration(){
+		return thrusterForce/this.getMass();
+	}
+	
+	public void accelerate(double t){
+		if(t<0)
+			t=0;
+		this.thrust(this.getAcceleration()*t);
+	}
+	
+	
+	private Set<Bullet> bullets = new HashSet<>();
+	
+	private void addBullet(Bullet bullet){
+		this.bullets.add(bullet);
+		this.setMass(this.getMass()+bullet.getMass());
+	}
+		
+	public void collision(Bullet bullet){
+		if (bullet == null)
+			throw new NullPointerException();
+		if(this.overlaps(bullet)){
+			if(this == bullet.getOwner()){
+				this.addBullet(bullet);
+			}
+			else{
+			this.terminate();
+			bullet.terminate();
+			}
+		}
+	}
+	
+	public void collision(Ship ship){
+		if(this == ship){
+			throw new IllegalArgumentException();
+		}
+		else if(ship == null)
+			throw new NullPointerException();
+		else{
+			Vector2D deltaV = new Vector2D(this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY());
+			Vector2D deltaR = new Vector2D(this.getPosX()-ship.getPosX(),this.getPosX()-ship.getPosY());
+			double sigma = this.getRadius() + ship.getRadius();
+			double J = 2*this.getMass()*ship.getMass()*deltaV.scalarProduct(deltaR)/((this.getMass()+ship.getMass())*sigma);
+			double Jx = J*(this.getPosX()-ship.getPosX())/sigma;
+			double Jy = J*(this.getPosY()-ship.getPosY())/sigma;
+			this.setVel(this.getVelX()+Jx/this.getMass(), this.getVelY()+Jy/this.getMass());
+			ship.setVel(ship.getVelX()-Jx/ship.getMass(), ship.getVelY()-Jy/ship.getMass());
+		}
+	}
 
 
 }

@@ -55,5 +55,9 @@ public class Vector2D {
 	public double scalarProduct(Vector2D other){
 		return this.getX()*other.getX() + this.getY()*other.getY();
 	}
+	
+	public double angle(){
+		return Math.atan2(this.getY(), this.getX());
+	}
 
 }
