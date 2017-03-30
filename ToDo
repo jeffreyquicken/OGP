@@ -1,3 +1,4 @@
+- setVel
 - overlaps with interval
 - thruster
 - Get/set thruster & acceleration
