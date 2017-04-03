@@ -108,7 +108,8 @@ public class World {
 			return (Object)bullets.get(posArray);
 		else if(ships.containsKey(posArray))
 			return (Object)ships.get(posArray);
-		throw new AssertionError();
+		else
+			return null;
 	}
 	
 	private void collision(Circle circle){

@@ -107,18 +107,39 @@ public class Ship extends Circle {
 	
 	private static double minRadius = 10;
 	
+	public static void setMinRadius(double newMinRadius){
+		minRadius = newMinRadius;
+	}
+	
+	@Immutable
+	public static double getMinRadius(){
+		return minRadius;
+	}
+	
 	private double mass;
-	private static double minDensity = 1.42E12;
+	private static double density = 1.42E12;
 	
 	public void setMass(double newMass){
-		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity)
-			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*minDensity;
+		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
+			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*density;
 		else
 			this.mass = newMass;
 	}
 	
+	public static double getDensity(){
+		return density;
+	}
+	
 	public double getMass(){
 		return this.mass;
+	}
+	
+	public double getTotalMass(){
+		double totalMass = this.getMass();
+		for(Bullet bullet:bullets){
+			totalMass+=bullet.getMass();
+		}
+		return totalMass;
 	}
 	
 	
@@ -184,9 +205,27 @@ public class Ship extends Circle {
 	
 	private Set<Bullet> bullets = new HashSet<>();
 	
-	private void addBullet(Bullet bullet){
+	public void addBullet(Bullet bullet){
+		bullet.setPosX(this.getPosX());
+		bullet.setPosY(this.getPosY());
 		this.bullets.add(bullet);
-		this.setMass(this.getMass()+bullet.getMass());
+	}
+	
+	public void addBullet(Bullet...bulletlist){
+		for(Bullet bullet:bulletlist){
+			this.addBullet(bullet);
+		}
+	}
+	
+	private static double initialBulletSpeed = 250;
+	
+	public void fireBullet(Bullet bullet){
+		bullets.remove(bullet);
+		double distance = (this.getRadius()+bullet.getRadius())/2;
+		bullet.setPosX(distance*Math.cos(this.getOrientation()));
+		bullet.setPosY(distance*Math.sin(this.getOrientation()));
+		bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
+		bullet.setHolder((Object)this.getWorld());
 	}
 		
 	public void collision(Bullet bullet){
@@ -213,11 +252,11 @@ public class Ship extends Circle {
 			Vector2D deltaV = new Vector2D(this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY());
 			Vector2D deltaR = new Vector2D(this.getPosX()-ship.getPosX(),this.getPosX()-ship.getPosY());
 			double sigma = this.getRadius() + ship.getRadius();
-			double J = 2*this.getMass()*ship.getMass()*deltaV.scalarProduct(deltaR)/((this.getMass()+ship.getMass())*sigma);
+			double J = 2*this.getTotalMass()*ship.getTotalMass()*deltaV.scalarProduct(deltaR)/((this.getTotalMass()+ship.getTotalMass())*sigma);
 			double Jx = J*(this.getPosX()-ship.getPosX())/sigma;
 			double Jy = J*(this.getPosY()-ship.getPosY())/sigma;
-			this.setVel(this.getVelX()+Jx/this.getMass(), this.getVelY()+Jy/this.getMass());
-			ship.setVel(ship.getVelX()-Jx/ship.getMass(), ship.getVelY()-Jy/ship.getMass());
+			this.setVel(this.getVelX()+Jx/this.getTotalMass(), this.getVelY()+Jy/this.getTotalMass());
+			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
 		}
 	}
 

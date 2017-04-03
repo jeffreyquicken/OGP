@@ -8,9 +8,30 @@ public class Bullet extends Circle {
 	
 	private static double minRadius =1;
 	private Ship owner;
+	private Object holder;
+	
+	public Ship getOwner(){
+		return this.owner;
+	}
+	
+	public void setOwner(Ship newOwner){
+		this.owner = newOwner;
+	}
+	
+	public Object getHolder(){
+		return this.holder;
+	}
+	
+	public void setHolder(Object newHolder){
+		this.holder = newHolder;
+	}
 	
 	private static double density = 7.8E12;
 	private final double mass = density*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
+	
+	public static double getDensity(){
+		return density;
+	}
 	
 	public double getMass(){
 		return this.mass;
@@ -31,10 +52,6 @@ public class Bullet extends Circle {
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
 		if(this.getAmountOfBounces()>=this.maxBounces)
 			this.terminate();
-	}
-	
-	public Ship getOwner(){
-		return this.owner;
 	}
 	
 	public void collision(Bullet bullet){

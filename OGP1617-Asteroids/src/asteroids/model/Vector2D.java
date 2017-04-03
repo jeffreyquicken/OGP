@@ -1,5 +1,8 @@
 package asteroids.model;
+import be.kuleuven.cs.som.annotate.*;
+import be.kuleuven.cs.som.taglet.*;
 
+@Value
 public class Vector2D {
 	
 	public Vector2D(double x, double y) throws IllegalArgumentException{

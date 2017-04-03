@@ -190,4 +190,8 @@ public class Facade implements IFacade {
 			throw new ModelException(d);
 		}
 	}
+	
+	public void terminateship(Ship ship) throws ModelException{
+		
+	}
 }
