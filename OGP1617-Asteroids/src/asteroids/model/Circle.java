@@ -47,8 +47,11 @@ public abstract class Circle {
 	
 	private boolean terminated = false;
 	
-	public void terminate(){
-		this.terminated = true;
+	public void terminate() throws IllegalArgumentException{
+		if(this.isTerminated())
+			throw new IllegalArgumentException();
+		else
+			this.terminated = true;
 	}
 	
 	public boolean isTerminated(){

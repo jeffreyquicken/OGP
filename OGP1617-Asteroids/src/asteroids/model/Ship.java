@@ -59,6 +59,12 @@ public class Ship extends Circle {
 		this.setOrientation(orientation);
 	}
 	
+	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation, double mass){
+		super(x,y,xVelocity,yVelocity,radius,minRadius);
+		this.setOrientation(orientation);
+		this.setMass(mass);
+	}
+	
 	public double orientation;
 	
 	/**
@@ -178,13 +184,10 @@ public class Ship extends Circle {
 	
 	private boolean thrusterActive = false;
 	
-	public void thrustOn(){
-		this.thrusterActive = true;
+	public void setThruster(boolean newStatus){
+		this.thrusterActive = newStatus;
 	}
-	
-	public void thrustOff(){
-		this.thrusterActive = false;
-	}
+		
 	
 	private final double thrusterForce = 1.1E21;
 	
@@ -211,21 +214,41 @@ public class Ship extends Circle {
 		this.bullets.add(bullet);
 	}
 	
-	public void addBullet(Bullet...bulletlist){
-		for(Bullet bullet:bulletlist){
+	public void addBullet(Collection<Bullet> bulletCollection){
+		for(Bullet bullet:bulletCollection){
 			this.addBullet(bullet);
 		}
 	}
 	
+	public void removeBullet(Bullet bullet) throws IllegalArgumentException ,NullPointerException{
+		if(bullet == null)
+			throw new NullPointerException();
+		else if(!this.getBullets().contains(bullet))
+			throw new IllegalArgumentException();
+		else
+			this.bullets.remove(bullet);
+	}
+	
+	public Set<Bullet> getBullets(){
+		return this.bullets;
+	}
+	
+	public int getNbBullets(){
+		return this.bullets.size();
+	}
+	
 	private static double initialBulletSpeed = 250;
 	
-	public void fireBullet(Bullet bullet){
-		bullets.remove(bullet);
+	public void fireBullet(){
+		Bullet bullet = null;
+		for(Bullet randomBullet:this.bullets){
+			bullet = randomBullet;
+		}
 		double distance = (this.getRadius()+bullet.getRadius())/2;
 		bullet.setPosX(distance*Math.cos(this.getOrientation()));
 		bullet.setPosY(distance*Math.sin(this.getOrientation()));
 		bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
-		bullet.setHolder((Object)this.getWorld());
+		bullet.setWorld(this.getWorld());
 	}
 		
 	public void collision(Bullet bullet){

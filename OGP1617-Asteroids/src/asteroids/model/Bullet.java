@@ -8,7 +8,8 @@ public class Bullet extends Circle {
 	
 	private static double minRadius =1;
 	private Ship owner;
-	private Object holder;
+	private Ship ship;
+	private World world;
 	
 	public Ship getOwner(){
 		return this.owner;
@@ -18,12 +19,20 @@ public class Bullet extends Circle {
 		this.owner = newOwner;
 	}
 	
-	public Object getHolder(){
-		return this.holder;
+	public World getWorld(){
+		return this.world;
 	}
 	
-	public void setHolder(Object newHolder){
-		this.holder = newHolder;
+	public Ship getShip(){
+		return this.ship;
+	}
+	
+	public void setShip(Ship newShip){
+		this.ship = newShip;
+	}
+	
+	public void setWorld(World newWorld){
+		this.world = newWorld;
 	}
 	
 	private static double density = 7.8E12;

@@ -1,7 +1,11 @@
 package asteroids.facade;
 
-import asteroids.model.Ship;
-import asteroids.part1.facade.IFacade;
+import java.util.*;
+
+import asteroids.model.*;
+//import asteroids.part1.facade.IFacade;
+import asteroids.part2.facade.*;
+import asteroids.part2.CollisionListener;
 import asteroids.util.ModelException;
 
 public class Facade implements IFacade {
@@ -30,6 +34,10 @@ public class Facade implements IFacade {
 		catch(IllegalArgumentException e){
 			throw new ModelException(e);
 		}
+	}
+	
+	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass){
+		return new Ship(x,y,xVelocity,yVelocity,radius,orientation,mass);
 	}
 	
 	/**
@@ -191,7 +199,258 @@ public class Facade implements IFacade {
 		}
 	}
 	
-	public void terminateship(Ship ship) throws ModelException{
-		
+	public void terminateShip(Ship ship) throws ModelException{
+		try{ship.terminate();}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
 	}
+	
+	public boolean isTerminatedShip(Ship ship){
+		return ship.isTerminated();
+	}
+	
+	public double getShipMass(Ship ship){
+		return ship.getTotalMass();
+	}
+	
+	public World getShipWorld(Ship ship){
+		return ship.getWorld();
+	}
+	
+	public boolean isShipThrusterActive(Ship ship){
+		return ship.getThrusterStatus();
+	}
+	
+	public void setThrusterActive(Ship ship, boolean active){
+		ship.setThruster(active);
+	}
+	
+	public double getShipAcceleration(Ship ship){
+		return ship.getAcceleration();
+	}
+	/////BULLET CODE//////
+	public Bullet createBullet(double x, double y, double xVelocity, double yVelocity, double radius) throws ModelException{
+		try{return new Bullet(x,y,xVelocity,yVelocity,radius);}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+	}
+	
+	public void terminateBullet(Bullet bullet) throws ModelException{
+		try{bullet.terminate();}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+	}
+	
+	public boolean isTerminatedBullet(Bullet bullet){
+		return bullet.isTerminated();
+	}
+	
+	public double[] getBulletPosition(Bullet bullet){
+		double[] posArray = {bullet.getPosX(),bullet.getPosY()};
+		return posArray;
+	}
+	
+	public double[] getBulletVelocity(Bullet bullet){
+		double[] velArray = {bullet.getVelX(),bullet.getVelY()};
+		return velArray;
+	}
+	
+	public double getBulletRadius(Bullet bullet){
+		return bullet.getRadius();
+	}
+	
+	public double getBulletMass(Bullet bullet){
+		return bullet.getMass();
+	}
+	
+	public World getBulletWorld(Bullet bullet){
+		return bullet.getWorld();
+	}
+	
+	public Ship getBulletShip(Bullet bullet){
+		return bullet.getShip();
+	}
+	
+	public Ship getBulletSource(Bullet bullet){
+		return bullet.getOwner();
+	}
+	
+	/////// WORLD CODE///////////////////:
+	public World createWorld(double width, double height){
+		return new World(width,height);
+	}
+	
+	public void terminateWorld(World world) throws ModelException{
+		try{world.terminate();}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+	}
+	
+	public boolean isTerminatedWorld(World world){
+		return world.isTerminated();
+	}
+	
+	public double[] getWorldSize(World world){
+		double[] sizeArray = {world.getWidth(),world.getHeight()};
+		return sizeArray;
+	}
+	
+	public Set<? extends Ship> getWorldShips(World world){
+		return world.getWorldShips();
+	}
+	
+	public Set<? extends Bullet> getWorldBullets(World world){
+		return world.getWorldBullets();
+	}
+	
+	public void addShipToWorld(World world, Ship ship) throws ModelException{
+		try{world.add(ship);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	public void removeShipFromWorld(World world,Ship ship) throws ModelException{
+		try{world.remove(ship);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	public void addBulletToWorld(World world, Bullet bullet) throws ModelException{
+		try{world.add(bullet);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	public void removeBulletFromWorld(World world,Bullet bullet) throws ModelException{
+		try{world.remove(bullet);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	//// SHIP AND BULLET CODE//////////////////
+	
+	
+	public Set<? extends Bullet> getBulletsOnShip(Ship ship) {
+		return ship.getBullets();
+	}
+	
+	public int getNbBulletsOnShip(Ship ship) {
+		return ship.getNbBullets();
+	}
+	
+	public void loadBulletOnShip(Ship ship, Bullet bullet) throws ModelException{
+		ship.addBullet(bullet);
+	}
+	
+	public void loadBulletsOnShip(Ship ship, Collection<Bullet> bullets) throws ModelException{
+		ship.addBullet(bullets);
+	}
+	
+	public void removeBulletFromShip(Ship ship, Bullet bullet) throws ModelException{
+		try{ship.removeBullet(bullet);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	public void fireBullet(Ship ship) throws ModelException{
+		ship.fireBullet();
+	}
+	///COLLISIONS//////////////////////////////////
+	public double getTimeCollisionBoundary(Object object){
+		if(object instanceof Circle){
+			return ((Circle)object).getTimeToCollision(((Circle)object).getWorld());
+		}
+		else 
+			throw new AssertionError();
+	}
+	
+	public double[] getPositionCollisionBoundary(Object object){
+		if(object instanceof Circle){
+			return ((Circle)object).getCollisionPosition(((Circle)object).getWorld());
+		}
+		else
+			throw new AssertionError();
+	}
+	
+	public double getTimeCollisionEntity(Object entity1, Object entity2){
+		if(entity1 instanceof Circle && entity2 instanceof World )
+			return ((Circle)entity1).getTimeToCollision(((World)entity2));
+		else if(entity1 instanceof World && entity2 instanceof Circle)
+			return getTimeCollisionEntity(entity2,entity1);
+			//return ((Circle)entity2).getTimeToCollision(((World)entity1));
+		else if(entity1 instanceof Circle && entity2 instanceof Circle)
+			return ((Circle)entity1).getTimeToCollision(((Circle)entity2));
+		throw new AssertionError();
+
+	}
+	
+	public double[] getPositionCollisionEntity(Object entity1, Object entity2){
+		if(entity1 instanceof Circle && entity2 instanceof World )
+			return ((Circle)entity1).getCollisionPosition(((World)entity2));
+		else if(entity1 instanceof World && entity2 instanceof Circle)
+			return getPositionCollisionEntity(entity2,entity1);
+			//return ((Circle)entity2).getTimeToCollision(((World)entity1));
+		else if(entity1 instanceof Circle && entity2 instanceof Circle)
+			return ((Circle)entity1).getCollisionPosition(((Circle)entity2));
+		throw new AssertionError();
+	}
+	
+	public double getTimeNextCollision(World world){
+		return (double)world.getTimeToFirstCollisionAndObjects().get(2);
+	}
+	
+	public double[] getPositionNextCollision(World world){
+		List<Object> collisionList = world.getTimeToFirstCollisionAndObjects();
+		Object collisionObject1 = collisionList.get(0);
+		Object collisionObject2 = collisionList.get(1);
+		if(collisionObject2 instanceof World)
+			return ((Circle)collisionObject1).getCollisionPosition(world);
+		else if(collisionObject2 instanceof Circle)
+			return ((Circle)collisionObject1).getCollisionPosition(((Circle)collisionObject2));
+		else 
+			throw new AssertionError();
+	}
+	
+	public void evolve(World world, double dt, CollisionListener collisionListener){
+		world.evolve(dt);
+	}
+	
+	
+	public Object getEntityAt(World world, double x, double y){
+		return world.getEntityAtPos(x, y);
+	}
+	
+	public Set<? extends Object> getEntities(World world){
+		return world.getWorldEntities();
+	}
+	
+	
+
+
+	
+	
 }

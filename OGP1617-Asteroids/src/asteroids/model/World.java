@@ -21,6 +21,19 @@ public class World {
 		
 	}
 	
+	private boolean terminated = false;
+	
+	public void terminate() throws IllegalArgumentException{
+		if(this.isTerminated())
+			throw new IllegalArgumentException();
+		else
+			this.terminated = true;
+	}
+	
+	public boolean isTerminated(){
+		return this.terminated;
+	}
+	
 	private final double height;
 	private final double width;
 	
@@ -122,29 +135,12 @@ public class World {
 	public void evolve(double dt) throws IllegalArgumentException{
 		if (dt<0)
 			throw new IllegalArgumentException();
-		double shortest = Double.POSITIVE_INFINITY;
+		List<Object>collisionList = this.getTimeToFirstCollisionAndObjects();
+		Object collisionObject1 = collisionList.get(0);
+		Object collisionObject2 = collisionList.get(1);
+		double shortest = (double)collisionList.get(2);
 		Set<Circle> circles = new HashSet<>(ships.values());
 		circles.addAll(bullets.values());
-		Object collisionObject1 = null;
-		Object collisionObject2 = null;
-		Set<Circle> uncheckedCircles = new HashSet<>(circles);
-		for(Circle circle:circles){
-			double worldCollisionTime = circle.getDistanceBetween(this);
-			if(worldCollisionTime<shortest){
-				shortest = worldCollisionTime;
-				collisionObject1 = circle;
-				collisionObject2 = this;
-			}
-			uncheckedCircles.remove(circle);
-			for(Circle secondCircle:uncheckedCircles){
-				double time = circle.getTimeToCollision(secondCircle);
-				if(time<shortest){
-					shortest = time;
-					collisionObject1 = circle;
-					collisionObject2 = secondCircle;
-				}
-			}
-		}
 		if(shortest<=dt){
 			for(Circle circle:circles){
 				circle.move(shortest);
@@ -172,6 +168,37 @@ public class World {
 			}
 		}
 			
+	}
+	
+	public List<Object> getTimeToFirstCollisionAndObjects(){
+		double shortest = Double.POSITIVE_INFINITY;
+		Set<Circle> circles = new HashSet<>(ships.values());
+		circles.addAll(bullets.values());
+		Object collisionObject1 = null;
+		Object collisionObject2 = null;
+		Set<Circle> uncheckedCircles = new HashSet<>(circles);
+		for(Circle circle:circles){
+			double worldCollisionTime = circle.getTimeToCollision(this);
+			if(worldCollisionTime<shortest){
+				shortest = worldCollisionTime;
+				collisionObject1 = circle;
+				collisionObject2 = this;
+			}
+			uncheckedCircles.remove(circle);
+			for(Circle secondCircle:uncheckedCircles){
+				double time = circle.getTimeToCollision(secondCircle);
+				if(time<shortest){
+					shortest = time;
+					collisionObject1 = circle;
+					collisionObject2 = secondCircle;
+				}
+			}
+		}
+		List<Object> returnList = new ArrayList<Object>();
+		returnList.add(collisionObject1);
+		returnList.add(collisionObject2);
+		returnList.add(shortest);
+		return returnList;
 	}
 
 }
