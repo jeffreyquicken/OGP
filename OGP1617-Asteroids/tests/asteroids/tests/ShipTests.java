@@ -100,7 +100,7 @@ public class ShipTests {
 		standardValueShip.setOrientation(3*Math.PI);
 		assertEquals(1*Math.PI, standardValueShip.getOrientation(),EPSILON);
 	}
-	
+		
 	@Test
 	public void getOrientation_LegalCase(){
 		standardValueShip.setOrientation(0);
@@ -129,9 +129,9 @@ public class ShipTests {
 	@Test
 	public void move_LegalCase(){
 		standardValueShip.setPosX(10);
-		standardValueShip.setVelX(10);
+		standardValueShip.setVel(10,standardValueShip.getVelY());
 		standardValueShip.setPosY(10);
-		standardValueShip.setVelY(10);
+		standardValueShip.setVel(standardValueShip.getVelX(),10);
 		standardValueShip.move(10);
 		assertEquals(110, standardValueShip.getPosX(),EPSILON);
 		assertEquals(110, standardValueShip.getPosY(),EPSILON);
@@ -141,9 +141,9 @@ public class ShipTests {
 	public void move_NegativeTime(){
 		exception.expect(IllegalArgumentException.class);
 		standardValueShip.setPosX(10);
-		standardValueShip.setVelX(10);
+		standardValueShip.setVel(10,standardValueShip.getVelY());
 		standardValueShip.setPosY(10);
-		standardValueShip.setVelY(10);
+		standardValueShip.setVel(standardValueShip.getVelX(),10);
 		standardValueShip.move(-10);
 		assertEquals(10, standardValueShip.getPosX(),EPSILON);
 		assertEquals(10, standardValueShip.getPosY(),EPSILON);
@@ -164,8 +164,7 @@ public class ShipTests {
 	
 	@Test 
 	public void thrust_LegalCase(){
-		standardValueShip.setVelX(0);
-		standardValueShip.setVelY(0);
+		standardValueShip.setVel(0,0);
 		standardValueShip.setOrientation(1);
 		standardValueShip.thrust(10);
 		assertEquals(10*Math.cos(1), standardValueShip.getVelX(),EPSILON);
@@ -174,8 +173,7 @@ public class ShipTests {
 	
 	@Test 
 	public void thrust_NegativeAcceleration(){
-		standardValueShip.setVelX(0);
-		standardValueShip.setVelY(0);
+		standardValueShip.setVel(0,0);
 		standardValueShip.setOrientation(1);
 		standardValueShip.thrust(-10);
 		assertEquals(0, standardValueShip.getVelX(),EPSILON);
@@ -212,25 +210,22 @@ public class ShipTests {
 	public void getTimeToCollision_LegalCase(){
 		distanceShip1.setPosY(0);
 		distanceShip2.setPosY(0);
-		distanceShip1.setVelY(0);
-		distanceShip2.setVelY(0);
-		distanceShip1.setVelX(5);
+		distanceShip1.setVel(5,0);
+		distanceShip2.setVel(distanceShip2.getVelX(),0);
 		assertEquals(1, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
 	}
 
 	@Test 
 	public void getTimeToCollision_ScalarProdGreaterthan0(){
-		distanceShip1.setVelY(10);
-		distanceShip2.setVelY(10);
+		distanceShip1.setVel(distanceShip1.getVelX(),10);
+		distanceShip2.setVel(distanceShip2.getVelX(),10);
 		assertEquals(Double.POSITIVE_INFINITY, distanceShip1.getTimeToCollision(distanceShip2), EPSILON);
 	}
 	
 	@Test
 	public void getTimeToCollision_dSmallerThen0(){
-		distanceShip1.setVelX(10);
-		distanceShip1.setVelY(10);
-		distanceShip2.setVelX(0);
-		distanceShip2.setVelY(20);
+		distanceShip1.setVel(10, 10);
+		distanceShip2.setVel(0,20);
 		distanceShip1.setPosX(20);
 		distanceShip1.setPosY(101);
 		distanceShip2.setPosX(10);
@@ -252,10 +247,8 @@ public class ShipTests {
 	
 	@Test
 	public void getCollisionPosition_LegalCase(){
-		distanceShip1.setVelX(5);
-		distanceShip1.setVelY(0);
-		distanceShip2.setVelX(0);
-		distanceShip2.setVelY(0);
+		distanceShip1.setVel(5, 0);
+		distanceShip2.setVel(0, 0);
 		distanceShip1.setPosX(0);
 		distanceShip1.setPosY(0);
 		distanceShip2.setPosX(25);
@@ -266,10 +259,8 @@ public class ShipTests {
 	
 	@Test
 	public void getCollisionPosition_deltaTInfinity(){
-		distanceShip1.setVelX(0);
-		distanceShip1.setVelY(10);
-		distanceShip2.setVelX(0);
-		distanceShip2.setVelY(10);
+		distanceShip1.setVel(0, 10);
+		distanceShip2.setVel(0, 10);
 		assertNull(distanceShip1.getCollisionPosition(distanceShip2));
 	}
 	

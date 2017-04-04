@@ -55,17 +55,17 @@ public class Ship extends Circle {
 	 * 
 	 */
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation){
-		super(x,y,xVelocity,yVelocity,radius,minRadius);
+		super(x,y,xVelocity,yVelocity,radius);
 		this.setOrientation(orientation);
 	}
 	
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation, double mass){
-		super(x,y,xVelocity,yVelocity,radius,minRadius);
+		super(x,y,xVelocity,yVelocity,radius);
 		this.setOrientation(orientation);
 		this.setMass(mass);
 	}
 	
-	public double orientation;
+	private double orientation;
 	
 	/**
 	 * Checks if a given orientation is a valid orientation.
@@ -115,6 +115,10 @@ public class Ship extends Circle {
 	
 	public static void setMinRadius(double newMinRadius){
 		minRadius = newMinRadius;
+	}
+	
+	protected boolean isValidRadius(double newRadius){
+		return newRadius>=minRadius;
 	}
 	
 	@Immutable

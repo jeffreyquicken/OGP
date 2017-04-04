@@ -37,11 +37,9 @@ public abstract class Circle {
 	 * 
 	 */
 	@Raw
-	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius,double minRadius) throws IllegalArgumentException{
-		this.minRadius = minRadius;
-		this.setPosX(x);
-		this.setPosY(y);
-		this.setVel(xVelocity, yVelocity);
+	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException{
+		this.position = new Vector2D(x,y);
+		this.velocity = new Vector2D(xVelocity,yVelocity);
 		this.setRadius(radius);
 	}
 	
@@ -190,7 +188,6 @@ public abstract class Circle {
 	}
 	
 	private double radius;
-	private double minRadius;
 	
 	/**
 	 * Returns the radius of this circle.
@@ -213,9 +210,7 @@ public abstract class Circle {
 	 * 		Returns true if the radius is greater or equal then the minimal radius.
 	 * 		|result == (rad>=minRadius)
 	 */
-	private boolean isValidRadius(double rad){
-		return (rad>=minRadius);
-	}
+	protected abstract boolean isValidRadius(double rad);
 	
 	/**
 	 * Sets the radius of this circle to a given radius.

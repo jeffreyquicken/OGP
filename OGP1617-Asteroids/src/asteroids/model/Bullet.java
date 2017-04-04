@@ -3,10 +3,14 @@ package asteroids.model;
 public class Bullet extends Circle {
 	
 	public Bullet(double x, double y, double xVelocity, double yVelocity, double radius){
-		super(x,y,xVelocity,yVelocity,radius,minRadius);
+		super(x,y,xVelocity,yVelocity,radius);
 	}
 	
 	private static double minRadius =1;
+	
+	protected boolean isValidRadius(double newRadius){
+		return newRadius>=minRadius;
+	}
 	private Ship owner;
 	private Ship ship;
 	private World world;
