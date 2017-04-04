@@ -14,7 +14,7 @@ import asteroids.model.Ship;
 public class ShipTests {
 	
 	/**
-	 * Variable referencing a ship with standard values.
+	 * Variables referencing ships with standard values.
 	 */
 	private static Ship standardValueShip;
 	private static Ship collisionShip1;
@@ -36,11 +36,11 @@ public class ShipTests {
 	 */
 	@Before
 	public void setUpMutableFixture(){
-		standardValueShip = new Ship(0,0,0,0,10,0);
-		collisionShip1 = new Ship(10,30,10,10,10,0);
-		collisionShip2 = new Ship(20,40,10,10,10,2);
-		distanceShip1 = new Ship(0,0,0,0,10,0);
-		distanceShip2 = new Ship(25,0,0,0,10,0);
+		standardValueShip = new Ship(0,0,0,0,10,0,0);
+		collisionShip1 = new Ship(10,30,10,10,10,0,0);
+		collisionShip2 = new Ship(20,40,10,10,10,2,0);
+		distanceShip1 = new Ship(0,0,0,0,10,0,0);
+		distanceShip2 = new Ship(25,0,0,0,10,0,0);
 	}
 	
 	@Test
@@ -80,44 +80,7 @@ public class ShipTests {
 		standardValueShip.setPosY(0);
 		assertEquals(0, standardValueShip.getPosY(),EPSILON);
 	}
-	
-	@Test
-	public void setVelX_LegalCase(){
-		standardValueShip.setVelX(10);
-		assertEquals(10, standardValueShip.getVelX(),EPSILON);
-	}
-	
-	@Test
-	public void setVelX_SpeedOverflow(){
-		standardValueShip.setVelX(400000);
-		assertEquals(300000, standardValueShip.getVelX(),EPSILON);
-	}
-	
-	@Test
-	public void setVelY_LegalCase(){
-		standardValueShip.setVelX(0);
-		standardValueShip.setVelY(10);
-		assertEquals(10, standardValueShip.getVelY(),EPSILON);
-	}
-	
-	@Test
-	public void setVelY_SpeedOverflow(){
-		standardValueShip.setVelY(400000);
-		assertEquals(300000, standardValueShip.getVelY(),EPSILON);
-	}
-	
-	@Test
-	public void getVelX_LegalCase(){
-		standardValueShip.setVelX(0);
-		assertEquals(0, standardValueShip.getVelX(),EPSILON);
-	}
-	
-	@Test
-	public void getVelY_LegalCase(){
-		standardValueShip.setVelY(0);
-		assertEquals(0, standardValueShip.getVelY(),EPSILON);
-	}
-	
+			
 	@Test
 	public void setOrientation_LegalCase(){
 		standardValueShip.setOrientation(1*Math.PI);
