@@ -47,14 +47,28 @@ public class Bullet extends Circle {
 		return this.ship;
 	}
 	
+	private boolean canHaveAsShip(Ship newShip){
+		return this.getWorld() == null;
+	}
+	
+	private boolean canHaveAsWorld(World newWorld){
+		return this.getShip() == null;
+	}
+	
 	@Basic
-	public void setShip(Ship newShip){
-		this.ship = newShip;
+	public void setShip(Ship newShip) throws IllegalArgumentException{
+		if(!canHaveAsShip(newShip))
+			throw new IllegalArgumentException();
+		else
+			this.ship = newShip;
 	}
 	
 	@Basic
 	public void setWorld(World newWorld){
-		this.world = newWorld;
+		if(!canHaveAsWorld(newWorld))
+			throw new IllegalArgumentException();
+		else
+			this.world = newWorld;
 	}
 	
 	private static double density = 7.8E12;
@@ -78,7 +92,6 @@ public class Bullet extends Circle {
 		return this.amountOfBounces;
 	}
 	
-	@Basic
 	private void setAmountOfBounces(double newAmount){
 		this.amountOfBounces = newAmount;
 	}

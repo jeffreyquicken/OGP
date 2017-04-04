@@ -275,9 +275,8 @@ public class Ship extends Circle {
 	}
 	
 	public void collision(Ship ship){
-		if(this == ship){
+		if(this == ship)
 			throw new IllegalArgumentException();
-		}
 		else if(ship == null)
 			throw new NullPointerException();
 		else{
@@ -291,6 +290,7 @@ public class Ship extends Circle {
 			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
 		}
 	}
+	
 
 
 }

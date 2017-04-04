@@ -1,6 +1,8 @@
 package asteroids.model;
 import java.util.*;
 
+import asteroids.part2.CollisionListener;
+
 public class World {
 	
 	public World(double height, double width){
@@ -132,48 +134,62 @@ public class World {
 		}
 	}
 	
-	public void evolve(double dt) throws IllegalArgumentException{
-		if (dt<0)
-			throw new IllegalArgumentException();
-		List<Object>collisionList = this.getTimeToFirstCollisionAndObjects();
-		Object collisionObject1 = collisionList.get(0);
-		Object collisionObject2 = collisionList.get(1);
-		double shortest = (double)collisionList.get(2);
+	private Set<Circle> getWorldCircles(){
 		Set<Circle> circles = new HashSet<>(ships.values());
 		circles.addAll(bullets.values());
-		if(shortest<=dt){
-			for(Circle circle:circles){
-				circle.move(shortest);
-				if(circle instanceof Ship){
-					if(((Ship)circle).getThrusterStatus() == true)
-						((Ship)circle).accelerate(shortest);
-				}
-			}
-			if(collisionObject2 instanceof World){
-				((World)collisionObject2).collision((Circle)collisionObject1);
-			}
-			else if(collisionObject2 instanceof Bullet)
-				((Circle)collisionObject1).collision((Bullet)collisionObject2);
-			
-			else if(collisionObject2 instanceof Ship)
-				((Circle)collisionObject1).collision((Ship)collisionObject2);
-			evolve(dt-shortest);
-		}
-		
-		for(Circle circle:circles){
-			circle.move(dt);
-			if(circle instanceof Ship){
-				if(((Ship)circle).getThrusterStatus() == true)
-					((Ship)circle).accelerate(dt);
-			}
-		}
-			
+		return circles;
 	}
 	
-	public List<Object> getTimeToFirstCollisionAndObjects(){
+	public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
+		if (dt<0)
+			throw new IllegalArgumentException();
+		Object[] collisionArray = this.getFirstCollisionArray();
+		Object collisionObject1 = collisionArray[1];
+		Object collisionObject2 = collisionArray[2];
+		double shortest = (double)collisionArray[0];
+		if(shortest<=dt){
+			this.moveForward(shortest);
+			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
+			evolve(dt-shortest,collisionListener);
+		}
+		this.moveForward(dt);
+	}
+	
+	public void moveForward(double time){
+		for(Circle circle:this.getWorldCircles()){
+			circle.move(time);
+			if(circle instanceof Ship){
+				if(((Ship)circle).getThrusterStatus() == true)
+					((Ship)circle).accelerate(time);
+			}
+		}
+	}
+	
+	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
+		if(collisionObject2 instanceof World){
+			((World)collisionObject2).collision((Circle)collisionObject1);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
+			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+		}
+		else if(collisionObject2 instanceof Bullet){
+			((Circle)collisionObject1).collision((Bullet)collisionObject2);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Bullet)collisionObject2);
+			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			}
+		else if(collisionObject2 instanceof Ship){
+			((Circle)collisionObject1).collision((Ship)collisionObject2);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Ship)collisionObject2);
+			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			}
+	}
+	
+	/**
+	 * 
+	 * @return An array with the time to the first collision and the two colliding objects.
+	 */
+	public Object[] getFirstCollisionArray(){
 		double shortest = Double.POSITIVE_INFINITY;
-		Set<Circle> circles = new HashSet<>(ships.values());
-		circles.addAll(bullets.values());
+		Set<Circle> circles = this.getWorldCircles();
 		Object collisionObject1 = null;
 		Object collisionObject2 = null;
 		Set<Circle> uncheckedCircles = new HashSet<>(circles);
@@ -194,11 +210,9 @@ public class World {
 				}
 			}
 		}
-		List<Object> returnList = new ArrayList<Object>();
-		returnList.add(collisionObject1);
-		returnList.add(collisionObject2);
-		returnList.add(shortest);
-		return returnList;
+
+		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
+		return returnArray;
 	}
 
 }

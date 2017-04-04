@@ -393,7 +393,7 @@ public class Facade implements IFacade {
 			return ((Circle)object).getCollisionPosition(((Circle)object).getWorld());
 		}
 		else
-			throw new AssertionError();
+			return null;
 	}
 	
 	public double getTimeCollisionEntity(Object entity1, Object entity2){
@@ -408,35 +408,44 @@ public class Facade implements IFacade {
 
 	}
 	
-	public double[] getPositionCollisionEntity(Object entity1, Object entity2){
+	public double[] getPositionCollisionEntity(Object entity1, Object entity2) throws ModelException{
 		if(entity1 instanceof Circle && entity2 instanceof World )
 			return ((Circle)entity1).getCollisionPosition(((World)entity2));
 		else if(entity1 instanceof World && entity2 instanceof Circle)
 			return getPositionCollisionEntity(entity2,entity1);
-			//return ((Circle)entity2).getTimeToCollision(((World)entity1));
 		else if(entity1 instanceof Circle && entity2 instanceof Circle)
 			return ((Circle)entity1).getCollisionPosition(((Circle)entity2));
-		throw new AssertionError();
+		else
+			return null;
 	}
 	
 	public double getTimeNextCollision(World world){
-		return (double)world.getTimeToFirstCollisionAndObjects().get(2);
+		return (double)world.getFirstCollisionArray()[0];
 	}
 	
 	public double[] getPositionNextCollision(World world){
-		List<Object> collisionList = world.getTimeToFirstCollisionAndObjects();
-		Object collisionObject1 = collisionList.get(0);
-		Object collisionObject2 = collisionList.get(1);
+		Object[] collisionArray = world.getFirstCollisionArray();
+		Object collisionObject1 = collisionArray[1];
+		Object collisionObject2 = collisionArray[2];
 		if(collisionObject2 instanceof World)
-			return ((Circle)collisionObject1).getCollisionPosition(world);
+			return ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 		else if(collisionObject2 instanceof Circle)
-			return ((Circle)collisionObject1).getCollisionPosition(((Circle)collisionObject2));
-		else 
-			throw new AssertionError();
-	}
+			return ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+		else
+			return null;
+		}
 	
 	public void evolve(World world, double dt, CollisionListener collisionListener){
-		world.evolve(dt);
+		Object[] collisionArray = world.getFirstCollisionArray();
+		Object collisionObject1 = collisionArray[1];
+		Object collisionObject2 = collisionArray[2];
+		double shortest = (double)collisionArray[0];
+		if(shortest<=dt){
+			world.moveForward(shortest);
+			world.resolveCollision(collisionObject1, collisionObject2, collisionListener);
+			evolve(world,dt-shortest,collisionListener);
+		}
+		world.moveForward(dt);
 	}
 	
 	
