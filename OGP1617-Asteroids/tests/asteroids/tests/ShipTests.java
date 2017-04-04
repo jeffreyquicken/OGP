@@ -36,11 +36,11 @@ public class ShipTests {
 	 */
 	@Before
 	public void setUpMutableFixture(){
-		standardValueShip = new Ship(0,0,0,0,10,0,0);
-		collisionShip1 = new Ship(10,30,10,10,10,0,0);
-		collisionShip2 = new Ship(20,40,10,10,10,2,0);
-		distanceShip1 = new Ship(0,0,0,0,10,0,0);
-		distanceShip2 = new Ship(25,0,0,0,10,0,0);
+		standardValueShip = new Ship(0,0,0,0,11,0,100);
+		collisionShip1 = new Ship(10,30,10,10,10,0,100);
+		collisionShip2 = new Ship(20,40,10,10,10,2,100);
+		distanceShip1 = new Ship(0,0,0,0,10,0,100);
+		distanceShip2 = new Ship(25,0,0,0,10,0,100);
 	}
 	
 	@Test
@@ -129,9 +129,8 @@ public class ShipTests {
 	@Test
 	public void move_LegalCase(){
 		standardValueShip.setPosX(10);
-		standardValueShip.setVelX(10);
+		standardValueShip.setVel(10,10);
 		standardValueShip.setPosY(10);
-		standardValueShip.setVelY(10);
 		standardValueShip.move(10);
 		assertEquals(110, standardValueShip.getPosX(),EPSILON);
 		assertEquals(110, standardValueShip.getPosY(),EPSILON);
