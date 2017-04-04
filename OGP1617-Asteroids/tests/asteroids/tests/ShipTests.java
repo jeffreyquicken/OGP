@@ -129,14 +129,11 @@ public class ShipTests {
 	@Test
 	public void move_LegalCase(){
 		standardValueShip.setPosX(10);
-<<<<<<< HEAD
 		standardValueShip.setVel(10,standardValueShip.getVelY());
 		standardValueShip.setPosY(10);
 		standardValueShip.setVel(standardValueShip.getVelX(),10);
-=======
 		standardValueShip.setVel(10,10);
 		standardValueShip.setPosY(10);
->>>>>>> origin/master
 		standardValueShip.move(10);
 		assertEquals(110, standardValueShip.getPosX(),EPSILON);
 		assertEquals(110, standardValueShip.getPosY(),EPSILON);
