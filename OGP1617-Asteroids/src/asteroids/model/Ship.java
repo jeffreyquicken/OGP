@@ -129,6 +129,7 @@ public class Ship extends Circle {
 	private double mass;
 	private static double density = 1.42E12;
 	
+	@Basic
 	public void setMass(double newMass){
 		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
 			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*density;
@@ -140,6 +141,7 @@ public class Ship extends Circle {
 		return density;
 	}
 	
+	@Basic
 	public double getMass(){
 		return this.mass;
 	}
@@ -188,6 +190,7 @@ public class Ship extends Circle {
 	
 	private boolean thrusterActive = false;
 	
+	@Basic
 	public void setThruster(boolean newStatus){
 		this.thrusterActive = newStatus;
 	}
@@ -195,10 +198,12 @@ public class Ship extends Circle {
 	
 	private final double thrusterForce = 1.1E21;
 	
+	@Basic
 	public boolean getThrusterStatus(){
 		return thrusterActive;
 	}
 	
+	@Basic
 	public double getAcceleration(){
 		return thrusterForce/this.getMass();
 	}

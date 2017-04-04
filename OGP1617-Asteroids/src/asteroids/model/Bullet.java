@@ -1,7 +1,10 @@
 package asteroids.model;
+import be.kuleuven.cs.som.annotate.*;
+import be.kuleuven.cs.som.taglet.*;
 
 public class Bullet extends Circle {
 	
+	@Raw
 	public Bullet(double x, double y, double xVelocity, double yVelocity, double radius){
 		super(x,y,xVelocity,yVelocity,radius);
 	}
@@ -15,26 +18,41 @@ public class Bullet extends Circle {
 	private Ship ship;
 	private World world;
 	
+	@Basic
 	public Ship getOwner(){
 		return this.owner;
 	}
 	
-	public void setOwner(Ship newOwner){
-		this.owner = newOwner;
+	private boolean canHaveAsOwner(Ship newOwner){
+		return (!newOwner.isTerminated() && this.getDistanceBetween(newOwner)+this.getRadius()<=0);
 	}
 	
+	@Basic
+	public void setOwner(Ship newOwner) throws IllegalArgumentException,NullPointerException{
+		if(newOwner == null)
+			throw new NullPointerException();
+		else if(!canHaveAsOwner(newOwner))
+			throw new IllegalArgumentException();
+		else
+			this.owner = newOwner;
+	}
+	
+	@Basic
 	public World getWorld(){
 		return this.world;
 	}
 	
+	@Basic
 	public Ship getShip(){
 		return this.ship;
 	}
 	
+	@Basic
 	public void setShip(Ship newShip){
 		this.ship = newShip;
 	}
 	
+	@Basic
 	public void setWorld(World newWorld){
 		this.world = newWorld;
 	}
@@ -42,10 +60,12 @@ public class Bullet extends Circle {
 	private static double density = 7.8E12;
 	private final double mass = density*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
 	
+	@Basic
 	public static double getDensity(){
 		return density;
 	}
 	
+	@Basic
 	public double getMass(){
 		return this.mass;
 	}
@@ -53,10 +73,12 @@ public class Bullet extends Circle {
 	private double amountOfBounces = 0;
 	private final double maxBounces = 3;
 	
+	@Basic
 	public double getAmountOfBounces(){
 		return this.amountOfBounces;
 	}
 	
+	@Basic
 	private void setAmountOfBounces(double newAmount){
 		this.amountOfBounces = newAmount;
 	}
