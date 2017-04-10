@@ -137,6 +137,7 @@ public class Ship extends Circle {
 			this.mass = newMass;
 	}
 	
+	@Immutable
 	public static double getDensity(){
 		return density;
 	}
@@ -199,15 +200,27 @@ public class Ship extends Circle {
 	private final double thrusterForce = 1.1E21;
 	
 	@Basic
+	public double getThrusterForce(){
+		return this.thrusterForce;
+	}
+	
+	@Basic
 	public boolean getThrusterStatus(){
 		return thrusterActive;
 	}
 	
 	@Basic
 	public double getAcceleration(){
-		return thrusterForce/this.getMass();
+		return this.thrusterForce/this.getTotalMass();
 	}
 	
+	/**
+	 * Accelerates the ship for a given amount of time.
+	 * @param t
+	 * 		  The amount of time the ship is thrusted forward.
+	 * @effect this.thrust(this.getAcceleration*t)
+	 * 		   Thrusts the ship forward with the acceleration derived from getAcceleration() with a duration t.
+	 */
 	public void accelerate(double t){
 		if(t<0)
 			t=0;
@@ -217,10 +230,32 @@ public class Ship extends Circle {
 	
 	private Set<Bullet> bullets = new HashSet<>();
 	
-	public void addBullet(Bullet bullet){
-		bullet.setPosX(this.getPosX());
-		bullet.setPosY(this.getPosY());
-		this.bullets.add(bullet);
+	/**
+	 * Adds a bullet to the ships collection of bullets.
+	 * @param bullet
+	 * 		  The bullet to be added to the ship.
+	 * @post (this.getPosX() == bullet.getPosX()&&(this.getPosY() == bullet.getPosY())
+	 * 		 The bullets center is located at the same position as the ships center.
+	 * @post this.getBullets.contains(bullet)
+	 * 		 The collection of bullets of the ship contains the bullet.
+	 */
+	public void addBullet(Bullet bullet)throws NullPointerException,IllegalArgumentException{
+		if(bullet == null)
+			throw new NullPointerException();
+		if(!canHaveAsBullet(bullet))
+			throw new IllegalArgumentException();
+		else{
+			bullet.setPosX(this.getPosX());
+			bullet.setPosY(this.getPosY());
+			this.bullets.add(bullet);
+			bullet.setWorld(null);
+			bullet.setOwner(this);
+			bullet.setShip(this);
+		}
+	}
+	
+	private boolean canHaveAsBullet(Bullet bullet){
+		return (!bullet.isTerminated() && !this.isTerminated());
 	}
 	
 	public void addBullet(Collection<Bullet> bulletCollection){
@@ -234,8 +269,11 @@ public class Ship extends Circle {
 			throw new NullPointerException();
 		else if(!this.getBullets().contains(bullet))
 			throw new IllegalArgumentException();
-		else
+		else{
 			this.bullets.remove(bullet);
+			bullet.setShip(null);
+			bullet.setWorld(this.getWorld());
+		}
 	}
 	
 	public Set<Bullet> getBullets(){
@@ -249,28 +287,29 @@ public class Ship extends Circle {
 	private static double initialBulletSpeed = 250;
 	
 	public void fireBullet(){
-		Bullet bullet = null;
-		for(Bullet randomBullet:this.bullets){
-			bullet = randomBullet;
+		Bullet bullet = new ArrayList<Bullet>(this.getBullets()).get(0);
+		if(bullet != null){
+			double distance = (this.getRadius()+bullet.getRadius())/2;
+			bullet.setPosX(distance*Math.cos(this.getOrientation()));
+			bullet.setPosY(distance*Math.sin(this.getOrientation()));
+			bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
+			bullet.setShip(null);
+			this.removeBullet(bullet);
+			bullet.setWorld(this.getWorld());
 		}
-		double distance = (this.getRadius()+bullet.getRadius())/2;
-		bullet.setPosX(distance*Math.cos(this.getOrientation()));
-		bullet.setPosY(distance*Math.sin(this.getOrientation()));
-		bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
-		bullet.setWorld(this.getWorld());
 	}
 		
 	public void collision(Bullet bullet){
 		if (bullet == null)
 			throw new NullPointerException();
-		if(this.overlaps(bullet)){
-			if(this == bullet.getOwner()){
+		if(this == bullet.getOwner()){
 				this.addBullet(bullet);
-			}
-			else{
+				bullet.setWorld(null);
+				bullet.setShip(this);
+		}
+		else{
 			this.terminate();
 			bullet.terminate();
-			}
 		}
 	}
 	
@@ -280,12 +319,12 @@ public class Ship extends Circle {
 		else if(ship == null)
 			throw new NullPointerException();
 		else{
-			Vector2D deltaV = new Vector2D(this.getVelX()-ship.getVelX(),this.getVelY()-ship.getVelY());
-			Vector2D deltaR = new Vector2D(this.getPosX()-ship.getPosX(),this.getPosX()-ship.getPosY());
+			Vector2D deltaV = this.getPosVector().substract(ship.getPosVector());
+			Vector2D deltaR = this.getVelVector().substract(ship.getVelVector());
 			double sigma = this.getRadius() + ship.getRadius();
 			double J = 2*this.getTotalMass()*ship.getTotalMass()*deltaV.scalarProduct(deltaR)/((this.getTotalMass()+ship.getTotalMass())*sigma);
-			double Jx = J*(this.getPosX()-ship.getPosX())/sigma;
-			double Jy = J*(this.getPosY()-ship.getPosY())/sigma;
+			double Jx = J*(deltaR.getX())/sigma;
+			double Jy = J*(deltaR.getY())/sigma;
 			this.setVel(this.getVelX()+Jx/this.getTotalMass(), this.getVelY()+Jy/this.getTotalMass());
 			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
 		}

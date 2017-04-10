@@ -48,8 +48,7 @@ public class Facade implements IFacade {
 	 * 		  |result == {ship.getPosX(),ship.getPosY()}
 	 */
 	public double[] getShipPosition(Ship ship){
-		double [] positionArray = {ship.getPosX(),ship.getPosY()};
-		return positionArray;
+		return ship.getPosVector().array();
 	}
 	
 	/**
@@ -61,8 +60,7 @@ public class Facade implements IFacade {
 	 * 			
 	 */
 	public double[] getShipVelocity(Ship ship){
-		double[] velocityArray = {ship.getVelX(),ship.getVelY()};
-		return velocityArray;
+		return ship.getVelVector().array();
 	}
 	
 	/**
@@ -385,7 +383,7 @@ public class Facade implements IFacade {
 			return ((Circle)object).getTimeToCollision(((Circle)object).getWorld());
 		}
 		else 
-			throw new AssertionError();
+			return Double.POSITIVE_INFINITY;
 	}
 	
 	public double[] getPositionCollisionBoundary(Object object){
@@ -404,7 +402,8 @@ public class Facade implements IFacade {
 			//return ((Circle)entity2).getTimeToCollision(((World)entity1));
 		else if(entity1 instanceof Circle && entity2 instanceof Circle)
 			return ((Circle)entity1).getTimeToCollision(((Circle)entity2));
-		throw new AssertionError();
+		else
+			return Double.POSITIVE_INFINITY;
 
 	}
 	
@@ -427,16 +426,17 @@ public class Facade implements IFacade {
 		Object[] collisionArray = world.getFirstCollisionArray();
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
-		if(collisionObject2 instanceof World)
-			return ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
-		else if(collisionObject2 instanceof Circle)
-			return ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-		else
-			return null;
+		if(collisionObject1!= null && collisionObject2 !=null){
+			if(collisionObject2 instanceof World)
+				return ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
+			else if(collisionObject2 instanceof Circle)
+				return ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+		}
+		return null;
 		}
 	
-	public void evolve(World world, double dt, CollisionListener collisionListener){
-		Object[] collisionArray = world.getFirstCollisionArray();
+	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException{
+		/*Object[] collisionArray = world.getFirstCollisionArray();
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
@@ -445,7 +445,16 @@ public class Facade implements IFacade {
 			world.resolveCollision(collisionObject1, collisionObject2, collisionListener);
 			evolve(world,dt-shortest,collisionListener);
 		}
-		world.moveForward(dt);
+		else{
+			world.moveForward(dt);
+		}*/
+		try{world.evolve(dt, collisionListener);}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+		catch(NullPointerException d){
+			throw new ModelException(d);
+		}
 	}
 	
 	

@@ -328,13 +328,13 @@ public abstract class Circle {
 	 * 		   The given circle overlaps with this circle.
 	 * 		   |this.overlaps(circle)
 	 */
-	public double getTimeToCollision(Circle circle) throws NullPointerException, IllegalArgumentException{
+	public double getTimeToCollision(Circle circle) throws NullPointerException{
 		if(circle == null)
 			throw new NullPointerException();
 		else if(this.overlaps(circle))
 			throw new IllegalArgumentException();
-		Vector2D deltaV = new Vector2D (this.getVelX()-circle.getVelX(),this.getVelY()-circle.getVelY());
-		Vector2D deltaR = new Vector2D (this.getPosX()-circle.getPosX(),this.getPosY()-circle.getPosY());
+		Vector2D deltaV = this.getVelVector().substract(circle.getVelVector());
+		Vector2D deltaR = this.getPosVector().substract(circle.getVelVector());
 		double totalSigma = Math.pow(this.getRadius()+circle.getRadius(),2);
 		double d = Math.pow(deltaV.scalarProduct(deltaR),2)-deltaV.scalarProduct(deltaV)*
 				(deltaR.scalarProduct(deltaR)-totalSigma);
@@ -381,7 +381,7 @@ public abstract class Circle {
 
 	
 	public double getDistanceBetween(World world){
-		double distance = 0;
+		/*double distance = 0;
 		double angle = Math.atan2(this.getVelY(), this.getVelX());
 		if((angle>=-Math.PI/4) && (angle<=Math.PI/4))
 			distance = ((world.getWidth()-this.getPosX())/Math.cos(angle))-this.getRadius();
@@ -391,16 +391,34 @@ public abstract class Circle {
 			distance = ((this.getPosX())/Math.cos(angle))-this.getRadius();
 		if((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4))
 			distance = ((this.getPosY())/Math.sin(angle))-this.getRadius();
+			*/
+		double distance = Double.POSITIVE_INFINITY;
+		if(distance>this.getPosX()-this.getRadius())
+			distance = this.getPosX()-this.getRadius();
+		if(distance>world.getWidth()-this.getPosX()-this.getRadius())
+			distance = world.getWidth()-this.getPosX()-this.getRadius();
+		if(distance>this.getPosY()-this.getRadius())
+			distance = this.getPosY()-this.getRadius();
+		if(distance >world.getHeight()-this.getPosY()-this.getRadius())
+			distance = world.getHeight()-this.getPosY()-this.getRadius();
 		return distance;
 	}
 	
 	public double getTimeToCollision(World world){
-		if((this.getVelX() == 0) && (this.getVelY() ==0 ))
-				return Double.POSITIVE_INFINITY;
+		if((this.getVelX() == 0) && (this.getVelY() == 0 ))
+			return Double.POSITIVE_INFINITY;
 		if (world == null)
 			return Double.POSITIVE_INFINITY;
-		
-		return this.getDistanceBetween(world)/this.velocity.length();
+		double time = Double.POSITIVE_INFINITY;
+		if(this.getVelX()<0 && time > -(this.getPosX()-this.getRadius())/this.getVelX())
+			time = -(this.getPosX()-this.getRadius())/this.getVelX();
+		if(this.getVelX()>0 && time >(world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX())
+			time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
+		if(this.getVelY()<0 && time>-(this.getPosY()-this.getRadius())/this.getVelY())
+			time = -(this.getPosY()-this.getRadius())/this.getVelY();
+		if(this.getVelY()>0 && time>(world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+			time = (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
+		return time;
 	}
 	
 	public double[]  getCollisionPosition(World world){
@@ -421,6 +439,14 @@ public abstract class Circle {
 	
 	public abstract void collision(Bullet bullet);
 	public abstract void collision(Ship ship);
+	
+	public Vector2D getPosVector(){
+		return this.position;
+	}
+	
+	public Vector2D getVelVector(){
+		return this.velocity;
+	}
 	
 
 }

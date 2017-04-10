@@ -62,5 +62,20 @@ public class Vector2D {
 	public double angle(){
 		return Math.atan2(this.getY(), this.getX());
 	}
+	
+	public Vector2D substract(Vector2D other){
+		return new Vector2D(this.getX()-other.getX(),this.getY()-other.getY());
+	}
+	public Vector2D multiply(double scalar){
+		return new Vector2D(this.getX()*scalar,this.getY()*scalar);
+	}
+	
+	@Override
+	public boolean equals(Object other){
+		if(other instanceof Vector2D)
+			return this.getX() == ((Vector2D)other).getX() && this.getY() == ((Vector2D)other).getY();
+		else
+			return false;
+	}
 
 }

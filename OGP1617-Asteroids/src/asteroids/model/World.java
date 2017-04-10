@@ -6,7 +6,6 @@ import asteroids.part2.CollisionListener;
 public class World {
 	
 	public World(double height, double width){
-		
 		if(height<0)
 			this.height = 0;
 		else if(height >maxHeight)
@@ -20,7 +19,6 @@ public class World {
 			this.width = maxWidth;
 		else
 			this.width = width;
-		
 	}
 	
 	private boolean terminated = false;
@@ -50,12 +48,16 @@ public class World {
 		return this.height;
 	}
 	
+	/**
+	 * 
+	 * @see implementation
+	 */
 	public double getWidth(){
 		return this.width;
 	}
 	
-	private HashMap<double[],Ship> ships = new HashMap<>();
-	private HashMap<double[],Bullet> bullets = new HashMap<>();
+	private HashMap<Vector2D,Ship> ships = new HashMap<>();
+	private HashMap<Vector2D,Bullet> bullets = new HashMap<>();
 	
 	private boolean isWithinWorldBounds(Circle circle){
 		return ((circle.getPosX()>=0.99*circle.getRadius())&&(circle.getPosX()+0.99*circle.getRadius()<=this.width)&&
@@ -85,30 +87,31 @@ public class World {
 			throw new IllegalArgumentException();
 		else if(newCircle.isTerminated())
 			throw new IllegalArgumentException();
-		Set<Circle> circles = new HashSet<>(ships.values());
-		circles.addAll(bullets.values());
-		for(Circle circle:circles){
-			if(circle.overlaps(newCircle))
-				throw new IllegalArgumentException();
+		for(Ship ship:ships.values()){
+			if(ship.overlaps(newCircle))
+				newCircle.collision(ship);
 		}
-		double[] posArray = {newCircle.getPosX(),newCircle.getPosY()};
+		for(Bullet bullet:bullets.values()){
+			if(bullet.overlaps(newCircle))
+				newCircle.collision(bullet);
+		}
 		newCircle.setWorld(this);
 		if(newCircle instanceof Ship)
-			ships.put(posArray, (Ship)newCircle);
+			ships.put(((Ship)newCircle).getPosVector(), (Ship)newCircle);
 		else if(newCircle instanceof Bullet)
-			bullets.put(posArray, (Bullet)newCircle);
+			bullets.put(((Bullet)newCircle).getPosVector(), (Bullet)newCircle);
+		newCircle.setWorld(this);
 	}
 	
 	public void remove(Circle circle) throws NullPointerException,IllegalArgumentException{
 		if(circle == null)
 			throw new NullPointerException();
 		if(this.getWorldEntities().contains(circle)){
-			double[] posArray = {circle.getPosX(),circle.getPosY()};
+			Vector2D posVector = circle.getPosVector();
 			if( circle instanceof Ship)
-				ships.remove(posArray);
+				ships.remove(posVector);
 			else if(circle instanceof Bullet)
-				bullets.remove(posArray);
-			circle.terminate();
+				bullets.remove(posVector);
 			circle.setWorld(null);
 		}
 		}
@@ -118,11 +121,11 @@ public class World {
 			return null;
 		if((y<0) || (y>this.getHeight()))
 			return null;
-		double[] posArray = {x,y};
-		if(bullets.containsKey(posArray))
-			return (Object)bullets.get(posArray);
-		else if(ships.containsKey(posArray))
-			return (Object)ships.get(posArray);
+		Vector2D posVector = new Vector2D(x,y);
+		if(bullets.containsKey(posVector))
+			return (Object)bullets.get(posVector);
+		else if(ships.containsKey(posVector))
+			return (Object)ships.get(posVector);
 		else
 			return null;
 	}
@@ -147,15 +150,17 @@ public class World {
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
-		if(shortest<=dt){
+		if(shortest<dt){
 			this.moveForward(shortest);
 			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
 			evolve(dt-shortest,collisionListener);
 		}
-		this.moveForward(dt);
+		else
+			this.moveForward(dt);
 	}
 	
 	public void moveForward(double time){
+		if(time>0){
 		for(Circle circle:this.getWorldCircles()){
 			circle.move(time);
 			if(circle instanceof Ship){
@@ -163,23 +168,24 @@ public class World {
 					((Ship)circle).accelerate(time);
 			}
 		}
+		}
 	}
 	
 	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
-			((World)collisionObject2).collision((Circle)collisionObject1);
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
 		else if(collisionObject2 instanceof Bullet){
-			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Bullet)collisionObject2);
 			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 			}
 		else if(collisionObject2 instanceof Ship){
-			((Circle)collisionObject1).collision((Ship)collisionObject2);
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Ship)collisionObject2);
 			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			((Circle)collisionObject1).collision((Ship)collisionObject2);
 			}
 	}
 	
@@ -189,18 +195,17 @@ public class World {
 	 */
 	public Object[] getFirstCollisionArray(){
 		double shortest = Double.POSITIVE_INFINITY;
-		Set<Circle> circles = this.getWorldCircles();
 		Object collisionObject1 = null;
 		Object collisionObject2 = null;
-		Set<Circle> uncheckedCircles = new HashSet<>(circles);
-		for(Circle circle:circles){
+		Set<Circle> uncheckedCircles = new HashSet<>(this.getWorldCircles());
+		for(Circle circle:this.getWorldCircles()){
+			uncheckedCircles.remove(circle);
 			double worldCollisionTime = circle.getTimeToCollision(this);
 			if(worldCollisionTime<shortest){
 				shortest = worldCollisionTime;
 				collisionObject1 = circle;
 				collisionObject2 = this;
 			}
-			uncheckedCircles.remove(circle);
 			for(Circle secondCircle:uncheckedCircles){
 				double time = circle.getTimeToCollision(secondCircle);
 				if(time<shortest){
@@ -210,9 +215,12 @@ public class World {
 				}
 			}
 		}
-
+		if(collisionObject1 == null || collisionObject2 == null)
+			return null;
+		else{
 		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
 		return returnArray;
+		}
 	}
 
 }

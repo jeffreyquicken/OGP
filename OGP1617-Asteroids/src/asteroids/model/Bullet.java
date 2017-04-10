@@ -11,6 +11,11 @@ public class Bullet extends Circle {
 	
 	private static double minRadius =1;
 	
+	@Immutable
+	public static double getMinRadius(){
+		return minRadius;
+	}
+	
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=minRadius;
 	}
@@ -48,11 +53,7 @@ public class Bullet extends Circle {
 	}
 	
 	private boolean canHaveAsShip(Ship newShip){
-		return this.getWorld() == null;
-	}
-	
-	private boolean canHaveAsWorld(World newWorld){
-		return this.getShip() == null;
+		return this.getOwner() == newShip && !newShip.isTerminated();
 	}
 	
 	@Basic
@@ -63,13 +64,6 @@ public class Bullet extends Circle {
 			this.ship = newShip;
 	}
 	
-	@Basic
-	public void setWorld(World newWorld){
-		if(!canHaveAsWorld(newWorld))
-			throw new IllegalArgumentException();
-		else
-			this.world = newWorld;
-	}
 	
 	private static double density = 7.8E12;
 	private final double mass = density*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
@@ -92,32 +86,74 @@ public class Bullet extends Circle {
 		return this.amountOfBounces;
 	}
 	
+	@Raw
+	@Basic
 	private void setAmountOfBounces(double newAmount){
 		this.amountOfBounces = newAmount;
 	}
 	
+	/**
+	 * Increases the amount of bounces of this bullet with 1.
+	 * 
+	 * @effect this.setAmountOfBounces(this.getAmountOfBounces()+1)
+	 * 		   Increases the amount of bounces with 1.
+	 * 
+	 * @post The bullet is terminated if the new amount of bounces exceeds the maximum amount of bounces.
+	 * 		 |if(this.getAmountOfBounces()+1>=maxBounces) then
+	 * 		 |this.isTerminated()	 
+	 */
 	public void increaseAmountOfBounces(){
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
 		if(this.getAmountOfBounces()>=this.maxBounces)
 			this.terminate();
 	}
 	
-	public void collision(Bullet bullet){
-		if(bullet == null){
+	/**
+	 * Resolves a collision of a bullet and a bullet.
+	 * 
+	 * @param other
+	 * 		  The other bullet to collide with this bullet.
+	 * 
+	 * @throws NullPointerException
+	 * 		  The other bullet is null.
+	 * 		  |other == null
+	 * @throws IllegalArgumentException
+	 * 		  The other bullet is this bullet.
+	 * 		  |other == this
+	 * 
+	 * @post The world of this bullet and the other bullet is set to null.
+	 * 		  |this.getWorld() == null && other.getWorld() == null
+	 * @post Both bullets are terminated.
+	 * 		  |this.isTerminated() && other.isTerminated()
+	 * 
+	 */
+	public void collision(Bullet other) throws NullPointerException,IllegalArgumentException{
+		if(other == null){
 			throw new NullPointerException();
 		}
-		else if (bullet == this)
+		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
-			if(this.overlaps(bullet)){
+				this.setWorld(null);
+				other.setWorld(null);
 				this.terminate();
-				bullet.terminate();
-			}
+				other.terminate();
 		}
 	}
 	
+	/**
+	 * Resolves the collision of a bullet with a ship.
+	 * 
+	 * @param ship
+	 * 		  The ship to collide with.
+	 * @effect ship.collision(this)
+	 * 		  The ship collides with this bullet.
+	 */
 	public void collision(Ship ship){
-		ship.collision(this);
+		if(ship == null)
+			throw new NullPointerException();
+		else
+			ship.collision(this);
 	}
 	
 }
