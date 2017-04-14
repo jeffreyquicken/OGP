@@ -152,13 +152,14 @@ public class World {
 	
 	public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
 		if (dt<0)
-			throw new IllegalArgumentException();
+			//throw new IllegalArgumentException();
+			dt=0;
 		Object[] collisionArray = this.getFirstCollisionArray();
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
 		double[] collisionPosition = (double[])collisionArray[3];
-		if(shortest<dt){
+		if(shortest<dt && collisionPosition != null){
 			this.moveForward(shortest);
 			this.resolveCollision(collisionObject1, collisionObject2, collisionListener,collisionPosition);
 			this.evolve(dt-shortest,collisionListener);
@@ -191,7 +192,8 @@ public class World {
 	
 	public void moveForward(double time) throws IllegalArgumentException{
 		if(time<0)
-			throw new IllegalArgumentException();
+			//throw new IllegalArgumentException();
+			time = 0;
 		for(Circle circle:circles.values()){
 			circle.move(time);
 			if(circle instanceof Ship){

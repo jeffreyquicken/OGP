@@ -447,9 +447,6 @@ public abstract class Circle {
 			throw new NullPointerException();
 		if(this.getVelX() == 0 && this.getVelY() == 0)
 			return Double.POSITIVE_INFINITY;
-		if(!world.isWithinWorldBounds(this))
-			return 0;
-		
 		/*double time = Double.POSITIVE_INFINITY;
 		
 		if(this.getVelX()<0 && time > -(this.getPosX()-this.getRadius())/this.getVelX())
@@ -478,24 +475,26 @@ public abstract class Circle {
 	}
 	
 	public double[]  getCollisionPosition(World world) throws NullPointerException{
-		double time = this.getTimeToCollision(world);
-		if(time == Double.POSITIVE_INFINITY)
+		
+		double collisionTime = this.getTimeToCollision(world);
+		
+		if(collisionTime == Double.POSITIVE_INFINITY)
 			return null;
 		else{
 			Direction direction = this.getWorldCollisionDirection(world);
 			switch(direction){
 			case UP:
 				Vector2D upVector = new Vector2D(0,this.getRadius());
-				return this.getPosVector().add(this.getVelVector().multiply(time)).add(upVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(upVector).array();
 			case DOWN:
 				Vector2D downVector = new Vector2D(0,-this.getRadius());
-				return this.getPosVector().add(this.getVelVector().multiply(time)).add(downVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(downVector).array();
 			case RIGHT:
 				Vector2D rightVector = new Vector2D(this.getRadius(),0);
-				return this.getPosVector().add(this.getVelVector().multiply(time)).add(rightVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(rightVector).array();
 			case LEFT:
 				Vector2D leftVector = new Vector2D(-this.getRadius(),0);
-				return this.getPosVector().add(this.getVelVector().multiply(time)).add(leftVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(leftVector).array();
 			}
 			return null;
 		}
@@ -553,14 +552,16 @@ public abstract class Circle {
 		switch(direction){
 		case UP:
 			this.setVel(this.getVelX(), -this.getVelY());
-			break;
+			return;
 		case DOWN:
 			this.setVel(this.getVelX(), -this.getVelY());
-			break;
+			return;
 		case LEFT:
 			this.setVel(-this.getVelX(), this.getVelY());
+			return;
 		case RIGHT:
 			this.setVel(-this.getVelX(), this.getVelY());
+			return;
 		}
 	}
 	

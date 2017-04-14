@@ -298,12 +298,11 @@ public class Ship extends Circle {
 		Bullet bullet = bulletList.get(0);
 		if(bullet != null && this.getWorld() != null && !this.isTerminated()){
 			double distance = (this.getRadius()+bullet.getRadius())/2;
-			bullet.setPosX(distance*Math.cos(this.getOrientation()));
-			bullet.setPosY(distance*Math.sin(this.getOrientation()));
+			bullet.setPosX(this.getPosX() + distance*Math.cos(this.getOrientation()));
+			bullet.setPosY(this.getPosY() + distance*Math.sin(this.getOrientation()));
 			bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
 			this.removeBullet(bullet);
 			if(this.getWorld().isWithinWorldBounds(bullet)){
-				bullet.setShip(null);
 				this.getWorld().add(bullet);
 				for(Object object:this.getWorld().getWorldEntities()){
 					if(object instanceof Circle){
