@@ -1,7 +1,12 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
-
+/**
+ * A class of bullets.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ *
+ */
 public class Bullet extends Circle {
 	
 	@Raw
@@ -9,19 +14,23 @@ public class Bullet extends Circle {
 		super(x,y,xVelocity,yVelocity,radius);
 	}
 	
-	private static double minRadius =1;
+	private static double minRadius = 1;
 	
 	@Immutable
 	public static double getMinRadius(){
 		return minRadius;
 	}
 	
+	@Basic
+	public static void setMinRadius(double newMinRadius){
+		minRadius = newMinRadius;
+	}
+	
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=minRadius;
 	}
-	private Ship owner;
-	private Ship ship;
-	private World world;
+	private Ship owner = null;
+	private Ship ship = null;
 	
 	@Basic
 	public Ship getOwner(){
@@ -29,7 +38,8 @@ public class Bullet extends Circle {
 	}
 	
 	private boolean canHaveAsOwner(Ship newOwner){
-		return (!newOwner.isTerminated() && this.getDistanceBetween(newOwner)+this.getRadius()<=0);
+		//return (!newOwner.isTerminated() && this.getDistanceBetween(newOwner)+this.getRadius()<=0);
+		return true;
 	}
 	
 	@Basic
@@ -43,17 +53,15 @@ public class Bullet extends Circle {
 	}
 	
 	@Basic
-	public World getWorld(){
-		return this.world;
-	}
-	
-	@Basic
 	public Ship getShip(){
 		return this.ship;
 	}
 	
 	private boolean canHaveAsShip(Ship newShip){
-		return this.getOwner() == newShip && !newShip.isTerminated();
+		if(newShip != null)
+			return this.getOwner() == newShip && !newShip.isTerminated();
+		else
+			return true;
 	}
 	
 	@Basic
@@ -66,6 +74,7 @@ public class Bullet extends Circle {
 	
 	
 	private static double density = 7.8E12;
+	
 	private final double mass = density*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
 	
 	@Basic
@@ -104,8 +113,9 @@ public class Bullet extends Circle {
 	 */
 	public void increaseAmountOfBounces(){
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
-		if(this.getAmountOfBounces()>=this.maxBounces)
+		if(this.getAmountOfBounces()>=maxBounces)
 			this.terminate();
+			this.getWorld().remove(this);
 	}
 	
 	/**
@@ -134,8 +144,8 @@ public class Bullet extends Circle {
 		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
-				this.setWorld(null);
-				other.setWorld(null);
+				this.getWorld().remove(this);
+				other.getWorld().remove(other);
 				this.terminate();
 				other.terminate();
 		}
@@ -149,7 +159,7 @@ public class Bullet extends Circle {
 	 * @effect ship.collision(this)
 	 * 		  The ship collides with this bullet.
 	 */
-	public void collision(Ship ship){
+	public void collision(Ship ship) throws NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else

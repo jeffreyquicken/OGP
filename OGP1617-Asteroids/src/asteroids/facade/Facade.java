@@ -247,13 +247,11 @@ public class Facade implements IFacade {
 	}
 	
 	public double[] getBulletPosition(Bullet bullet){
-		double[] posArray = {bullet.getPosX(),bullet.getPosY()};
-		return posArray;
+		return bullet.getPosVector().array();
 	}
 	
 	public double[] getBulletVelocity(Bullet bullet){
-		double[] velArray = {bullet.getVelX(),bullet.getVelY()};
-		return velArray;
+		return bullet.getVelVector().array();
 	}
 	
 	public double getBulletRadius(Bullet bullet){
@@ -278,7 +276,7 @@ public class Facade implements IFacade {
 	
 	/////// WORLD CODE///////////////////:
 	public World createWorld(double width, double height){
-		return new World(width,height);
+		return new World(height,width);
 	}
 	
 	public void terminateWorld(World world) throws ModelException{
@@ -357,11 +355,23 @@ public class Facade implements IFacade {
 	}
 	
 	public void loadBulletOnShip(Ship ship, Bullet bullet) throws ModelException{
-		ship.addBullet(bullet);
+		try{ship.addBullet(bullet);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
 	
 	public void loadBulletsOnShip(Ship ship, Collection<Bullet> bullets) throws ModelException{
-		ship.addBullet(bullets);
+		try{ship.addBullet(bullets);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
 	
 	public void removeBulletFromShip(Ship ship, Bullet bullet) throws ModelException{
@@ -375,79 +385,102 @@ public class Facade implements IFacade {
 	}
 	
 	public void fireBullet(Ship ship) throws ModelException{
-		ship.fireBullet();
+		try{ship.fireBullet();}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
 	///COLLISIONS//////////////////////////////////
-	public double getTimeCollisionBoundary(Object object){
+	public double getTimeCollisionBoundary(Object object) throws ModelException{
 		if(object instanceof Circle){
-			return ((Circle)object).getTimeToCollision(((Circle)object).getWorld());
+			try{return ((Circle)object).getTimeToCollision(((Circle)object).getWorld());}
+			catch(NullPointerException e){
+				throw new ModelException(e);
+			}
+			catch(IllegalArgumentException d){
+				throw new ModelException(d);
+			}
 		}
 		else 
 			return Double.POSITIVE_INFINITY;
 	}
 	
-	public double[] getPositionCollisionBoundary(Object object){
+	public double[] getPositionCollisionBoundary(Object object) throws ModelException{
 		if(object instanceof Circle){
-			return ((Circle)object).getCollisionPosition(((Circle)object).getWorld());
+			try{return ((Circle)object).getCollisionPosition(((Circle)object).getWorld());}
+			catch(NullPointerException e){
+				throw new ModelException(e);
+			}
+			catch(IllegalArgumentException d){
+				throw new ModelException(d);
+			}
 		}
 		else
 			return null;
 	}
 	
-	public double getTimeCollisionEntity(Object entity1, Object entity2){
-		if(entity1 instanceof Circle && entity2 instanceof World )
+	public double getTimeCollisionEntity(Object entity1, Object entity2) throws ModelException{
+		try{if(entity1 instanceof Circle && entity2 instanceof World )
 			return ((Circle)entity1).getTimeToCollision(((World)entity2));
 		else if(entity1 instanceof World && entity2 instanceof Circle)
 			return getTimeCollisionEntity(entity2,entity1);
-			//return ((Circle)entity2).getTimeToCollision(((World)entity1));
 		else if(entity1 instanceof Circle && entity2 instanceof Circle)
 			return ((Circle)entity1).getTimeToCollision(((Circle)entity2));
 		else
-			return Double.POSITIVE_INFINITY;
+			return Double.POSITIVE_INFINITY;}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 
 	}
 	
 	public double[] getPositionCollisionEntity(Object entity1, Object entity2) throws ModelException{
-		if(entity1 instanceof Circle && entity2 instanceof World )
+		try{if(entity1 instanceof Circle && entity2 instanceof World )
 			return ((Circle)entity1).getCollisionPosition(((World)entity2));
 		else if(entity1 instanceof World && entity2 instanceof Circle)
 			return getPositionCollisionEntity(entity2,entity1);
 		else if(entity1 instanceof Circle && entity2 instanceof Circle)
 			return ((Circle)entity1).getCollisionPosition(((Circle)entity2));
 		else
-			return null;
+			return null;}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
 	}
 	
 	public double getTimeNextCollision(World world){
 		return (double)world.getFirstCollisionArray()[0];
 	}
 	
-	public double[] getPositionNextCollision(World world){
+	public double[] getPositionNextCollision(World world) throws ModelException{
 		Object[] collisionArray = world.getFirstCollisionArray();
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
-		if(collisionObject1!= null && collisionObject2 !=null){
+		try{if(collisionObject1!= null && collisionObject2 !=null){
 			if(collisionObject2 instanceof World)
 				return ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 			else if(collisionObject2 instanceof Circle)
 				return ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+		}}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+		}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
 		}
 		return null;
 		}
 	
 	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException{
-		/*Object[] collisionArray = world.getFirstCollisionArray();
-		Object collisionObject1 = collisionArray[1];
-		Object collisionObject2 = collisionArray[2];
-		double shortest = (double)collisionArray[0];
-		if(shortest<=dt){
-			world.moveForward(shortest);
-			world.resolveCollision(collisionObject1, collisionObject2, collisionListener);
-			evolve(world,dt-shortest,collisionListener);
-		}
-		else{
-			world.moveForward(dt);
-		}*/
 		try{world.evolve(dt, collisionListener);}
 		catch(IllegalArgumentException e){
 			throw new ModelException(e);
@@ -465,6 +498,7 @@ public class Facade implements IFacade {
 	public Set<? extends Object> getEntities(World world){
 		return world.getWorldEntities();
 	}
+	
 	
 	
 

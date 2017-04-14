@@ -1,7 +1,12 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.*;
-
+/**
+ * A class of circular objects.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ *
+ */
 public abstract class Circle {
 	
 	/**
@@ -38,25 +43,28 @@ public abstract class Circle {
 	 */
 	@Raw
 	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException{
-		this.position = new Vector2D(x,y);
-		this.velocity = new Vector2D(xVelocity,yVelocity);
+		this.setPosX(x);
+		this.setPosY(y);
+		this.setVel(xVelocity,yVelocity);
 		this.setRadius(radius);
 	}
 	
 	private boolean terminated = false;
 	
+	@Basic
 	public void terminate() throws IllegalArgumentException{
 		if(this.isTerminated())
 			throw new IllegalArgumentException();
 		else
-			this.terminated = true;
+			this.terminated = true;	
 	}
 	
+	@Basic
 	public boolean isTerminated(){
 		return this.terminated;
 	}
 	
-	private Vector2D position;
+	private Vector2D position = new Vector2D(0,0);
 	
 	/**
 	 * Sets the X-coordinate of this circle to a given coordinate.
@@ -74,7 +82,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			position.setX(newPos);
+			this.position.setX(newPos);
 	}
 	
 	/**
@@ -87,7 +95,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getPosX(){
-		return position.getX();
+		return this.getPosVector().getX();
 	}
 	
 	/**
@@ -106,7 +114,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			position.setY(newPos);
+			this.position.setY(newPos);
 	}
 	
 	/**
@@ -118,7 +126,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getPosY(){
-		return position.getY();
+		return this.getPosVector().getY();
 	}
 	
 	/**
@@ -131,10 +139,10 @@ public abstract class Circle {
 	 * 		   | result == ((pos<=0) || (pos>=0))
 	 */
 	private static boolean isValidPos(double pos){
-		return (pos>=0) ;
-		}
+		return (pos>=0);
+	}
 	
-	private Vector2D velocity;
+	private Vector2D velocity = new Vector2D(0,0);
 	private double speedLimit = 300000;
 	
 	/**
@@ -146,22 +154,26 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getVelX(){
-		return velocity.getX();
+		return this.getVelVector().getX();
 	}
 	
 	/**
-	 * Sets the velocity in the X direction of this circle to a given velocity.
+	 * Sets the velocity this circle to a given velocity.
 	 * 
-	 * @param newVel
-	 * 		  The new velocity of this circle.
+	 * @param newVelX
+	 * 		  The new x velocity of this circle.
+	 * @param newVelY
+	 * 		  The new y velocity of this circle.
+	 * 
 	 * @post
 	 * 		If the total new speed does not exceed the speed limit, 
-	 * 		the speed in the velocity in the X direction is set to newVel.
-	 * 		Otherwise, the velocity in the X direction is set in such a way that the
-	 * 		total new speed is equal to the speed limit.
-	 * 		|if((Math.sqrt(Math.pow(newVel,2) + Math.pow(this.getVelY(),2)))>speedLimit) then
-	 * 		| new.getVelX() == Math.sqrt(Math.pow(speedLimit, 2)-Math.pow(this.getVelY(), 2))
-	 * 		|else then new.getVelX() == newVel 
+	 * 		the speed in the x and y direction is set to newVelX and newVelY.
+	 * 		Otherwise, the velocity in the X and Y direction is set in such a way that the
+	 * 		total new speed is equal to the speed limit, but the direction of the new velocity remains the same.
+	 * 		|if(Math.sqrt(Math.pow(newVelX, 2) + Math.pow(newVelY, 2))>speedLimit) then
+	 * 		|new.getVelX() == speedLimit*newVelX/totalSpeed && new.getVelY() == speedLimit*newVelY/totalSpeed)
+	 * 		|else
+	 * 		|new.getVelX() == newVelX && new.getVelY() == newVelY
 	 */
 	@Basic
 	public void setVel(double newVelX, double newVelY){
@@ -184,7 +196,7 @@ public abstract class Circle {
 	 */
 	@Basic
 	public double getVelY(){
-		return velocity.getY();
+		return this.getVelVector().getY();
 	}
 	
 	private double radius;
@@ -231,19 +243,25 @@ public abstract class Circle {
 			this.radius = newRadius;
 	} 
 	
-	private World world;
+	private World world = null;
 	
+	@Basic
 	public World getWorld(){
 		return this.world;
 	}
 	
-	public void setWorld(World newWorld){
-		if(this.canHaveAsWorld(newWorld))
-			this.world = newWorld;
+	@Basic
+	public void setWorld(World newWorld) throws IllegalArgumentException{
+		if(!canHaveAsWorld(newWorld))
+			throw new IllegalArgumentException();
+		this.world = newWorld;
 	}
 	
 	private boolean canHaveAsWorld(World newWorld){
-		return true;
+		if(newWorld != null)
+			return !newWorld.isTerminated();
+		else 
+			return true;
 	}
 	
 	/**
@@ -287,7 +305,7 @@ public abstract class Circle {
 		else if(circle == this)
 			return 0;
 		else 
-			return (Math.sqrt(Math.pow(this.getPosX()-circle.getPosX(),2)+Math.pow(this.getPosY()-circle.getPosY(), 2))-this.getRadius()-circle.getRadius());
+			return (this.getPosVector().substract(circle.getPosVector())).length()-this.getRadius()-circle.getRadius();
 	}
 	
 	/**
@@ -309,7 +327,18 @@ public abstract class Circle {
 		else if(circle == this)
 			return true;
 		else{
-			return (this.getDistanceBetween(circle)+this.getRadius()+circle.getRadius()<=0.99*(this.getRadius()+circle.getRadius()));
+			return this.getDistanceBetween(circle)+0.01*(this.getRadius()+circle.getRadius())<=0;
+		}
+	}
+	
+	public boolean actualOverlaps (Circle circle) throws NullPointerException{
+		if(circle == null){
+			throw new NullPointerException();
+		}
+		else if(circle == this)
+			return true;
+		else{
+			return this.getDistanceBetween(circle)<=0;
 		}
 	}
 	
@@ -331,8 +360,8 @@ public abstract class Circle {
 	public double getTimeToCollision(Circle circle) throws NullPointerException{
 		if(circle == null)
 			throw new NullPointerException();
-		else if(this.overlaps(circle))
-			throw new IllegalArgumentException();
+		//else if(this.actualOverlaps(circle))
+		//	throw new IllegalArgumentException();
 		Vector2D deltaV = this.getVelVector().substract(circle.getVelVector());
 		Vector2D deltaR = this.getPosVector().substract(circle.getVelVector());
 		double totalSigma = Math.pow(this.getRadius()+circle.getRadius(),2);
@@ -367,8 +396,8 @@ public abstract class Circle {
 	public double[] getCollisionPosition(Circle circle) throws NullPointerException, IllegalArgumentException{
 		if(circle == null)
 			throw new NullPointerException();
-		else if(this.overlaps(circle))
-			throw new IllegalArgumentException();
+		//else if(this.actualOverlaps(circle))
+		//	throw new IllegalArgumentException();
 		double deltaT = this.getTimeToCollision(circle);
 		if(deltaT == Double.POSITIVE_INFINITY)
 			return null;
@@ -380,61 +409,159 @@ public abstract class Circle {
 	}
 
 	
-	public double getDistanceBetween(World world){
-		/*double distance = 0;
-		double angle = Math.atan2(this.getVelY(), this.getVelX());
-		if((angle>=-Math.PI/4) && (angle<=Math.PI/4))
-			distance = ((world.getWidth()-this.getPosX())/Math.cos(angle))-this.getRadius();
-		if((angle>=Math.PI/4) && (angle<=3*Math.PI/4))
-			distance = ((world.getHeight()-this.getPosY())/Math.sin(angle))-this.getRadius();
-		if((angle>=3*Math.PI/4)&&(angle<=-3*Math.PI/4))
-			distance = ((this.getPosX())/Math.cos(angle))-this.getRadius();
-		if((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4))
-			distance = ((this.getPosY())/Math.sin(angle))-this.getRadius();
-			*/
-		double distance = Double.POSITIVE_INFINITY;
+	public double getDistanceBetween(World world)throws NullPointerException{
+		if(world == null)
+			throw new NullPointerException();
+		
+		/*double distance = Double.POSITIVE_INFINITY;
+		
 		if(distance>this.getPosX()-this.getRadius())
 			distance = this.getPosX()-this.getRadius();
+		
 		if(distance>world.getWidth()-this.getPosX()-this.getRadius())
 			distance = world.getWidth()-this.getPosX()-this.getRadius();
+		
 		if(distance>this.getPosY()-this.getRadius())
 			distance = this.getPosY()-this.getRadius();
+		
 		if(distance >world.getHeight()-this.getPosY()-this.getRadius())
 			distance = world.getHeight()-this.getPosY()-this.getRadius();
-		return distance;
+		
+		return distance;*/
+		Direction direction = this.getNearestWorldBoundary(world);
+		switch(direction){
+		case UP:
+			return world.getHeight()-this.getPosY()-this.getRadius();
+		case DOWN:
+			return this.getPosY()-this.getRadius();
+		case LEFT:
+			return this.getPosX()-this.getRadius();
+		case RIGHT:
+			return world.getWidth()-this.getPosX()-this.getRadius();
+		}
+		throw new AssertionError();
 	}
 	
-	public double getTimeToCollision(World world){
-		if((this.getVelX() == 0) && (this.getVelY() == 0 ))
-			return Double.POSITIVE_INFINITY;
+	public double getTimeToCollision(World world) throws NullPointerException{
 		if (world == null)
+			throw new NullPointerException();
+		if(this.getVelX() == 0 && this.getVelY() == 0)
 			return Double.POSITIVE_INFINITY;
-		double time = Double.POSITIVE_INFINITY;
+		if(!world.isWithinWorldBounds(this))
+			return 0;
+		
+		/*double time = Double.POSITIVE_INFINITY;
+		
 		if(this.getVelX()<0 && time > -(this.getPosX()-this.getRadius())/this.getVelX())
 			time = -(this.getPosX()-this.getRadius())/this.getVelX();
-		if(this.getVelX()>0 && time >(world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX())
+		
+		if(this.getVelX()>0 && time > (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX())
 			time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
-		if(this.getVelY()<0 && time>-(this.getPosY()-this.getRadius())/this.getVelY())
+		
+		if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
 			time = -(this.getPosY()-this.getRadius())/this.getVelY();
-		if(this.getVelY()>0 && time>(world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
-			time = (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
-		return time;
+		
+		if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+			time = (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();*/
+		Direction collisionDirection = this.getWorldCollisionDirection(world);
+		switch(collisionDirection){
+		case UP:
+			return (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
+		case DOWN:
+			return -(this.getPosY()-this.getRadius())/this.getVelY();
+		case LEFT:
+			return -(this.getPosX()-this.getRadius())/this.getVelX();
+		case RIGHT:
+			return (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
+		}
+		throw new AssertionError();
 	}
 	
-	public double[]  getCollisionPosition(World world){
+	public double[]  getCollisionPosition(World world) throws NullPointerException{
 		double time = this.getTimeToCollision(world);
 		if(time == Double.POSITIVE_INFINITY)
 			return null;
-		double[] posArray = {this.getPosX()+this.getVelX()*time,this.getPosY()+this.getVelY()*time};
-		return posArray;
+		else{
+			Direction direction = this.getWorldCollisionDirection(world);
+			switch(direction){
+			case UP:
+				Vector2D upVector = new Vector2D(0,this.getRadius());
+				return this.getPosVector().add(this.getVelVector().multiply(time)).add(upVector).array();
+			case DOWN:
+				Vector2D downVector = new Vector2D(0,-this.getRadius());
+				return this.getPosVector().add(this.getVelVector().multiply(time)).add(downVector).array();
+			case RIGHT:
+				Vector2D rightVector = new Vector2D(this.getRadius(),0);
+				return this.getPosVector().add(this.getVelVector().multiply(time)).add(rightVector).array();
+			case LEFT:
+				Vector2D leftVector = new Vector2D(-this.getRadius(),0);
+				return this.getPosVector().add(this.getVelVector().multiply(time)).add(leftVector).array();
+			}
+			return null;
+		}
+	}
+	
+	private Direction getWorldCollisionDirection(World world){
+		
+		if(this.getVelX()<0){
+			double time = -(this.getPosX()-this.getRadius())/this.getVelX();
+			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
+				return Direction.DOWN;
+			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+				return Direction.UP;
+			else
+				return Direction.LEFT;
+		}
+		else{
+			double time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
+			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
+				return Direction.DOWN;
+			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+				return Direction.UP;
+			else
+				return Direction.RIGHT;
+		}
+	}
+	
+	private Direction getNearestWorldBoundary(World world){
+		if(this.getPosX()-this.getRadius()<world.getWidth()-this.getPosX()-this.getRadius() &&
+				this.getPosX()-this.getRadius()<this.getPosY()-this.getRadius() &&
+				this.getPosX()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
+			return Direction.LEFT;
+		
+		else if(world.getWidth()-this.getPosX()-this.getRadius()<this.getPosX()-this.getRadius() &&
+				world.getWidth()-this.getPosX()-this.getRadius()<this.getPosY()-this.getRadius() && 
+						world.getWidth()-this.getPosX()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
+			return Direction.RIGHT;
+		
+		else if(this.getPosY()-this.getRadius()<this.getPosX()-this.getRadius() &&
+				this.getPosY()-this.getRadius()<world.getWidth()-this.getPosX()-this.getRadius() &&
+				this.getPosY()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
+			return Direction.DOWN;
+		
+		else
+			return Direction.UP;
 	}
 	
 	public void bounce(World world){
-		double angle = this.velocity.angle();
+		/*double angle = this.velocity.angle();
 		if(((angle>=-Math.PI/4) && (angle<=Math.PI/4)) || ((angle>=3*Math.PI/4)&&(angle<=-3*Math.PI/4)))
 			this.setVel(-this.getVelX(), this.getVelY());
 		if(((angle>=Math.PI/4) && (angle<=3*Math.PI/4)) || ((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4)))
+			this.setVel(this.getVelX(), -this.getVelY());*/
+		Direction direction = this.getNearestWorldBoundary(world);
+		switch(direction){
+		case UP:
 			this.setVel(this.getVelX(), -this.getVelY());
+			break;
+		case DOWN:
+			this.setVel(this.getVelX(), -this.getVelY());
+			break;
+		case LEFT:
+			this.setVel(-this.getVelX(), this.getVelY());
+		case RIGHT:
+			this.setVel(-this.getVelX(), this.getVelY());
+		}
 	}
 	
 	public abstract void collision(Bullet bullet);

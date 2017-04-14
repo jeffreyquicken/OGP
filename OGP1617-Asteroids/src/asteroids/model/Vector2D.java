@@ -1,36 +1,54 @@
 package asteroids.model;
+import java.util.*;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
 
+/**
+ * A class of 2-dimensional vectors.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ *
+ */
 @Value
 public class Vector2D {
 	
-	public Vector2D(double x, double y) throws IllegalArgumentException{
+	@Raw
+	public Vector2D(double x, double y){
 		this.setX(x);
 		this.setY(y);
+	}
+	
+	@Raw
+	public Vector2D(double[] vectorArray){
+		this.setX(vectorArray[0]);
+		this.setY(vectorArray[1]);
 	}
 	
 	private double xComponent;
 	private double yComponent;
 	
-	public void setX(double newX) throws IllegalArgumentException{
-		if(Double.isNaN(newX))
-			throw new IllegalArgumentException();
-		else
-			this.xComponent = newX;
+	public void setX(double newX){
+		this.xComponent = newX;
 	}
 	
-	public void setY(double newY) throws IllegalArgumentException{
-		if(Double.isNaN(newY))
-			throw new IllegalArgumentException();
-		else
-			this.yComponent = newY;
+	public void setY(double newY){
+		this.yComponent = newY;
 	}
 	
+	/**
+	 * Returns the x component of the vector.
+	 * @return the x component of the vector.
+	 * 		   |result == this.xComponent
+	 */
 	public double getX(){
 		return this.xComponent;
 	}
 	
+	/**
+	 * Returns the y component of the vector.
+	 * @return the y component of the vector.
+	 * 		   |result == this.yComponent
+	 */
 	public double getY(){
 		return this.yComponent;
 	}
@@ -39,6 +57,12 @@ public class Vector2D {
 		return Math.sqrt(Math.pow(this.getX(),2)+Math.pow(this.getY(), 2));
 	}
 	
+	/**
+	 * Converts the vector to an array.
+	 * 
+	 * @return An array with elements.
+	 * 		  |result == {this.getX(),this.getY()}
+	 */
 	public double[] array(){
 		double[] array = {this.getX(),this.getY()};
 		return array;
@@ -68,6 +92,9 @@ public class Vector2D {
 	}
 	public Vector2D multiply(double scalar){
 		return new Vector2D(this.getX()*scalar,this.getY()*scalar);
+	}
+	public Vector2D add(Vector2D other){
+		return new Vector2D(this.getX()+other.getX(),this.getY()+other.getY());
 	}
 	
 	@Override

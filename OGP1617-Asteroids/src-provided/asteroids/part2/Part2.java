@@ -3,7 +3,6 @@ package asteroids.part2;
 import asteroids.part2.facade.IFacade;
 import asteroids.part2.internal.AsteroidsFrame2;
 
-
 public class Part2 {
 	public static void main(String[] args) {
 		boolean tryFullscreen = false;

@@ -1,10 +1,18 @@
 package asteroids.model;
+import be.kuleuven.cs.som.annotate.*;
+import be.kuleuven.cs.som.taglet.*;
 import java.util.*;
 
 import asteroids.part2.CollisionListener;
-
+/**
+ * A class of world.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ *
+ */
 public class World {
 	
+	@Raw
 	public World(double height, double width){
 		if(height<0)
 			this.height = 0;
@@ -23,11 +31,27 @@ public class World {
 	
 	private boolean terminated = false;
 	
+	/**
+	 * Terminates this world.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		   Throws IllegalArgumentException if the world is already terminated.
+	 * 		   |this.isTerminated()
+	 * 
+	 * @post
+	 * 		 This world is terminated.
+	 * 		 |this.isTerminated()
+	 */
 	public void terminate() throws IllegalArgumentException{
 		if(this.isTerminated())
 			throw new IllegalArgumentException();
 		else
 			this.terminated = true;
+			for(Object object: this.getWorldEntities()){
+				if(object instanceof Circle)
+					((Circle)object).terminate();
+					((Circle)object).setWorld(null);
+			}
 	}
 	
 	public boolean isTerminated(){
@@ -56,27 +80,34 @@ public class World {
 		return this.width;
 	}
 	
-	private HashMap<Vector2D,Ship> ships = new HashMap<>();
-	private HashMap<Vector2D,Bullet> bullets = new HashMap<>();
+	private HashMap<Vector2D,Circle> circles = new HashMap<>();
 	
-	private boolean isWithinWorldBounds(Circle circle){
+	public boolean isWithinWorldBounds(Circle circle){
 		return ((circle.getPosX()>=0.99*circle.getRadius())&&(circle.getPosX()+0.99*circle.getRadius()<=this.width)&&
 				(circle.getPosY()-0.99*circle.getRadius()>=0)&&(circle.getPosY()+0.99*circle.getRadius()<=this.height));
 	}
 	
 	public Set<Ship> getWorldShips(){
-		return new HashSet<Ship>(ships.values());
-				
+		Set<Ship> ships = new HashSet<>();
+		for(Circle circle:circles.values()){
+			if(circle instanceof Ship)
+				ships.add((Ship)circle);
+		}
+		return ships;
 	}
 	
 	public Set<Bullet> getWorldBullets(){
-		return new HashSet<Bullet>(bullets.values());
+		Set<Bullet> bullets = new HashSet<>();
+		for(Circle circle:circles.values()){
+			if(circle instanceof Bullet)
+				bullets.add((Bullet)circle);
+		}
+		return bullets;
 	}
 	
 	public Set<Object> getWorldEntities(){
 		Set<Object> entitySet = new HashSet<Object>();
-		entitySet.addAll(this.bullets.values());
-		entitySet.addAll(this.ships.values());
+		entitySet.addAll(circles.values());
 		return entitySet;
 	}
 	
@@ -87,33 +118,20 @@ public class World {
 			throw new IllegalArgumentException();
 		else if(newCircle.isTerminated())
 			throw new IllegalArgumentException();
-		for(Ship ship:ships.values()){
-			if(ship.overlaps(newCircle))
-				newCircle.collision(ship);
-		}
-		for(Bullet bullet:bullets.values()){
-			if(bullet.overlaps(newCircle))
-				newCircle.collision(bullet);
+		for(Circle circle :circles.values()){
+			if(circle.overlaps(newCircle))
+				throw new IllegalArgumentException();
 		}
 		newCircle.setWorld(this);
-		if(newCircle instanceof Ship)
-			ships.put(((Ship)newCircle).getPosVector(), (Ship)newCircle);
-		else if(newCircle instanceof Bullet)
-			bullets.put(((Bullet)newCircle).getPosVector(), (Bullet)newCircle);
-		newCircle.setWorld(this);
+		circles.put(newCircle.getPosVector(), newCircle);
 	}
 	
 	public void remove(Circle circle) throws NullPointerException,IllegalArgumentException{
 		if(circle == null)
 			throw new NullPointerException();
-		if(this.getWorldEntities().contains(circle)){
-			Vector2D posVector = circle.getPosVector();
-			if( circle instanceof Ship)
-				ships.remove(posVector);
-			else if(circle instanceof Bullet)
-				bullets.remove(posVector);
-			circle.setWorld(null);
-		}
+		Vector2D posVector = circle.getPosVector();
+		circles.remove(posVector);
+		circle.setWorld(null);
 		}
 	
 	public Object getEntityAtPos(double x, double y){
@@ -122,12 +140,7 @@ public class World {
 		if((y<0) || (y>this.getHeight()))
 			return null;
 		Vector2D posVector = new Vector2D(x,y);
-		if(bullets.containsKey(posVector))
-			return (Object)bullets.get(posVector);
-		else if(ships.containsKey(posVector))
-			return (Object)ships.get(posVector);
-		else
-			return null;
+		return circles.get(posVector);
 	}
 	
 	private void collision(Circle circle){
@@ -137,12 +150,6 @@ public class World {
 		}
 	}
 	
-	private Set<Circle> getWorldCircles(){
-		Set<Circle> circles = new HashSet<>(ships.values());
-		circles.addAll(bullets.values());
-		return circles;
-	}
-	
 	public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
 		if (dt<0)
 			throw new IllegalArgumentException();
@@ -150,77 +157,113 @@ public class World {
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
+		double[] collisionPosition = (double[])collisionArray[3];
 		if(shortest<dt){
 			this.moveForward(shortest);
-			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
-			evolve(dt-shortest,collisionListener);
+			this.resolveCollision(collisionObject1, collisionObject2, collisionListener,collisionPosition);
+			this.evolve(dt-shortest,collisionListener);
 		}
-		else
+		else{
 			this.moveForward(dt);
+		}
 	}
 	
-	public void moveForward(double time){
-		if(time>0){
-		for(Circle circle:this.getWorldCircles()){
+	/*public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
+		if (dt<0)
+			throw new IllegalArgumentException();
+		Object[] collisionArray = this.getFirstCollisionArray();
+		double shortest = (double)collisionArray[0];
+		Object collisionObject1 = collisionArray[1];
+		Object collisionObject2 = collisionArray[2];
+		double[] collisionPosition = (double[])collisionArray[3];
+		while(shortest<dt && collisionObject1 != null && collisionObject2 != null && collisionPosition != null){
+			this.moveForward(shortest);
+			this.resolveCollision(collisionObject1, collisionObject2, collisionListener,collisionPosition);
+			dt = dt-shortest;
+			collisionArray = this.getFirstCollisionArray();
+			shortest = (double)collisionArray[0];
+			collisionObject1 = collisionArray[1];
+			collisionObject2 = collisionArray[2];
+			collisionPosition = (double[])collisionArray[3];
+		}
+		this.moveForward(dt);
+	}*/
+	
+	public void moveForward(double time) throws IllegalArgumentException{
+		if(time<0)
+			throw new IllegalArgumentException();
+		for(Circle circle:circles.values()){
 			circle.move(time);
 			if(circle instanceof Ship){
-				if(((Ship)circle).getThrusterStatus() == true)
+				if(((Ship)circle).getThrusterStatus())
 					((Ship)circle).accelerate(time);
 			}
 		}
-		}
+		this.updateCirclesMap();
 	}
 	
-	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
+	
+	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener, double[] collisionPosition){
 		if(collisionObject2 instanceof World){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
 			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
 		else if(collisionObject2 instanceof Bullet){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Bullet)collisionObject2);
 			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 			}
 		else if(collisionObject2 instanceof Ship){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Ship)collisionObject2);
 			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			((Circle)collisionObject1).collision((Ship)collisionObject2);
 			}
+		else
+			throw new AssertionError();
 	}
 	
 	/**
 	 * 
-	 * @return An array with the time to the first collision and the two colliding objects.
+	 * @return An array with the time to the first collision,the two colliding objects and the collision position.
 	 */
+
 	public Object[] getFirstCollisionArray(){
 		double shortest = Double.POSITIVE_INFINITY;
 		Object collisionObject1 = null;
 		Object collisionObject2 = null;
-		Set<Circle> uncheckedCircles = new HashSet<>(this.getWorldCircles());
-		for(Circle circle:this.getWorldCircles()){
-			uncheckedCircles.remove(circle);
+		double[] collisionPosition = null;
+		Collection<Circle> circleCollection = circles.values();
+		for(Circle circle:circleCollection){
 			double worldCollisionTime = circle.getTimeToCollision(this);
 			if(worldCollisionTime<shortest){
 				shortest = worldCollisionTime;
 				collisionObject1 = circle;
 				collisionObject2 = this;
+				collisionPosition = circle.getCollisionPosition(this);
 			}
-			for(Circle secondCircle:uncheckedCircles){
-				double time = circle.getTimeToCollision(secondCircle);
-				if(time<shortest){
-					shortest = time;
-					collisionObject1 = circle;
-					collisionObject2 = secondCircle;
+			for(Circle secondCircle:circleCollection){
+				if(secondCircle != circle){
+					double time = circle.getTimeToCollision(secondCircle);
+					if(time<shortest){
+						shortest = time;
+						collisionObject1 = circle;
+						collisionObject2 = secondCircle;
+						collisionPosition = circle.getCollisionPosition(secondCircle);
+					}
 				}
 			}
 		}
-		if(collisionObject1 == null || collisionObject2 == null)
-			return null;
-		else{
-		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
+		Object[] returnArray = {shortest,collisionObject1,collisionObject2,collisionPosition};
 		return returnArray;
 		}
+	
+	/**
+	 * Updates the keys of the circles map
+	 */
+	private void updateCirclesMap(){
+		HashMap<Vector2D,Circle> updatedCircles = new HashMap<Vector2D,Circle>();
+		for(Circle circle:this.circles.values()){
+			updatedCircles.put(circle.getPosVector(), circle);
+		}
+		this.circles = updatedCircles;
 	}
-
 }
+

@@ -54,11 +54,13 @@ public class Ship extends Circle {
 	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
 	 * 
 	 */
+	@Raw
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation){
 		super(x,y,xVelocity,yVelocity,radius);
 		this.setOrientation(orientation);
 	}
 	
+	@Raw
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation, double mass){
 		super(x,y,xVelocity,yVelocity,radius);
 		this.setOrientation(orientation);
@@ -138,8 +140,14 @@ public class Ship extends Circle {
 	}
 	
 	@Immutable
+	@Basic
 	public static double getDensity(){
 		return density;
+	}
+	
+	@Basic
+	public static void setDensity(double newDensity){
+		density = newDensity;
 	}
 	
 	@Basic
@@ -248,9 +256,9 @@ public class Ship extends Circle {
 			bullet.setPosX(this.getPosX());
 			bullet.setPosY(this.getPosY());
 			this.bullets.add(bullet);
-			bullet.setWorld(null);
 			bullet.setOwner(this);
 			bullet.setShip(this);
+			bullet.setWorld(null);
 		}
 	}
 	
@@ -272,7 +280,6 @@ public class Ship extends Circle {
 		else{
 			this.bullets.remove(bullet);
 			bullet.setShip(null);
-			bullet.setWorld(this.getWorld());
 		}
 	}
 	
@@ -287,15 +294,28 @@ public class Ship extends Circle {
 	private static double initialBulletSpeed = 250;
 	
 	public void fireBullet(){
-		Bullet bullet = new ArrayList<Bullet>(this.getBullets()).get(0);
-		if(bullet != null){
+		ArrayList<Bullet> bulletList = new ArrayList<Bullet>(this.getBullets());
+		Bullet bullet = bulletList.get(0);
+		if(bullet != null && this.getWorld() != null && !this.isTerminated()){
 			double distance = (this.getRadius()+bullet.getRadius())/2;
 			bullet.setPosX(distance*Math.cos(this.getOrientation()));
 			bullet.setPosY(distance*Math.sin(this.getOrientation()));
 			bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
-			bullet.setShip(null);
 			this.removeBullet(bullet);
-			bullet.setWorld(this.getWorld());
+			if(this.getWorld().isWithinWorldBounds(bullet)){
+				bullet.setShip(null);
+				this.getWorld().add(bullet);
+				for(Object object:this.getWorld().getWorldEntities()){
+					if(object instanceof Circle){
+						if(bullet.overlaps((Circle)object))
+							((Circle)object).collision(bullet);
+					}
+				}
+			}
+			else{
+				bullet.terminate();
+				bullet.setShip(null);
+			}
 		}
 	}
 		
@@ -304,12 +324,13 @@ public class Ship extends Circle {
 			throw new NullPointerException();
 		if(this == bullet.getOwner()){
 				this.addBullet(bullet);
-				bullet.setWorld(null);
-				bullet.setShip(this);
+				this.getWorld().remove(bullet);
 		}
 		else{
-			this.terminate();
+			this.getWorld().remove(bullet);
+			this.getWorld().remove(this);
 			bullet.terminate();
+			this.terminate();
 		}
 	}
 	
@@ -329,8 +350,6 @@ public class Ship extends Circle {
 			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
 		}
 	}
-	
-
 
 }
 
