@@ -360,10 +360,10 @@ public abstract class Circle {
 	public double getTimeToCollision(Circle circle) throws NullPointerException{
 		if(circle == null)
 			throw new NullPointerException();
-		//else if(this.actualOverlaps(circle))
-		//	throw new IllegalArgumentException();
+		//else if(this.overlaps(circle))
+		//	return 0;
 		Vector2D deltaV = this.getVelVector().substract(circle.getVelVector());
-		Vector2D deltaR = this.getPosVector().substract(circle.getVelVector());
+		Vector2D deltaR = this.getPosVector().substract(circle.getPosVector());
 		double totalSigma = Math.pow(this.getRadius()+circle.getRadius(),2);
 		double d = Math.pow(deltaV.scalarProduct(deltaR),2)-deltaV.scalarProduct(deltaV)*
 				(deltaR.scalarProduct(deltaR)-totalSigma);

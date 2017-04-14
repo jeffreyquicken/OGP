@@ -205,16 +205,16 @@ public class World {
 	
 	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener, double[] collisionPosition){
 		if(collisionObject2 instanceof World){
-			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
 			((World)collisionObject2).collision((Circle)collisionObject1);
-		}
+			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+			}
 		else if(collisionObject2 instanceof Bullet){
-			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			((Circle)collisionObject1).collision((Bullet)collisionObject2);
+			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			}
 		else if(collisionObject2 instanceof Ship){
-			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			((Circle)collisionObject1).collision((Ship)collisionObject2);
+			collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			}
 		else
 			throw new AssertionError();
@@ -263,6 +263,7 @@ public class World {
 		for(Circle circle:this.circles.values()){
 			updatedCircles.put(circle.getPosVector(), circle);
 		}
+		this.circles.clear();
 		this.circles = updatedCircles;
 	}
 }
