@@ -445,8 +445,6 @@ public abstract class Circle {
 	public double getTimeToCollision(World world) throws NullPointerException{
 		if (world == null)
 			throw new NullPointerException();
-		if(this.getVelX() == 0 && this.getVelY() == 0)
-			return Double.POSITIVE_INFINITY;
 		/*double time = Double.POSITIVE_INFINITY;
 		
 		if(this.getVelX()<0 && time > -(this.getPosX()-this.getRadius())/this.getVelX())
@@ -460,6 +458,7 @@ public abstract class Circle {
 		
 		if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
 			time = (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();*/
+		
 		Direction collisionDirection = this.getWorldCollisionDirection(world);
 		switch(collisionDirection){
 		case UP:
@@ -476,25 +475,25 @@ public abstract class Circle {
 	
 	public double[]  getCollisionPosition(World world) throws NullPointerException{
 		
-		double collisionTime = this.getTimeToCollision(world);
+		//double collisionTime = this.getTimeToCollision(world);
 		
-		if(collisionTime == Double.POSITIVE_INFINITY)
+		if(this.getTimeToCollision(world) == Double.POSITIVE_INFINITY)
 			return null;
 		else{
 			Direction direction = this.getWorldCollisionDirection(world);
 			switch(direction){
 			case UP:
 				Vector2D upVector = new Vector2D(0,this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(upVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(upVector).array();
 			case DOWN:
 				Vector2D downVector = new Vector2D(0,-this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(downVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(downVector).array();
 			case RIGHT:
 				Vector2D rightVector = new Vector2D(this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(rightVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(rightVector).array();
 			case LEFT:
 				Vector2D leftVector = new Vector2D(-this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(leftVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(leftVector).array();
 			}
 			return null;
 		}
