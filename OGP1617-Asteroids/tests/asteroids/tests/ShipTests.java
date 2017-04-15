@@ -241,11 +241,6 @@ public class ShipTests {
 		collisionShip1.getTimeToCollision(nullShip);
 	}
 	
-	@Test
-	public void getTimeToCollision_IllegalArgumentCase(){
-		exception.expect(IllegalArgumentException.class);
-		collisionShip1.getTimeToCollision(collisionShip1);
-	}
 	
 	@Test
 	public void getCollisionPosition_LegalCase(){
@@ -264,12 +259,6 @@ public class ShipTests {
 		distanceShip1.setVel(0, 10);
 		distanceShip2.setVel(0, 10);
 		assertNull(distanceShip1.getCollisionPosition(distanceShip2));
-	}
-	
-	@Test
-	public void getCollisionPosition_IllegalCase(){
-		exception.expect(IllegalArgumentException.class);
-		collisionShip1.getCollisionPosition(collisionShip1);
 	}
 	
 	@Test

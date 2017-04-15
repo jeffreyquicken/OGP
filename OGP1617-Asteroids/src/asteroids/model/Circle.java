@@ -51,14 +51,23 @@ public abstract class Circle {
 	
 	private boolean terminated = false;
 	
+	/**
+	 * Terminates the circle.
+	 * @post
+	 * 		The circle is terminated.
+	 * 		|new.isTerminated()
+	 */
 	@Basic
-	public void terminate() throws IllegalArgumentException{
-		if(this.isTerminated())
-			throw new IllegalArgumentException();
-		else
-			this.terminated = true;	
+	public void terminate() {
+		this.terminated = true;	
 	}
 	
+	/**
+	 * Returns if the circle is terminated
+	 * @return
+	 * 		  Returns true if the circle is terminated.
+	 * 		  |result == this.terminated
+	 */
 	@Basic
 	public boolean isTerminated(){
 		return this.terminated;
@@ -135,8 +144,8 @@ public abstract class Circle {
 	 * @param pos 
 	 * 		  The position to be validated
 	 * @return 
-	 * 		   Returns true if the position is a number.
-	 * 		   | result == ((pos<=0) || (pos>=0))
+	 * 		   Returns true if the position is a positive number.
+	 * 		   | result == pos>=0
 	 */
 	private static boolean isValidPos(double pos){
 		return (pos>=0);
@@ -150,7 +159,7 @@ public abstract class Circle {
 	 * 
 	 * @return
 	 * 		  Returns the velocity in the X direction of this circle.
-	 * 		  |result == this.velX
+	 * 		  |result == this.getVelVector().getX()
 	 */
 	@Basic
 	public double getVelX(){
@@ -192,7 +201,7 @@ public abstract class Circle {
 	 * 
 	 * @return
 	 * 		  Returns the velocity in the Y direction of this circle.
-	 * 		  |result == this.velY
+	 * 		  |result == this.getVelVector().getY()
 	 */
 	@Basic
 	public double getVelY(){
@@ -245,11 +254,27 @@ public abstract class Circle {
 	
 	private World world = null;
 	
+	/**
+	 * Returns the world of the circle.
+	 * @return
+	 * 		 The world of the circle.
+	 * 	 	 |result == this.world
+	 */
 	@Basic
 	public World getWorld(){
 		return this.world;
 	}
 	
+	/**
+	 * Sets the world of the circle to newWorld
+	 * @param newWorld
+	 * 		  The new world of the circle.
+	 * @throws IllegalArgumentException
+	 * 		  The circle can't have this world as a world.
+	 * 		  |!canHaveAsWorld(newWorld)
+	 * @post  The world of the circle is newWorld
+	 * 		  |new.getWorld() == newWorld
+	 */
 	@Basic
 	public void setWorld(World newWorld) throws IllegalArgumentException{
 		if(!canHaveAsWorld(newWorld))
@@ -257,6 +282,14 @@ public abstract class Circle {
 		this.world = newWorld;
 	}
 	
+	/**
+	 * Checks if the circle can have this world as a world.
+	 * @param newWorld
+	 * 		  The world that has to be validated.
+	 * @return
+	 * 		  True if the world is null or if the world is not terminated.
+	 * 		  |result == (newWorld == null || !newWorld.isTerminated())
+	 */
 	private boolean canHaveAsWorld(World newWorld){
 		if(newWorld != null)
 			return !newWorld.isTerminated();
@@ -317,8 +350,8 @@ public abstract class Circle {
 	 * 		  Returns true if the circle overlaps with the given circle or the given circle is equal to the given circle.
 	 * 		  |result == this.getDistanceBetween(circle)<=0
 	 * @throws NullPointerException
-	 * 		   The circle doesn't exist.
-	 * 		   |(circle == null)
+	 * 		  The circle doesn't exist.
+	 * 		  |(circle == null)
 	 */
 	public boolean overlaps (Circle circle) throws NullPointerException{
 		if(circle == null){
@@ -328,17 +361,6 @@ public abstract class Circle {
 			return true;
 		else{
 			return this.getDistanceBetween(circle)+0.01*(this.getRadius()+circle.getRadius())<=0;
-		}
-	}
-	
-	public boolean actualOverlaps (Circle circle) throws NullPointerException{
-		if(circle == null){
-			throw new NullPointerException();
-		}
-		else if(circle == this)
-			return true;
-		else{
-			return this.getDistanceBetween(circle)<=0;
 		}
 	}
 	
@@ -360,8 +382,6 @@ public abstract class Circle {
 	public double getTimeToCollision(Circle circle) throws NullPointerException{
 		if(circle == null)
 			throw new NullPointerException();
-		//else if(this.overlaps(circle))
-		//	return 0;
 		Vector2D deltaV = this.getVelVector().substract(circle.getVelVector());
 		Vector2D deltaR = this.getPosVector().substract(circle.getPosVector());
 		double totalSigma = Math.pow(this.getRadius()+circle.getRadius(),2);
@@ -396,8 +416,6 @@ public abstract class Circle {
 	public double[] getCollisionPosition(Circle circle) throws NullPointerException, IllegalArgumentException{
 		if(circle == null)
 			throw new NullPointerException();
-		//else if(this.actualOverlaps(circle))
-		//	throw new IllegalArgumentException();
 		double deltaT = this.getTimeToCollision(circle);
 		if(deltaT == Double.POSITIVE_INFINITY)
 			return null;
@@ -567,10 +585,22 @@ public abstract class Circle {
 	public abstract void collision(Bullet bullet);
 	public abstract void collision(Ship ship);
 	
+	/**
+	 * Returns the 2 dimensional position vector
+	 * @return
+	 * 		  The 2 dimensional position vector.
+	 * 		  |result == this.position
+	 */
 	public Vector2D getPosVector(){
 		return this.position;
 	}
 	
+	/**
+	 * Returns the 2 dimensional velocity vector
+	 * @return
+	 * 		  The 2 dimensional velocity vector.
+	 * 		  |result == this.velcity
+	 */
 	public Vector2D getVelVector(){
 		return this.velocity;
 	}

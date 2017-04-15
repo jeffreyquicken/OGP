@@ -115,15 +115,37 @@ public class Ship extends Circle {
 	
 	private static double minRadius = 10;
 	
+	/**
+	 * Sets the minimum radius of the ships to newMinRadius
+	 * @param newMinRadius
+	 * 		  The new minimum radius of the ships.
+	 * @post The minimum radius of the ship is newMinRadius.
+	 * 		 |getMinRadius() == newMinRadius
+	 */
+	@Basic
 	public static void setMinRadius(double newMinRadius){
 		minRadius = newMinRadius;
 	}
 	
+	/**
+	 * Checks if the given radius is a valid radius.
+	 * @param newRadius
+	 * 		  The radius that has to be validated.
+	 * @return True if the radius is greater then or equal to minRadius.
+	 * 		   |result == newRadius>=minRadius
+	 */
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=minRadius;
 	}
 	
+	/**
+	 * Returns the minimum radius of the ships.
+	 * @return
+	 * 		  The minimum radius of the ships.
+	 * 		  |result == minRadius
+	 */
 	@Immutable
+	@Basic
 	public static double getMinRadius(){
 		return minRadius;
 	}
@@ -131,30 +153,64 @@ public class Ship extends Circle {
 	private double mass;
 	private static double density = 1.42E12;
 	
+	/**
+	 * Sets the mass of the ship to newMass
+	 * @param newMass
+	 * 		  The new mass of the ship.
+	 * @post If the mass of the ship is smaller then the minimum mass, the mass is set to the minimum mass.
+	 * 		 Otherwise the mass is set to newMass
+	 * 		 |if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
+			 |then new.getMass()  == (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
+		     |else then new.getMass() == newMass;
+	 */
 	@Basic
 	public void setMass(double newMass){
-		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
-			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*density;
+		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
+			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
 		else
 			this.mass = newMass;
 	}
 	
+	/**
+	 * Returns the minimum density of the ships.
+	 * @return
+	 * 		  The minimum density of the ships.
+	 * 		  |result == density
+	 */
 	@Immutable
 	@Basic
 	public static double getDensity(){
 		return density;
 	}
 	
+	/**
+	 * Sets the density of the ships to newDensity.
+	 * @param newDensity
+	 * 		  The new density of the ships.
+	 * 		  |getDensity() == newDensity
+	 */
 	@Basic
 	public static void setDensity(double newDensity){
 		density = newDensity;
 	}
 	
+	/**
+	 * Returns the mass of the ship.
+	 * @return
+	 * 		  The mass of the ship.
+	 * 		  |result == this.mass
+	 */
 	@Basic
 	public double getMass(){
 		return this.mass;
 	}
 	
+	/**
+	 * Returns the total mass of the ship (including all loaded bullets)
+	 * @return
+	 * 	     The total mass of the ship.
+	 * 		 | result == this.getMass() + bullet.getMass() for Bullet bullet in this.getBullets()
+	 */
 	public double getTotalMass(){
 		double totalMass = this.getMass();
 		if(!this.getBullets().isEmpty()){
@@ -201,6 +257,13 @@ public class Ship extends Circle {
 	
 	private boolean thrusterActive = false;
 	
+	/**
+	 * Sets the thruster status of the ship to newStatus
+	 * @param newStatus
+	 * 		  The new thruster status of the ship.
+	 * @post The thruster status of the ship is newStatus.
+	 * 		 |new.getThrusterStatus() == newStatus
+	 */
 	@Basic
 	public void setThruster(boolean newStatus){
 		this.thrusterActive = newStatus;
@@ -209,19 +272,33 @@ public class Ship extends Circle {
 	
 	private final double thrusterForce = 1.1E21;
 	
+	/**
+	 * 
+	 * @see implementation
+	 */
 	@Basic
 	public double getThrusterForce(){
 		return this.thrusterForce;
 	}
 	
+	/**
+	 * 
+	 * @see implementation
+	 */
 	@Basic
 	public boolean getThrusterStatus(){
 		return thrusterActive;
 	}
 	
+	/**
+	 * Returns the amount of acceleration of the ship.
+	 * @return
+	 * 		  The amount of acceleration of the ship.
+	 * 		  |result == this.getThrusterForce()/this.getTotalMass()
+	 */
 	@Basic
 	public double getAcceleration(){
-		return this.thrusterForce/this.getTotalMass();
+		return this.getThrusterForce()/this.getTotalMass();
 	}
 	
 	/**
@@ -244,10 +321,22 @@ public class Ship extends Circle {
 	 * Adds a bullet to the ships collection of bullets.
 	 * @param bullet
 	 * 		  The bullet to be added to the ship.
-	 * @post (this.getPosX() == bullet.getPosX()&&(this.getPosY() == bullet.getPosY())
-	 * 		 The bullets center is located at the same position as the ships center.
-	 * @post this.getBullets.contains(bullet)
-	 * 		 The collection of bullets of the ship contains the bullet.
+	 * @post The bullets center is located at the same position as the ships center.
+	 * 		 |(this.getPosX() == bullet.getPosX()&&(this.getPosY() == bullet.getPosY())
+	 * @post The collection of bullets of the ship contains the bullet.
+	 * 		 |this.getBullets.contains(bullet)
+	 * @post The owner of the bullet is this ship
+	 * 		 |bullet.getOwner() == this
+	 * @post The ship of the bullet is this ship
+	 * 		 |bullet.getShip() == this
+	 * @post The bullet is not in a world.
+	 * 		 |bullet.getWorld() == null
+	 * @throws NullPointerException
+	 * 		  The bullet is null.
+	 * 		  |bullet == null
+	 * @throws IllegalArgumentException
+	 * 		   The ship can not have this bullet as a bullet.
+	 * 		   |!canHaveAsBullet(bullet)
 	 */
 	public void addBullet(Bullet bullet)throws NullPointerException,IllegalArgumentException{
 		if(bullet == null)
@@ -264,16 +353,48 @@ public class Ship extends Circle {
 		}
 	}
 	
+	/**
+	 * Checks if the ship can have a bullet as bullet.
+	 * 
+	 * @param bullet
+	 * 		  The bullet to be validated.
+	 * @return
+	 * 		  True if both the ship and bullet are not terminated.
+	 * 		  |result ==(!bullet.isTerminated() && !this.isTerminated())
+	 */
 	private boolean canHaveAsBullet(Bullet bullet){
 		return (!bullet.isTerminated() && !this.isTerminated());
 	}
 	
+	/**
+	 * Adds a collection of bullets to this ship.
+	 * @param bulletCollection
+	 * 		  The collection of bullets.
+	 * @effect this.addBullet(bullet) for Bullet bullet in bulletCollection
+	 * 		  Adds every bullet in bulletCollection.
+	 */
 	public void addBullet(Collection<Bullet> bulletCollection){
 		for(Bullet bullet:bulletCollection){
 			this.addBullet(bullet);
 		}
 	}
 	
+	/**
+	 * Removes a bullet from this ship.
+	 * 
+	 * @param bullet
+	 * 		  The bullet that has to be removed.
+	 * @throws IllegalArgumentException
+	 * 		   The ship doesn't have this bullet loaded
+	 * 		   |!this.getBullets().contains(bullet)
+	 * @throws NullPointerException
+	 * 		   The bullet is null
+	 * 		   |bullet == null
+	 * @post The ship does not have this bullet loaded.
+	 * 		 |!this.getBullets().contains(bullet)
+	 * @post The bullet does not have a ship.
+	 * 		 |bullet.getShip() == null
+	 */
 	public void removeBullet(Bullet bullet) throws IllegalArgumentException ,NullPointerException{
 		if(bullet == null)
 			throw new NullPointerException();
@@ -289,12 +410,47 @@ public class Ship extends Circle {
 		return this.bullets;
 	}
 	
+	/**
+	 * Returns the number of bullets loaded on the ship.
+	 * @return
+	 * 		  The number of bullets loaded on the ship.
+	 * 		  |result == this.getBullets().size
+	 */
 	public int getNbBullets(){
-		return this.bullets.size();
+		return this.getBullets().size();
 	}
 	
 	private static double initialBulletSpeed = 250;
 	
+	/**
+	 * 
+	 * @see implementation
+	 */
+	public static double getInitialBulletSpeed(){
+		return initialBulletSpeed;
+	}
+	
+	/**
+	 * Picks a random bullet of this ship and fires it.
+	 * @effect this.removeBullet(bullet)
+	 * 		 Removes the bullet from this ship
+	 * @post The bullet is located next to the ship.
+	 * 		 |bullet.getPosX() == this.getPosX()+2*distance*Math.cos(this.getOrientation())
+	 * 		 |&& bullet.getPosY() == this.getPosX()+2*distance*Math.sin(this.getOrientation())
+	 * @post The initial bullet speed is initialBulletSpeed in the direction of the circle.
+	 * 		 |bullet.getVelX() == Math.cos(this.getOrientation())*getInitialBulletSpeed
+	 * 		 |&& bullet.getVelY() == Math.sin(this.getOrientation())*getInitialBulletSpeed
+	 * @post If the bullet is within the world bounds and it doesn't overlap with any of the world entities
+	 * 		 it is placed in the world
+	 * 		 |if(this.getWorld().isWithinWorldBounds(bullet) && !circle.overlaps(bullet) for Circle circle in this.getWorld().getWorldCircles())
+	 * 		 |then bullet.getWorld() == this.getWorld() && this.getWorld().getWorldEntities().contains(bullet)
+	 * @effect if(bullet.overlaps(circle) for Circle circle in this.getWorld().getWorldCircles()
+	 * 		   then circle.collision(bullet) 
+	 * 		  If the bullet overlaps with any of the world circles. It collides with that circle.
+	 * @post If the bullet doesn't lie within the world bounds, it is terminated and its ship is set to null.
+	 * 		 |if(!this.getWorld().isWithinWorldBounds(bullet)
+	 * 		 |then bullet.isTerminated() && bullet.getShip() == null
+	 */
 	public void fireBullet(){
 		if(!this.getBullets().isEmpty()){
 			ArrayList<Bullet> bulletList = new ArrayList<Bullet>(this.getBullets());
@@ -323,7 +479,22 @@ public class Ship extends Circle {
 			}
 		}
 	}
-		
+	
+	/**
+	 * Resolves the collision of a ship and a bullet.
+	 * @param bullet
+	 * 	      The bullet that collides with the ship.
+	 * @throws NullPointerException
+	 * 		   The bullet is null
+	 * 		   |bullet == null
+	 * @post If this ship is the owner of the bullet then the bullet is reloaded on the ship.
+	 * 		 |if(this == bullet.getOwner()) then this.getBullets.contains(bullet) && bullet.getShip == this
+	 * @post The bullet is removed from the world.
+	 * 		 |!this.getWorld().getWorldBullets().contains(bullet) && bullet.getWorld() == null
+	 * @post If this ship isn't the owner of the bullet , this ship and the bullet are terminated and the ship is removed from the world.
+	 * 		 |if(this != bullet.getOwner()) then bullet.isTerminated() && this.isTerminated()
+	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
+	 */
 	public void collision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
@@ -339,6 +510,22 @@ public class Ship extends Circle {
 		}
 	}
 	
+	/**
+	 * Resolves the collision between a ship and another ship.
+	 * @param ship
+	 * 		  The ship with which this ship collides.
+	 * @throws IllegalArgumentException
+	 * 		   The other ship is the same as this ship.
+	 * 		   |ship == this
+	 * @throws NullPointerException
+	 * 		   The other ship is null
+	 * 		   |ship == null
+	 * @post This ship its speed is corrected.	
+	 *		   |new.getVelX() == this.getVeX()-Jx/this.getTotalMass() && new.getVelY() == this.getVelY()-Jy/this.getTotalMass()
+	 * @post The other ship its speed is corrected.
+	 * 		   |((new)ship).getVelX() == ship.getVelX()+Jx/this.getTotalMass() && ((new)ship).getVelY() == this.getVelY()+Jy/this.getTotalMass()
+	 * 
+	 */
 	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(this == ship)
 			throw new IllegalArgumentException();
@@ -351,8 +538,8 @@ public class Ship extends Circle {
 			double J = 2*this.getTotalMass()*ship.getTotalMass()*deltaV.scalarProduct(deltaR)/((this.getTotalMass()+ship.getTotalMass())*sigma);
 			double Jx = J*(deltaR.getX())/sigma;
 			double Jy = J*(deltaR.getY())/sigma;
-			this.setVel(this.getVelX()-Jx/this.getTotalMass(), this.getVelY()-Jy/this.getTotalMass());
-			ship.setVel(ship.getVelX()+Jx/ship.getTotalMass(), ship.getVelY()+Jy/ship.getTotalMass());
+			this.setVel(this.getVelX()+Jx/this.getTotalMass(), this.getVelY()+Jy/this.getTotalMass());
+			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
 		}
 	}
 

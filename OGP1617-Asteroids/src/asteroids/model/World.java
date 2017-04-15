@@ -293,9 +293,16 @@ public class World {
 	
 	/**
 	 * Evolves the world
+	 * 
 	 * @param dt
+	 * 		  The amount of time the world evolves.
+	 * 
 	 * @param collisionListener
+	 * 		  The collisionListener used by the GUI.
+	 * 
 	 * @throws IllegalArgumentException
+	 * 		   The amount of time the world evolves is a negative number.
+	 * 		   |dt<0
 	 */
 	public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
 		if (dt<0)
@@ -442,7 +449,8 @@ public class World {
 	private void updateCirclesMap(){
 		HashMap<Vector2D,Circle> updatedCircles = new HashMap<Vector2D,Circle>();
 		for(Circle circle:this.circles.values()){
-			updatedCircles.put(circle.getPosVector(), circle);
+			if(!circle.isTerminated() && circle.getWorld() == this)
+				updatedCircles.put(circle.getPosVector(), circle);
 		}
 		this.circles.clear();
 		this.circles = updatedCircles;
