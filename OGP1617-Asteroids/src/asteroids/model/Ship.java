@@ -531,8 +531,8 @@ public class Ship extends Circle {
 	 * @param ship
 	 * 		  The ship with which this ship collides.
 	 * @throws IllegalArgumentException
-	 * 		   The other ship is the same as this ship.
-	 * 		   |ship == this
+	 * 		   The other ship is the same as this ship or they are not positioned in the same world.
+	 * 		   |ship == this || this.getWorld() != ship.getWorld()
 	 * @throws NullPointerException
 	 * 		   The other ship is null
 	 * 		   |ship == null
@@ -543,10 +543,10 @@ public class Ship extends Circle {
 	 * 
 	 */
 	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
-		if(this == ship)
-			throw new IllegalArgumentException();
-		else if(ship == null)
+		if(ship == null)
 			throw new NullPointerException();
+		else if(this == ship || this.getWorld() != ship.getWorld())
+			throw new IllegalArgumentException();
 		else{
 			Vector2D deltaV = this.getPosVector().substract(ship.getPosVector());
 			Vector2D deltaR = this.getVelVector().substract(ship.getVelVector());

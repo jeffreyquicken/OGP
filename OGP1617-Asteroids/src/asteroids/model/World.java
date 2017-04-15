@@ -327,25 +327,6 @@ public class World {
 			
 	}
 	
-	/*public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
-		if (dt<0)
-			throw new IllegalArgumentException();
-		Object[] collisionArray = this.getFirstCollisionArray();
-		double shortest = (double)collisionArray[0];
-		Object collisionObject1 = collisionArray[1];
-		Object collisionObject2 = collisionArray[2];
-		while(shortest<dt && collisionObject1 != null && collisionObject2 != null ){
-			this.moveForward(shortest);
-			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
-			dt = dt-shortest;
-			collisionArray = this.getFirstCollisionArray();
-			shortest = (double)collisionArray[0];
-			collisionObject1 = collisionArray[1];
-			collisionObject2 = collisionArray[2];
-		}
-		this.moveForward(dt);
-	}*/
-	
 	/**
 	 * Moves all of the entities of the world forward with a given amount of time.
 	 * 
@@ -447,6 +428,25 @@ public class World {
 		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
 		return returnArray;
 		}
+	
+	public double getFirstCollisionTime(){
+		double shortest = Double.POSITIVE_INFINITY;
+		//Set<Circle> uncheckedCircles = new HashSet<Circle>(this.getWorldCircles());
+		for(Circle circle:this.getWorldCircles()){
+			//uncheckedCircles.remove(circle);
+			double worldCollisionTime = circle.getTimeToCollision(this);
+			if(worldCollisionTime<shortest)
+				shortest = worldCollisionTime;
+			for(Circle secondCircle:this.getWorldCircles()){
+				if(circle != secondCircle){
+					double time = circle.getTimeToCollision(secondCircle);
+					if(time<shortest)
+						shortest = time;
+				}
+			}
+		}
+		return shortest;
+	}
 	
 	/**
 	 * Updates the keys of the circles map

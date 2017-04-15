@@ -338,7 +338,17 @@ public abstract class Circle {
 		else if(circle == this)
 			return 0;
 		else 
-			return (this.getPosVector().substract(circle.getPosVector())).length()-this.getRadius()-circle.getRadius();
+			return this.getDistanceBetweenCenter(circle)-this.getRadius()-circle.getRadius();
+	}
+	
+	public double getDistanceBetweenCenter(Circle circle) throws NullPointerException{
+		if(circle == null){
+			throw new NullPointerException();
+		}
+		else if(circle == this)
+			return 0;
+		else 
+			return (this.getPosVector().substract(circle.getPosVector())).length();
 	}
 	
 	/**
@@ -360,7 +370,7 @@ public abstract class Circle {
 		else if(circle == this)
 			return true;
 		else{
-			return this.getDistanceBetween(circle)+0.01*(this.getRadius()+circle.getRadius())<=0;
+			return this.getDistanceBetweenCenter(circle)<=0.99*(this.getRadius()+circle.getRadius());
 		}
 	}
 	
@@ -596,6 +606,11 @@ public abstract class Circle {
 	 */
 	public Vector2D getVelVector(){
 		return this.velocity;
+	}
+	
+	public boolean collides(Circle circle){
+		return (this.getDistanceBetweenCenter(circle)<=1.01*(this.getRadius()+circle.getRadius())
+				 && this.getDistanceBetweenCenter(circle)>=0.99*(this.getRadius()+circle.getRadius()));
 	}
 	
 

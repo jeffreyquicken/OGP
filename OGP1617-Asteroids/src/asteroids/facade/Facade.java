@@ -458,7 +458,7 @@ public class Facade implements IFacade {
 	}
 	
 	public double getTimeNextCollision(World world){
-		return (double)world.getFirstCollisionArray()[0];
+		return world.getFirstCollisionTime();
 	}
 	
 	public double[] getPositionNextCollision(World world) throws ModelException{
