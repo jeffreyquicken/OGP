@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import asteroids.model.Bullet;
+import asteroids.model.*;
 
 public class BulletTests {
 	
@@ -20,6 +20,7 @@ public class BulletTests {
 	private static Bullet nullBullet;
 	private static Bullet distanceBullet1;
 	private static Bullet distanceBullet2;
+	private static Ship testShip;
 	private static final double EPSILON = 0.0001;
 
 	
@@ -39,6 +40,7 @@ public class BulletTests {
 		collisionBullet2 = new Bullet(20,40,10,10,10);
 		distanceBullet1 = new Bullet(0,0,0,0,10);
 		distanceBullet2 = new Bullet(25,0,0,0,10);
+		testShip = new Ship(10,20,10,10,10,Math.PI,20);
 	}
 	
 	@Test
@@ -207,5 +209,7 @@ public class BulletTests {
 		exception.expect(NullPointerException.class);
 		collisionBullet1.getCollisionPosition(nullBullet);
 	}
+
+	
 
 }

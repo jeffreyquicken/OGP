@@ -49,7 +49,7 @@ public abstract class Circle {
 		this.setRadius(radius);
 	}
 	
-	private boolean terminated = false;
+	protected boolean terminated = false;
 	
 	/**
 	 * Terminates the circle.
@@ -463,55 +463,48 @@ public abstract class Circle {
 	public double getTimeToCollision(World world) throws NullPointerException{
 		if (world == null)
 			throw new NullPointerException();
-		/*double time = Double.POSITIVE_INFINITY;
 		
-		if(this.getVelX()<0 && time > -(this.getPosX()-this.getRadius())/this.getVelX())
-			time = -(this.getPosX()-this.getRadius())/this.getVelX();
-		
-		if(this.getVelX()>0 && time > (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX())
-			time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
-		
-		if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
-			time = -(this.getPosY()-this.getRadius())/this.getVelY();
-		
-		if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
-			time = (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();*/
-		
-		Direction collisionDirection = this.getWorldCollisionDirection(world);
-		switch(collisionDirection){
-		case UP:
-			return (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
-		case DOWN:
-			return -(this.getPosY()-this.getRadius())/this.getVelY();
-		case LEFT:
-			return -(this.getPosX()-this.getRadius())/this.getVelX();
-		case RIGHT:
-			return (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
+		if(this.getVelX()<0){
+			double time = -(this.getPosX()-this.getRadius())/this.getVelX();
+			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
+				return -(this.getPosY()-this.getRadius())/this.getVelY();
+			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+				return (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
+			else
+				return time;
 		}
-		throw new AssertionError();
+		else{
+			double time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
+			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
+				return -(this.getPosY()-this.getRadius())/this.getVelY();
+			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+				return (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
+			else
+				return time;
+		}
 	}
 	
 	public double[]  getCollisionPosition(World world) throws NullPointerException{
 		
-		//double collisionTime = this.getTimeToCollision(world);
+		double collisionTime = this.getTimeToCollision(world);
 		
-		if(this.getTimeToCollision(world) == Double.POSITIVE_INFINITY)
+		if(collisionTime == Double.POSITIVE_INFINITY)
 			return null;
 		else{
 			Direction direction = this.getWorldCollisionDirection(world);
 			switch(direction){
 			case UP:
 				Vector2D upVector = new Vector2D(0,this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(upVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(upVector).array();
 			case DOWN:
 				Vector2D downVector = new Vector2D(0,-this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(downVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(downVector).array();
 			case RIGHT:
 				Vector2D rightVector = new Vector2D(this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(rightVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(rightVector).array();
 			case LEFT:
 				Vector2D leftVector = new Vector2D(-this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(this.getTimeToCollision(world)))).add(leftVector).array();
+				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(leftVector).array();
 			}
 			return null;
 		}

@@ -71,7 +71,6 @@ public class World {
 			this.terminated = true;
 			for(Object object: this.getWorldEntities()){
 				if(object instanceof Circle)
-					((Circle)object).terminate();
 					((Circle)object).setWorld(null);
 			}
 	}
@@ -311,15 +310,21 @@ public class World {
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
-		double[] collisionPosition = (double[])collisionArray[3];
-		if(shortest<dt && collisionPosition != null && collisionObject1 != null && collisionObject2 != null){
-			this.moveForward(shortest);
-			this.resolveCollision(collisionObject1, collisionObject2, collisionListener,collisionPosition);
-			this.evolve(dt-shortest,collisionListener);
+		if(shortest>=0){
+			if(shortest<dt){
+				this.moveForward(shortest);
+				this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
+				this.evolve(dt-shortest,collisionListener);
+			}
+			else{
+				this.moveForward(dt);
+			}
 		}
 		else{
-			this.moveForward(dt);
+			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
+			this.evolve(dt, collisionListener);
 		}
+			
 	}
 	
 	/*public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
@@ -329,16 +334,14 @@ public class World {
 		double shortest = (double)collisionArray[0];
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
-		double[] collisionPosition = (double[])collisionArray[3];
-		while(shortest<dt && collisionObject1 != null && collisionObject2 != null && collisionPosition != null){
+		while(shortest<dt && collisionObject1 != null && collisionObject2 != null ){
 			this.moveForward(shortest);
-			this.resolveCollision(collisionObject1, collisionObject2, collisionListener,collisionPosition);
+			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
 			dt = dt-shortest;
 			collisionArray = this.getFirstCollisionArray();
 			shortest = (double)collisionArray[0];
 			collisionObject1 = collisionArray[1];
 			collisionObject2 = collisionArray[2];
-			collisionPosition = (double[])collisionArray[3];
 		}
 		this.moveForward(dt);
 	}*/
@@ -362,7 +365,8 @@ public class World {
 	 */
 	public void moveForward(double time) throws IllegalArgumentException{
 		if(time<0)
-			throw new IllegalArgumentException();
+			//throw new IllegalArgumentException();
+			time = 0;
 		for(Circle circle:this.getWorldCircles()){
 			circle.move(time);
 			if(circle instanceof Ship){
@@ -386,60 +390,61 @@ public class World {
 	 * 		  The position where the two objects collide.
 	 * 
 	 */
-	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener, double[] collisionPosition){
+	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
 			((World)collisionObject2).collision((Circle)collisionObject1);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
 		}
 		else if(collisionObject2 instanceof Bullet){
 			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 			if(collisionObject1 instanceof Ship){
-				if(!((Ship)collisionObject1 == ((Bullet)collisionObject2).getOwner()))
+				if(!((Ship)collisionObject1 == ((Bullet)collisionObject2).getOwner())){
+					double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
 					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+				}
 			}
 		}
 		else if(collisionObject2 instanceof Ship){
 			((Circle)collisionObject1).collision((Ship)collisionObject2);
 			if(collisionObject1 instanceof Bullet){
-				if(!((Ship)collisionObject2 == ((Bullet)collisionObject1).getOwner()))
+				if(!((Ship)collisionObject2 == ((Bullet)collisionObject1).getOwner())){
+					double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
 					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+				}
 			}
 		}
 	}
 	
 	/**
-	 * Returns an array with the time to the first collision,the two colliding objects and the collision position.
+	 * Returns an array with the time to the first collision and the two colliding objects.
 	 * 
-	 * @return An array with the time to the first collision,the two colliding objects and the collision position.
+	 * @return An array with the time to the first collision and the two colliding objects.
 	 */
 
 	public Object[] getFirstCollisionArray(){
 		double shortest = Double.POSITIVE_INFINITY;
 		Object collisionObject1 = null;
 		Object collisionObject2 = null;
-		double[] collisionPosition = null;
-		Collection<Circle> circleCollection = circles.values();
-		for(Circle circle:circleCollection){
+		for(Circle circle:this.getWorldCircles()){
 			double worldCollisionTime = circle.getTimeToCollision(this);
 			if(worldCollisionTime<shortest){
 				shortest = worldCollisionTime;
 				collisionObject1 = circle;
 				collisionObject2 = this;
-				collisionPosition = circle.getCollisionPosition(this);
 			}
-			for(Circle secondCircle:circleCollection){
+			for(Circle secondCircle:this.getWorldCircles()){
 				if(secondCircle != circle){
 					double time = circle.getTimeToCollision(secondCircle);
 					if(time<shortest){
 						shortest = time;
 						collisionObject1 = circle;
 						collisionObject2 = secondCircle;
-						collisionPosition = circle.getCollisionPosition(secondCircle);
 					}
 				}
 			}
 		}
-		Object[] returnArray = {shortest,collisionObject1,collisionObject2,collisionPosition};
+		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
 		return returnArray;
 		}
 	

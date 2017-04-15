@@ -67,6 +67,22 @@ public class Ship extends Circle {
 		this.setMass(mass);
 	}
 	
+	/**
+	 * Terminate the ship and all of its bullets.
+	 * @post The ship is terminated.
+	 * 		 |this.isTerminated()
+	 * @post All of the ships bullets are terminated and they don't have a ship.
+	 * 		 |(bullet.isTerminated() && bullet.getShip() == null) for Bullet bullet in this.getBullets() 
+	 */
+	@Override
+	public void terminate(){
+		this.terminated = true;
+		for(Bullet bullet: this.getBullets()){
+			bullet.terminate();
+			bullet.setShip(null);
+		}
+	}
+	
 	private double orientation;
 	
 	/**
