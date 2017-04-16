@@ -18,7 +18,7 @@ import asteroids.model.Bullet;
 public class WorldTests {
 	
 	/**
-	 * Variables referencing ships with standard values.
+	 * Variables referencing worlds & circles with standard values.
 	 */
 	private static World world1;
 	private static World world2;
