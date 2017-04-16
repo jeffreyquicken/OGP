@@ -71,14 +71,11 @@ public class WorldTests {
 		world1.add(circle2);
 	}
 	
-	@Test
-	public void move_LegalCase() {
 		
-	}
-	
 	@Test
 	public void evolve_dtSmallerThanZero() {
-		
+		exception.expect(IllegalArgumentException.class);
+		world1.evolve(-10, CollisionListener);
 	}
 	
 	@Test
