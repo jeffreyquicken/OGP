@@ -5,6 +5,17 @@ import be.kuleuven.cs.som.taglet.*;
  * A class of bullets.
  * 
  * @author Senne Gielen & Jeffrey Quicken
+ * 
+ * @invar If a bullet has a ship, the ships bullets collection contains the bullet.
+ * 		  |if(this.getShip()) != null then this.getShip().getBullets().contains(this)
+ * @invar A bullet can have its owner as an owner.
+ * 		  |canHaveAsOwner(this.getOwner())
+ * @invar A bullet can have its ship as a ship
+ * 		  |canHaveAsShip(this.getShip())
+ * @invar If a bullet is in a world, the collection of the worlds bullets contains the bullet.
+ * 		  |if(this.getWorld()) != null then this.getWorld().getWorldBullets().contains(bullet)
+ * @invar The amount of bounces of a bullet is smaller then or equal to the maximum amount of bounces.
+ * 		  |this.getAmountOfBounces() < maxBounces
  *
  */
 public class Bullet extends Circle {
@@ -38,6 +49,7 @@ public class Bullet extends Circle {
 	@Raw
 	public Bullet(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException{
 		super(x,y,xVelocity,yVelocity,radius);
+		this.mass = getDensity()*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
 	}
 	
 	private static double minRadius = 1;
@@ -187,7 +199,7 @@ public class Bullet extends Circle {
 	
 	private static double density = 7.8E12;
 	
-	private final double mass = density*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
+	private final double mass;
 	
 	/**
 	 * Returns the density of bullets.
@@ -251,6 +263,7 @@ public class Bullet extends Circle {
 	 * 		 |if(new.getAmountOfBounces()+1>=maxBounces) then
 	 * 		 |(new.isTerminated() && new.getWorld == null && !this.getWorld().getWorldBullets().contains(this)
 	 */
+	@Raw
 	public void increaseAmountOfBounces(){
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
 		if(this.getAmountOfBounces()>=maxBounces){
@@ -280,6 +293,7 @@ public class Bullet extends Circle {
 	 * 		  |this.isTerminated() && other.isTerminated()
 	 * 
 	 */
+	@Raw
 	public void collision(Bullet other) throws NullPointerException,IllegalArgumentException{
 		if(other == null){
 			throw new NullPointerException();
@@ -304,6 +318,7 @@ public class Bullet extends Circle {
 	 * @effect ship.collision(this)
 	 * 		  The ship collides with this bullet.
 	 */
+	@Raw
 	public void collision(Ship ship) throws NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();

@@ -6,6 +6,18 @@ import be.kuleuven.cs.som.annotate.*;
  * 
  * @author Senne Gielen & Jeffrey Quicken
  *
+ * @invar The X-coordinate of the circle is a valid coordinate.
+ * 		  |isValidPos(posX)
+ * @invar The Y-coordinate of the circle is a valid coordinate.
+ * 		  |isValidPos(posY)
+ * @invar The total velocity of the circle does not exceed the speedLimit.
+ * 		  |speedLimit>=(Math.sqrt(Math.pow(velX,2)+Math.pow(velY,2)))
+ * @invar The radius of the circle is a valid radius.
+ * 		  |isValidRadius(radius)
+ * @invar If a circle is in a world, the worlds circle collection contains the circle.
+ * 		  |if(this.getWorld() != null) then this.getWorld().getWorldCircles().contains(this)
+ * @invar The circle can have its world as a world.
+ * 		  |(canHaveAsWorld(this.getWorld())
  */
 public abstract class Circle {
 	
@@ -341,6 +353,17 @@ public abstract class Circle {
 			return this.getDistanceBetweenCenter(circle)-this.getRadius()-circle.getRadius();
 	}
 	
+	/**
+	 * Returns the distance between the centers of two circles.
+	 * @param circle
+	 * 		  The other circle.
+	 * @return
+	 * 		 The distance between the other two circles.
+	 * 		 |result == this.getPosVector().substract(circle.getPosVector())).length()
+	 * @throws NullPointerException
+	 * 		  The other circle is null
+	 * 		  |circle == null
+	 */
 	public double getDistanceBetweenCenter(Circle circle) throws NullPointerException{
 		if(circle == null){
 			throw new NullPointerException();
@@ -502,7 +525,7 @@ public abstract class Circle {
 	 * 		  An array of the coordinates where the circle collides with the boundary of the world.
 	 * 		  Returns null if the circle never collides with the world.
 	 * 		  |if(this.getTimeToCollision(world) == Double.POSITIVE_INFINITY) then result == null
-	 * 		  |else result == 
+	 * 		  |else see implementation
 	 * @throws NullPointerException
 	 * 		   The world is null;
 	 * 		   |world == null;
@@ -549,6 +572,7 @@ public abstract class Circle {
 	 * 		 The ship is not in this world.
 	 * 		 |this.getWorld() != world
 	 */
+	@Raw
 	public void bounce(World world) throws NullPointerException, IllegalArgumentException{
 		if(world == null)
 			throw new NullPointerException();
@@ -569,6 +593,7 @@ public abstract class Circle {
 	 * 		  The 2 dimensional position vector.
 	 * 		  |result == this.position
 	 */
+	@Basic
 	public Vector2D getPosVector(){
 		return this.position;
 	}
@@ -579,6 +604,7 @@ public abstract class Circle {
 	 * 		  The 2 dimensional velocity vector.
 	 * 		  |result == this.velcity
 	 */
+	@Basic
 	public Vector2D getVelVector(){
 		return this.velocity;
 	}

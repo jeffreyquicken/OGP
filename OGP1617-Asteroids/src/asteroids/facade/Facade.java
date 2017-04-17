@@ -17,7 +17,7 @@ public class Facade implements IFacade {
 	 */
 	public Ship createShip()
 			throws ModelException{
-		try{return new Ship(0,0,0,0,1,0);}
+		try{return new Ship(0,0,0,0,1,0,0);}
 		catch(IllegalArgumentException e){
 			throw new ModelException(e);
 		}
@@ -30,7 +30,7 @@ public class Facade implements IFacade {
 	 */
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException{
-		try{return new Ship(x,y,xVelocity,yVelocity,radius,orientation);}
+		try{return new Ship(x,y,xVelocity,yVelocity,radius,orientation,0);}
 		catch(IllegalArgumentException e){
 			throw new ModelException(e);
 		}

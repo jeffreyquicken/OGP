@@ -8,6 +8,16 @@ import asteroids.part2.CollisionListener;
  * A class of world.
  * 
  * @author Senne Gielen & Jeffrey Quicken
+ * 
+ * @invar If a circular object is in the world, its world is this world.
+ * 		  |circle.getWorld() == this for Circle circle in this.getWorldCircles()
+ * @invar All of the worlds circles are within its bounds.
+ * 		  |this.isWithinWorldBounds(circle) for Circle circle in this.getWorldCircles()
+ * @invar The height of the world is smaller then or equal to maxHeight
+ * 		  |this.getHeight<=getMaxHeight()
+ * @invar The width of the world is smaller then or equal to maxWidth
+ * 		  |this.getWidth<=getMaxWidth()
+ * 
  *
  */
 public class World {
@@ -64,6 +74,8 @@ public class World {
 	 * @post All of the worlds objects are terminated.
 	 * 		 @see implementation
 	 */
+	@Raw
+	@Basic
 	public void terminate() throws IllegalArgumentException{
 		if(this.isTerminated())
 			throw new IllegalArgumentException();
@@ -80,6 +92,7 @@ public class World {
 	 * @return
 	 * 		  True if the world is terminated
 	 */
+	@Basic
 	public boolean isTerminated(){
 		return this.terminated;
 	}
@@ -113,17 +126,23 @@ public class World {
 	}
 	
 	/**
+	 * Returns the height of the world.
 	 * 
 	 * @see implementation
 	 */
+	@Basic
+	@Immutable
 	public double getHeight(){
 		return this.height;
 	}
 	
 	/**
+	 * Returns the width of the world.
 	 * 
 	 * @see implementation
 	 */
+	@Basic
+	@Immutable
 	public double getWidth(){
 		return this.width;
 	}
@@ -151,6 +170,7 @@ public class World {
 	 * @return
 	 * 		  A set of the ships of the world.
 	 */
+	@Basic
 	public Set<Ship> getWorldShips(){
 		Set<Ship> ships = new HashSet<>();
 		for(Circle circle:circles.values()){
@@ -165,6 +185,7 @@ public class World {
 	 * @return
 	 * 		  A set of the bullets of the world.
 	 */
+	@Basic
 	public Set<Bullet> getWorldBullets(){
 		Set<Bullet> bullets = new HashSet<>();
 		for(Circle circle:circles.values()){
@@ -179,6 +200,7 @@ public class World {
 	 * @return
 	 * 		  A set of objects of the world.
 	 */
+	@Basic
 	public Set<Object> getWorldEntities(){
 		Set<Object> entitySet = new HashSet<Object>();
 		entitySet.addAll(circles.values());
@@ -211,6 +233,8 @@ public class World {
 	 * @post The world of the circle is this world.
 	 * 		 |newCircle.getWorld() == this
 	 */
+	@Basic
+	@Raw
 	public void add(Circle newCircle) throws NullPointerException,IllegalArgumentException{
 		if(newCircle == null)
 			throw new NullPointerException();
@@ -242,6 +266,8 @@ public class World {
 	 * @post The world of the circle is set to null.
 	 * 		  |circle.getWorld == null
 	 */
+	@Basic
+	@Raw
 	public void remove(Circle circle) throws NullPointerException,IllegalArgumentException{
 		if(circle == null)
 			throw new NullPointerException();
@@ -283,6 +309,7 @@ public class World {
 	 * 		 If the circle is a bullet, the amount of bounces is increased with 1.
 	 * 		 |if(circle instanceof Bullet) then ((Bullet)circle).increaseAmountOfBounces()
 	 */
+	@Raw
 	private void collision(Circle circle){
 		circle.bounce(this);
 		if(circle instanceof Bullet){
@@ -303,6 +330,7 @@ public class World {
 	 * 		   The amount of time the world evolves is a negative number.
 	 * 		   |dt<0
 	 */
+	@Raw
 	public void evolve(double dt, CollisionListener collisionListener) throws IllegalArgumentException{
 		if (dt<0)
 			throw new IllegalArgumentException();
@@ -340,6 +368,7 @@ public class World {
 	 * 		   If the circle is a ship and the thruster is active,
 	 * 		   the ship accelerates during the time.
 	 */
+	@Raw
 	public void moveForward(double time) throws IllegalArgumentException{
 		if(time<0)
 			throw new IllegalArgumentException();
@@ -373,6 +402,7 @@ public class World {
 	 * 		   If the second collision object is a circle then the collisionListener gets an object collision.
 	 * 
 	 */
+	@Raw
 	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
@@ -406,7 +436,7 @@ public class World {
 	 * 
 	 * @return An array with the time to the first collision and the two colliding objects.
 	 */
-
+	@Raw
 	public Object[] getFirstCollisionArray(){
 		double shortest = Double.POSITIVE_INFINITY;
 		Object collisionObject1 = null;
@@ -433,27 +463,13 @@ public class World {
 		return returnArray;
 	}
 	
-	
-	/**
-	 * Updates the keys of the circles map
-	 * @post The circles map keys are correct.
-	 * 		 |for Circle circle in this.getWorldCircles()
-	 */
-	/*private void updateCirclesMap(){
-		HashMap<Vector2D,Circle> updatedCircles = new HashMap<Vector2D,Circle>();
-		for(Circle circle:this.circles.values()){
-			if(!circle.isTerminated() && circle.getWorld() == this)
-				updatedCircles.put(circle.getPosVector(), circle);
-		}
-		this.circles = updatedCircles;
-	}*/
-	
 	/**
 	 * Returns a collection with all of the circles in this world.
 	 * @return
 	 * 		  A collection with all circle in this world.
 	 * 		  |result == this.circles.values()
 	 */
+	@Basic
 	private Collection<Circle> getWorldCircles(){
 		return this.circles.values();
 	}

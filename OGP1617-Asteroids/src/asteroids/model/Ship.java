@@ -8,16 +8,12 @@ import java.util.*;
  * 
  * @author Senne Gielen & Jeffrey Quicken
  * 
- * @invar The X-coordinate of the ship is a valid coordinate.
- * 		  |isValidPos(posX)
- * @invar The Y-coordinate of the ship is a valid coordinate.
- * 		  |isValidPos(posY)
- * @invar The total velocity of the ship does not exceed the speedLimit.
- * 		  |speedLimit>=(Math.sqrt(Math.pow(velX,2)+Math.pow(velY,2)))
- * @invar The radius of the ship is a valid radius.
- * 		  |isValidRadius(radius)
  * @invar The orientation of the ship is a valid orientation.
  * 		  |isValidOrientation(orientation)
+ * @invar If a ship has a bullet loaded, the ship of the bullet is this ship.
+ * 		  |bullet.getShip() == this for Bullet bullet in this.getBullets()
+ * @invar The ship can have all of its bullets.
+ * 		  |this.canHaveAsBullet(bullet) for Bullet bullet in this.getBullets()
  *
  */
 public class Ship extends Circle {
@@ -54,11 +50,6 @@ public class Ship extends Circle {
 	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
 	 * 
 	 */
-	@Raw
-	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation){
-		super(x,y,xVelocity,yVelocity,radius);
-		this.setOrientation(orientation);
-	}
 	
 	@Raw
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation, double mass){
@@ -75,6 +66,7 @@ public class Ship extends Circle {
 	 * 		 |(bullet.isTerminated() && bullet.getShip() == null) for Bullet bullet in this.getBullets() 
 	 */
 	@Override
+	@Basic
 	public void terminate(){
 		this.terminated = true;
 		for(Bullet bullet: this.getBullets()){
@@ -356,6 +348,7 @@ public class Ship extends Circle {
 	 * 		   The ship can not have this bullet as a bullet.
 	 * 		   |!canHaveAsBullet(bullet)
 	 */
+	@Raw
 	public void addBullet(Bullet bullet)throws NullPointerException,IllegalArgumentException{
 		if(bullet == null)
 			throw new NullPointerException();
@@ -391,6 +384,7 @@ public class Ship extends Circle {
 	 * @effect this.addBullet(bullet) for Bullet bullet in bulletCollection
 	 * 		  Adds every bullet in bulletCollection.
 	 */
+	@Raw
 	public void addBullet(Collection<Bullet> bulletCollection){
 		for(Bullet bullet:bulletCollection){
 			this.addBullet(bullet);
@@ -413,6 +407,7 @@ public class Ship extends Circle {
 	 * @post The bullet does not have a ship.
 	 * 		 |bullet.getShip() == null
 	 */
+	@Raw
 	public void removeBullet(Bullet bullet) throws IllegalArgumentException ,NullPointerException{
 		if(bullet == null)
 			throw new NullPointerException();
@@ -424,6 +419,11 @@ public class Ship extends Circle {
 		}
 	}
 	
+	/**
+	 * Returns the set of bullets loaded on the ship.
+	 * @see implementation
+	 */
+	@Basic
 	public Set<Bullet> getBullets(){
 		return this.bullets;
 	}
@@ -434,6 +434,7 @@ public class Ship extends Circle {
 	 * 		  The number of bullets loaded on the ship.
 	 * 		  |result == this.getBullets().size
 	 */
+	@Basic
 	public int getNbBullets(){
 		return this.getBullets().size();
 	}
@@ -445,6 +446,7 @@ public class Ship extends Circle {
 	 * 
 	 * @see implementation
 	 */
+	@Basic
 	public static double getInitialBulletSpeed(){
 		return initialBulletSpeed;
 	}
@@ -470,6 +472,7 @@ public class Ship extends Circle {
 	 * 		 |if(!this.getWorld().isWithinWorldBounds(bullet))
 	 * 		 |then bullet.isTerminated() && bullet.getShip() == null
 	 */
+	@Raw
 	public void fireBullet(){
 		if(!this.getBullets().isEmpty()){
 			ArrayList<Bullet> bulletList = new ArrayList<Bullet>(this.getBullets());
@@ -515,6 +518,7 @@ public class Ship extends Circle {
 	 * 		 |if(this != bullet.getOwner()) then bullet.isTerminated() && this.isTerminated()
 	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
 	 */
+	@Raw
 	public void collision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
@@ -548,6 +552,7 @@ public class Ship extends Circle {
 	 * 		   |((new)ship).getVelX() == ship.getVelX()+Jx/this.getTotalMass() && ((new)ship).getVelY() == this.getVelY()+Jy/this.getTotalMass()
 	 * 
 	 */
+	@Raw
 	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
