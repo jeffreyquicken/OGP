@@ -289,6 +289,7 @@ public class Ship extends Circle {
 	private final double thrusterForce = 1.1E21;
 	
 	/**
+	 * Returns the thruster force.
 	 * 
 	 * @see implementation
 	 */
@@ -298,6 +299,7 @@ public class Ship extends Circle {
 	}
 	
 	/**
+	 * Returns the thruster status.
 	 * 
 	 * @see implementation
 	 */
@@ -439,6 +441,7 @@ public class Ship extends Circle {
 	private static double initialBulletSpeed = 250;
 	
 	/**
+	 * Returns the initial bullet speed.
 	 * 
 	 * @see implementation
 	 */
@@ -481,7 +484,7 @@ public class Ship extends Circle {
 					bullet.setShip(null);
 					bullet.terminate();
 				}
-				else{this.getWorld().add(bullet);
+				else{
 					for(Object object:this.getWorld().getWorldEntities()){
 						if(object instanceof Circle){
 							if(bullet.overlaps((Circle)object) && (Circle)object != this){
@@ -490,6 +493,8 @@ public class Ship extends Circle {
 							}
 						}
 					}
+					if(!bullet.isTerminated())
+						this.getWorld().add(bullet);
 				}
 			}
 		}
@@ -518,8 +523,10 @@ public class Ship extends Circle {
 				this.getWorld().remove(bullet);
 		}
 		else{
-			this.getWorld().remove(bullet);
-			this.getWorld().remove(this);
+			if(this.getWorld().getWorldEntities().contains(bullet))
+				this.getWorld().remove(bullet);
+			if(this.getWorld().getWorldEntities().contains(this))
+				this.getWorld().remove(this);
 			bullet.terminate();
 			this.terminate();
 		}

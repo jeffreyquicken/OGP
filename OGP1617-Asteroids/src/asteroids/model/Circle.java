@@ -463,7 +463,7 @@ public abstract class Circle {
 	 * 		  The world with which the circle collides.
 	 * @return
 	 * 		  The expired time if the circle collides with the world.
-	 * 		  | result == 
+	 * 		  @see implementation
 	 * @throws NullPointerException
 	 * 		   The world is null.
 	 * 		   |world == null

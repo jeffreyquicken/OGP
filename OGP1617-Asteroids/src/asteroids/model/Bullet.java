@@ -287,7 +287,9 @@ public class Bullet extends Circle {
 		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
+			if(this.getWorld().getWorldEntities().contains(this))
 				this.getWorld().remove(this);
+			if(this.getWorld().getWorldEntities().contains(other))
 				other.getWorld().remove(other);
 				this.terminate();
 				other.terminate();
