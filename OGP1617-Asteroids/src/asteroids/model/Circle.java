@@ -388,6 +388,9 @@ public abstract class Circle {
 	 * @throws IllegalArgumentException
 	 * 		   The given circle overlaps with this circle.
 	 * 		   |this.overlaps(circle)
+	 * @return 
+	 * 		   The collapsed time when the two circles collide.
+	 * 		   |if this.move(result) then new.collides(circle)
 	 */
 	public double getTimeToCollision(Circle circle) throws NullPointerException{
 		if(circle == null)
@@ -401,8 +404,9 @@ public abstract class Circle {
 			return Double.POSITIVE_INFINITY;
 		else if(d<=0)
 			return Double.POSITIVE_INFINITY;
-		else
-			return -(deltaV.scalarProduct(deltaR)+Math.sqrt(d))/deltaV.scalarProduct(deltaV);
+		else{
+			return -((deltaV.scalarProduct(deltaR)+Math.sqrt(d))/deltaV.scalarProduct(deltaV));
+		}
 	}
 	
 	/**
@@ -419,9 +423,6 @@ public abstract class Circle {
 	 * @throws NullPointerException
 	 *  	   The circle doesn't exist.
 	 * 		   |(circle == null)
-	 * @throws IllegalArgumentException
-	 * 		   The given circle overlaps with this circle.
-	 * 		   |this.overlaps(circle)
 	 */
 	public double[] getCollisionPosition(Circle circle) throws NullPointerException, IllegalArgumentException{
 		if(circle == null)
@@ -429,47 +430,44 @@ public abstract class Circle {
 		double deltaT = this.getTimeToCollision(circle);
 		if(deltaT == Double.POSITIVE_INFINITY)
 			return null;
-		else{
-			double[] collisionPosition = {(((this.getPosX()+deltaT*this.getVelX())*circle.getRadius())+(circle.getPosX()+deltaT*circle.getVelX())*this.getRadius())/(this.getRadius()+circle.getRadius()),
-										  (((this.getPosY()+deltaT*this.getVelY())*circle.getRadius())+(circle.getPosY()+deltaT*circle.getVelY())*this.getRadius())/(this.getRadius()+circle.getRadius())};
-			return collisionPosition;
-		}
+		if(deltaT <=0)
+			deltaT = 0;
+		double[] collisionPosition = {(((this.getPosX()+deltaT*this.getVelX())*circle.getRadius())+(circle.getPosX()+deltaT*circle.getVelX())*this.getRadius())/(this.getRadius()+circle.getRadius()),
+										 (((this.getPosY()+deltaT*this.getVelY())*circle.getRadius())+(circle.getPosY()+deltaT*circle.getVelY())*this.getRadius())/(this.getRadius()+circle.getRadius())};
+		return collisionPosition;
 	}
 
-	
+	/**
+	 * Calculates the distance between the circle and the world.
+	 * @param world
+	 * 		  The world of which the distance between this circle is calculated.
+	 * @return
+	 * 		  The distance between the world and the circle.
+	 * 		  |result == Math.min(Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()), 
+			  | 	Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()))
+	 * @throws NullPointerException
+	 * 		  The world is null.
+	 * 		  |world == null
+	 */
 	public double getDistanceBetween(World world)throws NullPointerException{
 		if(world == null)
 			throw new NullPointerException();
-		
-		/*double distance = Double.POSITIVE_INFINITY;
-		
-		if(distance>this.getPosX()-this.getRadius())
-			distance = this.getPosX()-this.getRadius();
-		
-		if(distance>world.getWidth()-this.getPosX()-this.getRadius())
-			distance = world.getWidth()-this.getPosX()-this.getRadius();
-		
-		if(distance>this.getPosY()-this.getRadius())
-			distance = this.getPosY()-this.getRadius();
-		
-		if(distance >world.getHeight()-this.getPosY()-this.getRadius())
-			distance = world.getHeight()-this.getPosY()-this.getRadius();
-		
-		return distance;*/
-		Direction direction = this.getNearestWorldBoundary(world);
-		switch(direction){
-		case UP:
-			return world.getHeight()-this.getPosY()-this.getRadius();
-		case DOWN:
-			return this.getPosY()-this.getRadius();
-		case LEFT:
-			return this.getPosX()-this.getRadius();
-		case RIGHT:
-			return world.getWidth()-this.getPosX()-this.getRadius();
-		}
-		throw new AssertionError();
+		return Math.min(Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()), 
+				Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()));
 	}
 	
+	/**
+	 * Calculates in how much time the circle collides with a world.
+	 * 
+	 * @param world
+	 * 		  The world with which the circle collides.
+	 * @return
+	 * 		  The expired time if the circle collides with the world.
+	 * 		  | result == 
+	 * @throws NullPointerException
+	 * 		   The world is null.
+	 * 		   |world == null
+	 */
 	public double getTimeToCollision(World world) throws NullPointerException{
 		if (world == null)
 			throw new NullPointerException();
@@ -489,100 +487,77 @@ public abstract class Circle {
 				return -(this.getPosY()-this.getRadius())/this.getVelY();
 			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
 				return (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY();
+				
 			else
 				return time;
 		}
 	}
 	
+	
+	/**
+	 * Returns the collision position of a circle with the world
+	 * @param world
+	 * 		  The world with which the circle collides.
+	 * @return
+	 * 		  An array of the coordinates where the circle collides with the boundary of the world.
+	 * 		  Returns null if the circle never collides with the world.
+	 * 		  |if(this.getTimeToCollision(world) == Double.POSITIVE_INFINITY) then result == null
+	 * 		  |else result == 
+	 * @throws NullPointerException
+	 * 		   The world is null;
+	 * 		   |world == null;
+	 */
 	public double[]  getCollisionPosition(World world) throws NullPointerException{
+		if(world == null)
+			throw new NullPointerException();
 		
 		double collisionTime = this.getTimeToCollision(world);
 		
 		if(collisionTime == Double.POSITIVE_INFINITY)
 			return null;
 		else{
-			Direction direction = this.getWorldCollisionDirection(world);
-			switch(direction){
-			case UP:
-				Vector2D upVector = new Vector2D(0,this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(upVector).array();
-			case DOWN:
-				Vector2D downVector = new Vector2D(0,-this.getRadius());
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(downVector).array();
-			case RIGHT:
-				Vector2D rightVector = new Vector2D(this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(rightVector).array();
-			case LEFT:
-				Vector2D leftVector = new Vector2D(-this.getRadius(),0);
-				return (this.getPosVector().add(this.getVelVector().multiply(collisionTime))).add(leftVector).array();
+			double distance = this.getDistanceBetween(world);
+			Vector2D centerPosition = this.getPosVector().add(this.getVelVector().multiply(collisionTime));
+			Vector2D radiusVector = new Vector2D(0,0);
+			if(distance == world.getHeight()-this.getPosY()-this.getRadius())
+				radiusVector.setY(this.getRadius());
+			else if(distance == this.getPosY()-this.getRadius())
+				radiusVector.setY(-this.getRadius());
+			else if(distance == this.getPosX()-this.getRadius())
+				radiusVector.setX(-this.getRadius());
+			else
+				radiusVector.setX(this.getRadius());
+			return centerPosition.add(radiusVector).array();
 			}
-			return null;
-		}
 	}
 	
-	private Direction getWorldCollisionDirection(World world){
-		
-		if(this.getVelX()<0){
-			double time = -(this.getPosX()-this.getRadius())/this.getVelX();
-			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
-				return Direction.DOWN;
-			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
-				return Direction.UP;
-			else
-				return Direction.LEFT;
-		}
-		else{
-			double time = (world.getWidth()-this.getPosX()-this.getRadius())/this.getVelX();
-			if(this.getVelY()<0 && time> -(this.getPosY()-this.getRadius())/this.getVelY())
-				return Direction.DOWN;
-			else if(this.getVelY()>0 && time> (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
-				return Direction.UP;
-			else
-				return Direction.RIGHT;
-		}
-	}
-	
-	private Direction getNearestWorldBoundary(World world){
-		if(this.getPosX()-this.getRadius()<world.getWidth()-this.getPosX()-this.getRadius() &&
-				this.getPosX()-this.getRadius()<this.getPosY()-this.getRadius() &&
-				this.getPosX()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
-			return Direction.LEFT;
-		
-		else if(world.getWidth()-this.getPosX()-this.getRadius()<this.getPosX()-this.getRadius() &&
-				world.getWidth()-this.getPosX()-this.getRadius()<this.getPosY()-this.getRadius() && 
-						world.getWidth()-this.getPosX()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
-			return Direction.RIGHT;
-		
-		else if(this.getPosY()-this.getRadius()<this.getPosX()-this.getRadius() &&
-				this.getPosY()-this.getRadius()<world.getWidth()-this.getPosX()-this.getRadius() &&
-				this.getPosY()-this.getRadius()<world.getHeight()-this.getPosY()-this.getRadius())
-			return Direction.DOWN;
-		
-		else
-			return Direction.UP;
-	}
-	
-	public void bounce(World world){
-		/*double angle = this.velocity.angle();
-		if(((angle>=-Math.PI/4) && (angle<=Math.PI/4)) || ((angle>=3*Math.PI/4)&&(angle<=-3*Math.PI/4)))
+	/**
+	 * Bounces the circle off the edge of the world.
+	 * 
+	 * @param world
+	 * 		  The world against which the circle bounces.
+	 * @post If the closest world boundary of the circle is a vertical boundary, the x velocity is reversed.
+	 * 		 |if(this.getDistanceBetween(world) == Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()))
+	 * 	     |then -this.getVelX() == new.getVelX()
+	 * @post If the closest world boundary of the circle is a horizontal boundary, the y velocity is reversed.
+	 * 		 |if(this.getDistanceBetween(world) == Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()))
+	 * 		 |then -this.getVelY() == new.getVelY()
+	 * @throws NullPointerException
+	 * 		 The world is null.
+	 * 		 |world == null
+	 * @throws IllegalArgumentException
+	 * 		 The ship is not in this world.
+	 * 		 |this.getWorld() != world
+	 */
+	public void bounce(World world) throws NullPointerException, IllegalArgumentException{
+		if(world == null)
+			throw new NullPointerException();
+		if(this.getWorld() != world)
+			throw new IllegalArgumentException();
+		if(this.getDistanceBetween(world) == Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()))
 			this.setVel(-this.getVelX(), this.getVelY());
-		if(((angle>=Math.PI/4) && (angle<=3*Math.PI/4)) || ((angle>=-3*Math.PI/4)&&(angle<=-Math.PI/4)))
-			this.setVel(this.getVelX(), -this.getVelY());*/
-		Direction direction = this.getNearestWorldBoundary(world);
-		switch(direction){
-		case UP:
+		if(this.getDistanceBetween(world) == Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()))
 			this.setVel(this.getVelX(), -this.getVelY());
-			return;
-		case DOWN:
-			this.setVel(this.getVelX(), -this.getVelY());
-			return;
-		case LEFT:
-			this.setVel(-this.getVelX(), this.getVelY());
-			return;
-		case RIGHT:
-			this.setVel(-this.getVelX(), this.getVelY());
-			return;
-		}
 	}
 	
 	public abstract void collision(Bullet bullet);
@@ -608,6 +583,15 @@ public abstract class Circle {
 		return this.velocity;
 	}
 	
+	/**
+	 * Checks if 2 circles are colliding.
+	 * @param circle
+	 * 		  The other circle to be checked.
+	 * @return
+	 * 		  True if the distance between the centers of the circles is between 99% and 101% of the sum of their radii.
+	 * 		  |result == (this.getDistanceBetweenCenter(circle)<=1.01*(this.getRadius()+circle.getRadius())
+			  | 		  && this.getDistanceBetweenCenter(circle)>=0.99*(this.getRadius()+circle.getRadius()))
+	 */
 	public boolean collides(Circle circle){
 		return (this.getDistanceBetweenCenter(circle)<=1.01*(this.getRadius()+circle.getRadius())
 				 && this.getDistanceBetweenCenter(circle)>=0.99*(this.getRadius()+circle.getRadius()));

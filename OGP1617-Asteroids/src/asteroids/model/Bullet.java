@@ -65,10 +65,12 @@ public class Bullet extends Circle {
 	}
 	
 	/**
+	 * Checks if the radius is a valid radius.
+	 * 
 	 * @param newRadius
 	 * 		  The radius of which to check if it is a valid radius.
 	 * @return 
-	 * 		  Returns true if newRadius is greather then or equal to the minRadius.
+	 * 		  Returns true if newRadius is greater then or equal to the minRadius.
 	 * 		  |newRadius>=getMinRadius()
 	 */
 	protected boolean isValidRadius(double newRadius){
@@ -83,6 +85,7 @@ public class Bullet extends Circle {
 	 * @return
 	 * 		  Returns the owner ship of the bullet. 
 	 * 		  Returns null if the bullet has no owner.
+	 * 		  |result == this.owner
 	 */
 	@Basic
 	public Ship getOwner(){
@@ -115,6 +118,7 @@ public class Bullet extends Circle {
 	 * 
 	 * @throws NullPointerException
 	 * 		   The new owner of the ship is null.
+	 * 		   |newOwner == null
 	 * 
 	 * @post   The new owner of the ship is newOwner.
 	 * 		   |new.getOwner() == newOwner
@@ -135,6 +139,7 @@ public class Bullet extends Circle {
 	 * @return
 	 * 		 Returns the ship of the bullet.
 	 * 		 Returns null if the bullet is terminated or the bullet is in the world.
+	 * 		 |result == this.ship
 	 */
 	@Basic
 	public Ship getShip(){
@@ -167,6 +172,9 @@ public class Bullet extends Circle {
 	 * @throws IllegalArgumentException
 	 * 		  The bullet can not have newShip as ship.
 	 * 		  |!canHaveAsShip(newShip)
+	 * @post  The ship of the bullet is set to newShip.
+	 * 		  |new.getShip() == newShip
+	 * 
 	 */
 	@Basic
 	public void setShip(Ship newShip) throws IllegalArgumentException{
@@ -185,6 +193,7 @@ public class Bullet extends Circle {
 	 * Returns the density of bullets.
 	 * @return
 	 * 		  The density of the bullets
+	 * 		  |result == density
 	 */
 	@Basic
 	public static double getDensity(){
@@ -195,6 +204,7 @@ public class Bullet extends Circle {
 	 * Returns the mass of the bullet
 	 * @return
 	 * 		 The mass of the bullet.
+	 * 		 |result == this.mass
 	 */
 	@Basic
 	public double getMass(){
@@ -208,6 +218,7 @@ public class Bullet extends Circle {
 	 * Returns the amount of times the bullet has bounced against the world.
 	 * @return
 	 * 	     The amount of times the bullet has bounced against the world.
+	 * 		 |result == this.amountOfBounces
 	 */
 	@Basic
 	public double getAmountOfBounces(){

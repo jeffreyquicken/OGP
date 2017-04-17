@@ -464,7 +464,7 @@ public class Ship extends Circle {
 	 * 		   then circle.collision(bullet) 
 	 * 		  If the bullet overlaps with any of the world circles. It collides with that circle.
 	 * @post If the bullet doesn't lie within the world bounds, it is terminated and its ship is set to null.
-	 * 		 |if(!this.getWorld().isWithinWorldBounds(bullet)
+	 * 		 |if(!this.getWorld().isWithinWorldBounds(bullet))
 	 * 		 |then bullet.isTerminated() && bullet.getShip() == null
 	 */
 	public void fireBullet(){
@@ -472,25 +472,24 @@ public class Ship extends Circle {
 			ArrayList<Bullet> bulletList = new ArrayList<Bullet>(this.getBullets());
 			Bullet bullet = bulletList.get(0);
 			if(bullet != null && this.getWorld() != null && !this.isTerminated()){
-				double distance = (this.getRadius()+bullet.getRadius())/2;
-				bullet.setPosX(this.getPosX()+2*distance*Math.cos(this.getOrientation()));
-				bullet.setPosY(this.getPosY()+2*distance*Math.sin(this.getOrientation()));
+				double distance = this.getRadius()+bullet.getRadius();
+				bullet.setPosX(this.getPosX()+distance*Math.cos(this.getOrientation()));
+				bullet.setPosY(this.getPosY()+distance*Math.sin(this.getOrientation()));
 				bullet.setVel(initialBulletSpeed*Math.cos(this.getOrientation()), initialBulletSpeed*Math.sin(this.getOrientation()));
 				this.removeBullet(bullet);
-				if(this.getWorld().isWithinWorldBounds(bullet)){
+				if(!this.getWorld().isWithinWorldBounds(bullet)){
+					bullet.setShip(null);
+					bullet.terminate();
+				}
+				else{this.getWorld().add(bullet);
 					for(Object object:this.getWorld().getWorldEntities()){
 						if(object instanceof Circle){
-							if(bullet.overlaps((Circle)object)){
+							if(bullet.overlaps((Circle)object) && (Circle)object != this){
 								((Circle)object).collision(bullet);
 								break;
 							}
 						}
 					}
-					this.getWorld().add(bullet);
-				}
-				else{
-					bullet.setShip(null);
-					bullet.terminate();
 				}
 			}
 		}
@@ -550,12 +549,12 @@ public class Ship extends Circle {
 		else{
 			Vector2D deltaV = this.getPosVector().substract(ship.getPosVector());
 			Vector2D deltaR = this.getVelVector().substract(ship.getVelVector());
-			double sigma = this.getRadius() + ship.getRadius();
+			double sigma = deltaR.length();
 			double J = 2*this.getTotalMass()*ship.getTotalMass()*deltaV.scalarProduct(deltaR)/((this.getTotalMass()+ship.getTotalMass())*sigma);
 			double Jx = J*(deltaR.getX())/sigma;
 			double Jy = J*(deltaR.getY())/sigma;
-			this.setVel(this.getVelX()+Jx/this.getTotalMass(), this.getVelY()+Jy/this.getTotalMass());
-			ship.setVel(ship.getVelX()-Jx/ship.getTotalMass(), ship.getVelY()-Jy/ship.getTotalMass());
+			this.setVel(this.getVelX()+(Jx/this.getTotalMass()), this.getVelY()+(Jy/this.getTotalMass()));
+			ship.setVel(ship.getVelX()-(Jx/ship.getTotalMass()), ship.getVelY()-(Jy/ship.getTotalMass()));
 		}
 	}
 

@@ -310,29 +310,27 @@ public class World {
 		Object collisionObject1 = collisionArray[1];
 		Object collisionObject2 = collisionArray[2];
 		double shortest = (double)collisionArray[0];
-		if(shortest>=0){
-			if(shortest<dt){
+		if(shortest<dt && collisionObject1!= null && collisionObject2 != null){
+			if(shortest>0){
 				this.moveForward(shortest);
 				this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
 				this.evolve(dt-shortest,collisionListener);
 			}
 			else{
-				this.moveForward(dt);
+				this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
+				this.evolve(dt, collisionListener);
 			}
 		}
 		else{
-			this.resolveCollision(collisionObject1, collisionObject2, collisionListener);
-			this.evolve(dt, collisionListener);
+			this.moveForward(dt);
 		}
-			
 	}
-	
+		
 	/**
 	 * Moves all of the entities of the world forward with a given amount of time.
 	 * 
 	 * @param time
-	 * 		  The amount of time.
-	 * 
+	 * 		  The amount of time. 
 	 * @throws IllegalArgumentException
 	 * 		   The amount of time is negative.
 	 * @effect circle.move(time) for Circle circle in this.getWorldCircles()
@@ -341,13 +339,10 @@ public class World {
 	 * 		   if(circle instanceof Ship && ((Ship)circle).getThrusterStatus())
 	 * 		   If the circle is a ship and the thruster is active,
 	 * 		   the ship accelerates during the time.
-	 * @effect this.updateCirclesMap()
-	 * 		   Updates the circles HashMap after moving the circles forward.
 	 */
 	public void moveForward(double time) throws IllegalArgumentException{
 		if(time<0)
-			//throw new IllegalArgumentException();
-			time = 0;
+			throw new IllegalArgumentException();
 		for(Circle circle:this.getWorldCircles()){
 			circle.move(time);
 			if(circle instanceof Ship){
@@ -355,7 +350,6 @@ public class World {
 					((Ship)circle).accelerate(time);
 			}
 		}
-		this.updateCirclesMap();
 	}
 	
 	/**
@@ -367,33 +361,43 @@ public class World {
 	 * 		  The second colliding object. It can be either a Circle, a World or null.
 	 * @param collisionListener
 	 * 		  The collisionListener used by the GUI.
-	 * @param collisionPosition
-	 * 		  The position where the two objects collide.
+	 * @effect if(collisionObject2 instanceof World) then ((World)collisionObject2).collision((Circle)collisionObject1)
+	 * 		  If the second collision object is a world then there is a boundary collision.
+	 * @effect if(collisionObject2 instanceof Bullet) then ((Circle)collisionObject1).collision((Bullet)collisionObject2);
+	 * 		  If the second collision object is a bullet then there is a collision between a circle and a bullet.
+	 * @effect if(collisionObject2 instanceof Ship) then ((Circle)collisionObject1).collision((Ship)collisionObject2)
+	 * 		   If the second collision object is a bullet then there is a collision between a circle and a ship.
+	 * @effect If (collisionObject2 instanceof World) then collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1])
+	 * 		   If the second collision object is a world then the collisionListener gets a boundary collision.
+	 * @effect If(collisionObject2 instanceof Circle) then collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1])
+	 * 		   If the second collision object is a circle then the collisionListener gets an object collision.
 	 * 
 	 */
-	public void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
+	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
-			((World)collisionObject2).collision((Circle)collisionObject1);
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
 			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
 		else if(collisionObject2 instanceof Bullet){
-			((Circle)collisionObject1).collision((Bullet)collisionObject2);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
 			if(collisionObject1 instanceof Ship){
-				if(!((Ship)collisionObject1 == ((Bullet)collisionObject2).getOwner())){
-					double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+				if((Ship)collisionObject1 != ((Bullet)collisionObject2).getOwner())
 					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-				}
 			}
+			else
+				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 		}
 		else if(collisionObject2 instanceof Ship){
-			((Circle)collisionObject1).collision((Ship)collisionObject2);
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
 			if(collisionObject1 instanceof Bullet){
-				if(!((Ship)collisionObject2 == ((Bullet)collisionObject1).getOwner())){
-					double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+				if((Ship)collisionObject2 != ((Bullet)collisionObject1).getOwner())
 					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-				}
 			}
+			else
+				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			((Circle)collisionObject1).collision((Ship)collisionObject2);
 		}
 	}
 	
@@ -407,62 +411,52 @@ public class World {
 		double shortest = Double.POSITIVE_INFINITY;
 		Object collisionObject1 = null;
 		Object collisionObject2 = null;
+		Set<Circle> uncheckedCircles = new HashSet<>(this.getWorldCircles());
 		for(Circle circle:this.getWorldCircles()){
+			uncheckedCircles.remove(circle);
+			for(Circle secondCircle:uncheckedCircles){
+				double time = circle.getTimeToCollision(secondCircle);
+				if(time<shortest){
+					shortest = time;
+					collisionObject1 = circle;
+					collisionObject2 = secondCircle;
+				}
+			}
 			double worldCollisionTime = circle.getTimeToCollision(this);
 			if(worldCollisionTime<shortest){
 				shortest = worldCollisionTime;
 				collisionObject1 = circle;
 				collisionObject2 = this;
 			}
-			for(Circle secondCircle:this.getWorldCircles()){
-				if(secondCircle != circle){
-					double time = circle.getTimeToCollision(secondCircle);
-					if(time<shortest){
-						shortest = time;
-						collisionObject1 = circle;
-						collisionObject2 = secondCircle;
-					}
-				}
-			}
 		}
 		Object[] returnArray = {shortest,collisionObject1,collisionObject2};
 		return returnArray;
-		}
-	
-	public double getFirstCollisionTime(){
-		double shortest = Double.POSITIVE_INFINITY;
-		//Set<Circle> uncheckedCircles = new HashSet<Circle>(this.getWorldCircles());
-		for(Circle circle:this.getWorldCircles()){
-			//uncheckedCircles.remove(circle);
-			double worldCollisionTime = circle.getTimeToCollision(this);
-			if(worldCollisionTime<shortest)
-				shortest = worldCollisionTime;
-			for(Circle secondCircle:this.getWorldCircles()){
-				if(circle != secondCircle){
-					double time = circle.getTimeToCollision(secondCircle);
-					if(time<shortest)
-						shortest = time;
-				}
-			}
-		}
-		return shortest;
 	}
+	
 	
 	/**
 	 * Updates the keys of the circles map
+	 * @post The circles map keys are correct.
+	 * 		 |for Circle circle in this.getWorldCircles()
 	 */
-	private void updateCirclesMap(){
+	/*private void updateCirclesMap(){
 		HashMap<Vector2D,Circle> updatedCircles = new HashMap<Vector2D,Circle>();
 		for(Circle circle:this.circles.values()){
 			if(!circle.isTerminated() && circle.getWorld() == this)
 				updatedCircles.put(circle.getPosVector(), circle);
 		}
-		this.circles.clear();
 		this.circles = updatedCircles;
-	}
+	}*/
 	
+	/**
+	 * Returns a collection with all of the circles in this world.
+	 * @return
+	 * 		  A collection with all circle in this world.
+	 * 		  |result == this.circles.values()
+	 */
 	private Collection<Circle> getWorldCircles(){
 		return this.circles.values();
 	}
+	
 }
 
