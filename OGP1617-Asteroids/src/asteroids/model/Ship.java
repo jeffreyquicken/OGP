@@ -53,9 +53,8 @@ public class Ship extends Circle {
 	
 	@Raw
 	public Ship(double x, double y, double xVelocity, double yVelocity, double radius,double orientation, double mass){
-		super(x,y,xVelocity,yVelocity,radius);
+		super(x,y,xVelocity,yVelocity,radius,mass);
 		this.setOrientation(orientation);
-		this.setMass(mass);
 	}
 	
 	/**
@@ -158,26 +157,35 @@ public class Ship extends Circle {
 		return minRadius;
 	}
 	
-	private double mass;
+//	private double mass;
+	
+	@Override
+	protected double massCorrection(double newMass){
+		if(newMass<	(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
+			return 	(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
+		else
+			return newMass;
+
+	}
 	private static double density = 1.42E12;
 	
-	/**
-	 * Sets the mass of the ship to newMass
-	 * @param newMass
-	 * 		  The new mass of the ship.
-	 * @post If the mass of the ship is smaller then the minimum mass, the mass is set to the minimum mass.
-	 * 		 Otherwise the mass is set to newMass
-	 * 		 |if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
-			 |then new.getMass()  == (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
-		     |else then new.getMass() == newMass;
-	 */
-	@Basic
-	public void setMass(double newMass){
-		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
-			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
-		else
-			this.mass = newMass;
-	}
+//	/**
+//	 * Sets the mass of the ship to newMass
+//	 * @param newMass
+//	 * 		  The new mass of the ship.
+//	 * @post If the mass of the ship is smaller then the minimum mass, the mass is set to the minimum mass.
+//	 * 		 Otherwise the mass is set to newMass
+//	 * 		 |if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
+//			 |then new.getMass()  == (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
+//		     |else then new.getMass() == newMass;
+//	 */
+//	@Basic
+//	public void setMass(double newMass){
+//		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
+//			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
+//		else
+//			this.mass = newMass;
+//	}
 	
 	/**
 	 * Returns the minimum density of the ships.
@@ -202,16 +210,16 @@ public class Ship extends Circle {
 		density = newDensity;
 	}
 	
-	/**
-	 * Returns the mass of the ship.
-	 * @return
-	 * 		  The mass of the ship.
-	 * 		  |result == this.mass
-	 */
-	@Basic
-	public double getMass(){
-		return this.mass;
-	}
+//	/**
+//	 * Returns the mass of the ship.
+//	 * @return
+//	 * 		  The mass of the ship.
+//	 * 		  |result == this.mass
+//	 */
+//	@Basic
+//	public double getMass(){
+//		return this.mass;
+//	}
 	
 	/**
 	 * Returns the total mass of the ship (including all loaded bullets)
@@ -278,7 +286,7 @@ public class Ship extends Circle {
 	}
 		
 	
-	private final double thrusterForce = 1.1E21;
+	private final double thrusterForce = 1.1E18;
 	
 	/**
 	 * Returns the thruster force.
@@ -567,6 +575,13 @@ public class Ship extends Circle {
 			double Jy = J*(deltaR.getY())/sigma;
 			this.setVel(this.getVelX()+(Jx/this.getTotalMass()), this.getVelY()+(Jy/this.getTotalMass()));
 			ship.setVel(ship.getVelX()-(Jx/ship.getTotalMass()), ship.getVelY()-(Jy/ship.getTotalMass()));
+		}
+	}
+	
+	public void teleportToRandomLocation(){
+		if(this.getWorld()!= null){
+			this.setPosX(this.getRadius()+Math.random()*(this.getWorld().getWidth()-2*this.getRadius()));
+			this.setPosY(this.getRadius()+Math.random()*(this.getWorld().getHeight()-2*this.getRadius()));
 		}
 	}
 

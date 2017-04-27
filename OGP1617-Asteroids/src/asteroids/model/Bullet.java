@@ -48,8 +48,7 @@ public class Bullet extends Circle {
 	 */		 
 	@Raw
 	public Bullet(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException{
-		super(x,y,xVelocity,yVelocity,radius);
-		this.mass = getDensity()*(4.0/3.0)*Math.pow(this.getRadius(), 3)*Math.PI;
+		super(x,y,xVelocity,yVelocity,radius,getDensity()*(4.0/3.0)*Math.pow(radius, 3)*Math.PI);
 	}
 	
 	private static double minRadius = 1;
@@ -198,9 +197,7 @@ public class Bullet extends Circle {
 	
 	
 	private static double density = 7.8E12;
-	
-	private final double mass;
-	
+		
 	/**
 	 * Returns the density of bullets.
 	 * @return
@@ -212,16 +209,16 @@ public class Bullet extends Circle {
 		return density;
 	}
 	
-	/**
-	 * Returns the mass of the bullet
-	 * @return
-	 * 		 The mass of the bullet.
-	 * 		 |result == this.mass
-	 */
-	@Basic
-	public double getMass(){
-		return this.mass;
-	}
+//	/**
+//	 * Returns the mass of the bullet
+//	 * @return
+//	 * 		 The mass of the bullet.
+//	 * 		 |result == this.mass
+//	 */
+//	@Basic
+//	public double getMass(){
+//		return this.mass;
+//	}
 	
 	private double amountOfBounces = 0;
 	private final double maxBounces = 3;
@@ -304,7 +301,7 @@ public class Bullet extends Circle {
 			if(this.getWorld().getWorldEntities().contains(this))
 				this.getWorld().remove(this);
 			if(this.getWorld().getWorldEntities().contains(other))
-				other.getWorld().remove(other);
+				this.getWorld().remove(other);
 				this.terminate();
 				other.terminate();
 		}

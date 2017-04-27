@@ -54,11 +54,12 @@ public abstract class Circle {
 	 * 
 	 */
 	@Raw
-	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException{
+	protected Circle(double x, double y, double xVelocity, double yVelocity, double radius, double mass) throws IllegalArgumentException{
 		this.setPosX(x);
 		this.setPosY(y);
 		this.setVel(xVelocity,yVelocity);
 		this.setRadius(radius);
+		this.setMass(mass);
 	}
 	
 	protected boolean terminated = false;
@@ -83,6 +84,24 @@ public abstract class Circle {
 	@Basic
 	public boolean isTerminated(){
 		return this.terminated;
+	}
+	
+	private double mass;
+	
+	public double getMass(){
+		return this.mass;
+	}
+	
+	protected double massCorrection(double newMass){
+		if(newMass<0)
+			return 0;
+		else 
+			return newMass;
+	}
+	
+	public void setMass(double newMass){
+		double correctedMass = this.massCorrection(newMass);
+		this.mass = correctedMass;
 	}
 	
 	private Vector2D position = new Vector2D(0,0);
