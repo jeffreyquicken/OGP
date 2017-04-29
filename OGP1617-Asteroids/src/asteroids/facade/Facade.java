@@ -4,7 +4,8 @@ import java.util.*;
 
 import asteroids.model.*;
 //import asteroids.part1.facade.IFacade;
-import asteroids.part2.facade.*;
+//import asteroids.part2.facade.*;
+import asteroids.part3.facade.*;
 import asteroids.part2.CollisionListener;
 import asteroids.util.ModelException;
 
@@ -498,6 +499,149 @@ public class Facade implements IFacade {
 	public Set<? extends Object> getEntities(World world){
 		return world.getWorldEntities();
 	}
+	
+	public int getNbStudentsInTeam(){
+		return 2;
+	}
+	
+	public Set<? extends Asteroid> getWorldAsteroids(World world) throws ModelException{
+		return world.getWorldAsteroids();
+	}
+	
+	public void addAsteroidToWorld(World world, Asteroid asteroid) throws ModelException{
+		try{world.add(asteroid);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	public void removeAsteroidFromWorld(World world, Asteroid asteroid) throws ModelException{
+		try{world.remove(asteroid);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+
+	public Set<? extends Planetoid> getWorldPlanetoids(World world) throws ModelException{
+		return world.getWorldPlanetoids();
+	}
+
+	public void addPlanetoidToWorld(World world, Planetoid planetoid) throws ModelException{
+		try{world.add(planetoid);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+
+	public void removePlanetoidFromWorld(World world, Planetoid planetoid) throws ModelException{
+		try{world.remove(planetoid);}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+	
+	//ASTEROIDS////////////
+	public Asteroid createAsteroid(double x, double y, double xVelocity, double yVelocity, double radius)
+			throws ModelException{
+		try{return new Asteroid(x,y,xVelocity,yVelocity,radius);}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+	}
+
+	public void terminateAsteroid(Asteroid asteroid) throws ModelException{
+		try{asteroid.terminate();}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+
+	public boolean isTerminatedAsteroid(Asteroid asteroid) throws ModelException{
+		return asteroid.isTerminated();
+	}
+
+	public double[] getAsteroidPosition(Asteroid asteroid) throws ModelException{
+		return asteroid.getPosVector().array();
+	}
+
+	public double[] getAsteroidVelocity(Asteroid asteroid) throws ModelException{
+		return asteroid.getVelVector().array();
+	}
+
+	public double getAsteroidRadius(Asteroid asteroid) throws ModelException{
+		return asteroid.getRadius();
+	}
+
+	public double getAsteroidMass(Asteroid asteroid) throws ModelException{
+		return asteroid.getMass();
+	}
+
+	public World getAsteroidWorld(Asteroid asteroid) throws ModelException{
+		return asteroid.getWorld();
+	}
+////PLANETOID///////////////////////////////
+	
+	public Planetoid createPlanetoid(double x, double y, double xVelocity, double yVelocity, double radius,
+			double totalTraveledDistance) throws ModelException{
+		try{return new Planetoid(x,y,xVelocity,yVelocity,radius);}
+		catch(IllegalArgumentException e){
+			throw new ModelException(e);
+		}
+	}
+
+	public void terminatePlanetoid(Planetoid planetoid) throws ModelException{
+		try{planetoid.terminate();}
+		catch(NullPointerException e){
+			throw new ModelException(e);
+			}
+		catch(IllegalArgumentException d){
+			throw new ModelException(d);
+		}
+	}
+
+	public boolean isTerminatedPlanetoid(Planetoid planetoid) throws ModelException{
+		return planetoid.isTerminated();
+	}
+
+	public double[] getPlanetoidPosition(Planetoid planetoid) throws ModelException{
+		return planetoid.getPosVector().array();
+	}
+
+	public double[] getPlanetoidVelocity(Planetoid planetoid) throws ModelException{
+		return planetoid.getVelVector().array();
+	}
+
+	public double getPlanetoidRadius(Planetoid planetoid) throws ModelException{
+		return planetoid.getRadius();
+	}
+
+	public double getPlanetoidMass(Planetoid planetoid) throws ModelException{
+		return planetoid.getMass();
+	}
+
+	public double getPlanetoidTotalTraveledDistance(Planetoid planetoid) throws ModelException{
+		return planetoid.getDistanceTraveled();
+	}
+
+	public World getPlanetoidWorld(Planetoid planetoid) throws ModelException{
+		return planetoid.getWorld();
+	}
+	
+
 	
 	
 	

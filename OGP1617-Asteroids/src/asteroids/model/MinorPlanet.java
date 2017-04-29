@@ -64,5 +64,20 @@ public abstract class MinorPlanet extends Circle {
 		}
 	}
 	
+	public void collision(Object other) throws IllegalArgumentException,NullPointerException{
+		if(other == null)
+			throw new NullPointerException();
+		else if(other == this)
+			throw new IllegalArgumentException();
+		if(other instanceof Bullet)
+			((Bullet)other).collision(this);
+		else if(other instanceof Ship)
+			this.collision((Ship)other);
+		else if(other instanceof MinorPlanet)
+			this.collision((MinorPlanet)other);
+		else if(other instanceof World)
+			this.collision((World)other);
+	}
+	
 	public abstract void collision(Ship ship);
 }

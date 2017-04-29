@@ -8,9 +8,35 @@ public class Planetoid extends MinorPlanet {
 		this.initialRadius = this.getRadius();
 	}
 	
+	@Override
+	public void terminate(){
+		this.terminated = true;
+		if(this.getWorld() != null && this.getRadius()>=30){
+			double direction = Math.random();
+			double otherDirection = Math.sqrt(1-Math.pow(direction,2));
+			this.getWorld().add(
+					new Asteroid(this.getPosX()+direction*this.getRadius()/2,this.getPosY()+otherDirection*this.getRadius()/2,
+							1.5*this.getVelVector().length()*direction,1.5*this.getVelVector().length()*otherDirection,this.getRadius()/2));
+			this.getWorld().add(
+					new Asteroid(this.getPosX()-direction*this.getRadius()/2,this.getPosY()-otherDirection*this.getRadius()/2,
+							-1.5*this.getVelVector().length()*direction,-1.5*this.getVelVector().length()*otherDirection,this.getRadius()/2));
+		}
+	}
+	
 	private final double initialRadius;
 	
 	private double distanceTravelled = 0;
+	
+	public double getDistanceTraveled(){
+		return this.distanceTravelled;
+	}
+	
+	public void updateDistanceTraveled(double dt) {
+		if(dt<0)
+			dt=0;
+		else
+			this.distanceTravelled+=this.getVelVector().length()*dt;
+	}
 	
 	public void collision(Ship ship){
 		if(ship == null){

@@ -195,6 +195,26 @@ public class World {
 		return bullets;
 	}
 	
+	@Basic
+	public Set<Asteroid> getWorldAsteroids(){
+		Set<Asteroid> asteroids = new HashSet<>();
+		for(Circle circle:circles.values()){
+			if(circle instanceof Asteroid)
+				asteroids.add((Asteroid)circle);
+		}
+		return asteroids;
+	}
+	
+	@Basic
+	public Set<Planetoid> getWorldPlanetoids(){
+		Set<Planetoid> planetoids = new HashSet<>();
+		for(Circle circle:circles.values()){
+			if(circle instanceof Planetoid)
+				planetoids.add((Planetoid)circle);
+		}
+		return planetoids;
+	}
+	
 	/**
 	 * Returns a set of all the objects of the world
 	 * @return
@@ -378,6 +398,8 @@ public class World {
 				if(((Ship)circle).getThrusterStatus())
 					((Ship)circle).accelerate(time);
 			}
+			else if(circle instanceof Planetoid)
+				((Planetoid)circle).updateDistanceTraveled(time);
 		}
 	}
 	
@@ -429,7 +451,13 @@ public class World {
 				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
 			((Circle)collisionObject1).collision((Ship)collisionObject2);
 		}
+		else{
+			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
+			((Circle)collisionObject1).collision(collisionObject2);
+		}
 	}
+		
 	
 	/**
 	 * Returns an array with the time to the first collision and the two colliding objects.

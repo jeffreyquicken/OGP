@@ -270,28 +270,28 @@ public class Bullet extends Circle {
 	}
 	
 	/**
-	 * Resolves a collision of a bullet and a bullet.
+	 * Resolves a collision of a bullet and a circle that is not a ship.
 	 * 
 	 * @param other
-	 * 		  The other bullet to collide with this bullet.
+	 * 		  The other circle to collide with this bullet.
 	 * 
 	 * @throws NullPointerException
-	 * 		  The other bullet is null.
+	 * 		  The other circle is null.
 	 * 		  |other == null
 	 * @throws IllegalArgumentException
-	 * 		  The other bullet is this bullet.
+	 * 		  The other circle is this bullet.
 	 * 		  |other == this
 	 * 
-	 * @post The world of this bullet and the other bullet is set to null.
+	 * @post The world of this bullet and the other circle is set to null.
 	 * 		  |new.getWorld() == null && newOther.getWorld() == null
-	 * @post The world doesn't contain this and the other bullet
+	 * @post The world doesn't contain this and the other circle
 	 * 		  |!this.getWorld().getWorldBullets().contains(this) && other.getWorld().getWorldBullets().contains(other)
-	 * @post Both bullets are terminated.
+	 * @post Both the circle and the bullet are terminated.
 	 * 		  |this.isTerminated() && other.isTerminated()
 	 * 
 	 */
 	@Raw
-	public void collision(Bullet other) throws NullPointerException,IllegalArgumentException{
+	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
 		if(other == null){
 			throw new NullPointerException();
 		}
@@ -307,6 +307,8 @@ public class Bullet extends Circle {
 		}
 	}
 	
+	
+	
 	/**
 	 * Resolves the collision of a bullet with a ship.
 	 * 
@@ -321,6 +323,19 @@ public class Bullet extends Circle {
 			throw new NullPointerException();
 		else
 			ship.collision(this);
+	}
+	
+	public void collision(Object other) throws NullPointerException, IllegalArgumentException{
+		if(other == null)
+			throw new NullPointerException();
+		else if(other == this)
+			throw new IllegalArgumentException();
+		if(other instanceof Ship)
+			this.collision((Ship)other);
+		else if(other instanceof Circle)
+			this.collision((Circle)other);
+		else if(other instanceof World)
+			this.collision((World)other);
 	}
 	
 }

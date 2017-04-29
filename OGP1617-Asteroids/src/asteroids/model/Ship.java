@@ -578,6 +578,21 @@ public class Ship extends Circle {
 		}
 	}
 	
+	public void collision(Object other) throws IllegalArgumentException, NullPointerException {
+		if(other == null)
+			throw new NullPointerException();
+		else if(this == other)
+			throw new IllegalArgumentException();
+		if(other instanceof Bullet)
+			this.collision((Bullet)other);
+		else if(other instanceof Ship)
+			this.collision((Ship)other);
+		else if(other instanceof MinorPlanet)
+			((MinorPlanet)other).collision(this);
+		else if(other instanceof World)
+			this.collision((World)other);
+	}
+	
 	public void teleportToRandomLocation(){
 		if(this.getWorld()!= null){
 			this.setPosX(this.getRadius()+Math.random()*(this.getWorld().getWidth()-2*this.getRadius()));
