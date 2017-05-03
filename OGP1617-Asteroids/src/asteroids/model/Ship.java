@@ -67,7 +67,7 @@ public class Ship extends Circle {
 	@Override
 	@Basic
 	public void terminate(){
-		this.terminated = true;
+		this.setTerminated(true);;
 		for(Bullet bullet: this.getBullets()){
 			bullet.terminate();
 			bullet.setShip(null);

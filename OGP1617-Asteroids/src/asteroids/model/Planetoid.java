@@ -10,7 +10,7 @@ public class Planetoid extends MinorPlanet {
 	
 	@Override
 	public void terminate(){
-		this.terminated = true;
+		this.setTerminated(true);
 		if(this.getWorld() != null && this.getRadius()>=30){
 			double direction = Math.random();
 			double otherDirection = Math.sqrt(1-Math.pow(direction,2));
@@ -60,6 +60,21 @@ public class Planetoid extends MinorPlanet {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void move(double time)throws IllegalArgumentException {
+		if(time<0)
+			throw new IllegalArgumentException();
+		else
+			this.setPosX(this.getPosX() + this.getVelX()*time);
+			this.setPosY(this.getPosY() + this.getVelY()*time);
+			this.distanceTravelled+=this.getVelVector().length()*time;
+			try{this.setRadius(0.999999*this.getRadius());}
+			catch(IllegalArgumentException e){
+				this.terminate();
+				this.setWorld(null);
+			}
 	}
 
 	

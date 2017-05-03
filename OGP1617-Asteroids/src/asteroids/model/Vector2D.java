@@ -25,8 +25,8 @@ public class Vector2D {
 	 */
 	@Raw
 	public Vector2D(double x, double y){
-		this.setX(x);
-		this.setY(y);
+		this.xComponent = x;
+		this.yComponent = y;
 	}
 	
 	/**
@@ -39,30 +39,12 @@ public class Vector2D {
 	 */
 	@Raw
 	public Vector2D(double[] vectorArray){
-		this.setX(vectorArray[0]);
-		this.setY(vectorArray[1]);
+		this.xComponent = vectorArray[0];
+		this.yComponent = vectorArray[1];
 	}
 	
-	private double xComponent;
-	private double yComponent;
-	
-	/**
-	 * Sets the x component of this vector to newX
-	 * @param newX
-	 * 		  The new x component of the vector.
-	 */
-	public void setX(double newX){
-		this.xComponent = newX;
-	}
-	
-	/**
-	 * Sets the y component of this vector to newY
-	 * @param newY
-	 * 		  The new y component of the vector.
-	 */
-	public void setY(double newY){
-		this.yComponent = newY;
-	}
+	private final double xComponent;
+	private final double yComponent;
 	
 	/**
 	 * Returns the x component of the vector.

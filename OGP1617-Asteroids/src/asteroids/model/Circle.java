@@ -62,7 +62,7 @@ public abstract class Circle {
 		this.setMass(mass);
 	}
 	
-	protected boolean terminated = false;
+	private boolean terminated = false;
 	
 	/**
 	 * Terminates the circle.
@@ -72,7 +72,20 @@ public abstract class Circle {
 	 */
 	@Basic
 	public void terminate() {
-		this.terminated = true;	
+		this.setTerminated(true);
+	}
+	
+	/**
+	 * Sets the terminated status to a new status.
+	 * @param newStatus
+	 * 		  The new terminated status.
+	 * @post
+	 * 		The terminated status is the new terminated status
+	 * 	    |new.terminated = newStatus
+	 */
+	@Basic
+	protected void setTerminated(boolean newStatus){
+		this.terminated = newStatus;
 	}
 	
 	/**
@@ -88,10 +101,25 @@ public abstract class Circle {
 	
 	private double mass;
 	
+	/**
+	 * Returns the mass of the circle
+	 * @return
+	 * 		  Returns the mass of the circle.
+	 * 		  |result == this.mass
+	 */
 	public double getMass(){
 		return this.mass;
 	}
 	
+	/**
+	 * Corrects the mass.
+	 * @param newMass The mass that has to be corrected
+	 * @return
+	 * 		  If the mass that has to be corrected is smaller then zero, zero is returned.
+	 * 		  Else the mass itself is returned.
+	 * 	      |if(newMass<0) then result == 0
+	 * 		  |else then result == newMass
+	 */
 	protected double massCorrection(double newMass){
 		if(newMass<0)
 			return 0;
@@ -99,9 +127,15 @@ public abstract class Circle {
 			return newMass;
 	}
 	
+	/**
+	 * Sets the mass of the circle to a new mass.
+	 * @param newMass
+	 * 		  The new mass of the circle.
+	 * @post The mass of the circle is equal to the corrected newMass.
+	 * 		 |new.getMass() == this.massCorrection(newMass)
+	 */
 	public void setMass(double newMass){
-		double correctedMass = this.massCorrection(newMass);
-		this.mass = correctedMass;
+		this.mass = this.massCorrection(newMass);
 	}
 	
 	private Vector2D position = new Vector2D(0,0);
@@ -122,7 +156,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			this.position.setX(newPos);
+			this.position = new Vector2D(newPos,this.getPosY());
 	}
 	
 	/**
@@ -154,7 +188,7 @@ public abstract class Circle {
 		if(!isValidPos(newPos))
 			throw new IllegalArgumentException();
 		else
-			this.position.setY(newPos);
+			this.position = new Vector2D(this.getPosX(),newPos);
 	}
 	
 	/**
@@ -219,12 +253,10 @@ public abstract class Circle {
 	public void setVel(double newVelX, double newVelY){
 		double totalSpeed = Math.sqrt(Math.pow(newVelX, 2) + Math.pow(newVelY, 2));
 		if(totalSpeed>speedLimit){
-			this.velocity.setX(speedLimit*newVelX/totalSpeed);
-			this.velocity.setY(speedLimit*newVelY/totalSpeed);
+			this.velocity = new Vector2D(speedLimit*newVelX/totalSpeed,speedLimit*newVelY/totalSpeed);
 		}
 		else 
-			this.velocity.setX(newVelX);
-			this.velocity.setY(newVelY);
+			this.velocity = new Vector2D(newVelX,newVelY);
 	}
 	
 	/**
@@ -562,13 +594,13 @@ public abstract class Circle {
 			Vector2D centerPosition = this.getPosVector().add(this.getVelVector().multiply(collisionTime));
 			Vector2D radiusVector = new Vector2D(0,0);
 			if(distance == world.getHeight()-this.getPosY()-this.getRadius())
-				radiusVector.setY(this.getRadius());
+				radiusVector = new Vector2D(0,this.getRadius());
 			else if(distance == this.getPosY()-this.getRadius())
-				radiusVector.setY(-this.getRadius());
+				radiusVector = new Vector2D(0,-this.getRadius());
 			else if(distance == this.getPosX()-this.getRadius())
-				radiusVector.setX(-this.getRadius());
+				radiusVector = new Vector2D(-this.getRadius(),0);
 			else
-				radiusVector.setX(this.getRadius());
+				radiusVector = new Vector2D(this.getRadius(),0);
 			return centerPosition.add(radiusVector).array();
 			}
 	}
