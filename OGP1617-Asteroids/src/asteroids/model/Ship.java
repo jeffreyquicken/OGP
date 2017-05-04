@@ -527,7 +527,7 @@ public class Ship extends Circle {
 	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
 	 */
 	@Raw
-	public void collision(Bullet bullet) throws NullPointerException{
+	public void BulletCollision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
 		if(this == bullet.getOwner()){
@@ -561,7 +561,7 @@ public class Ship extends Circle {
 	 * 
 	 */
 	@Raw
-	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
+	public void ShipCollision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else if(this == ship || this.getWorld() != ship.getWorld())
@@ -584,9 +584,9 @@ public class Ship extends Circle {
 		else if(this == other)
 			throw new IllegalArgumentException();
 		if(other instanceof Bullet)
-			this.collision((Bullet)other);
+			this.BulletCollision((Bullet)other);
 		else if(other instanceof Ship)
-			this.collision((Ship)other);
+			this.ShipCollision((Ship)other);
 		else if(other instanceof MinorPlanet)
 			((MinorPlanet)other).collision(this);
 		else if(other instanceof World)

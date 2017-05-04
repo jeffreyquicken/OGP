@@ -34,8 +34,12 @@ public class Planetoid extends MinorPlanet {
 	public void updateDistanceTraveled(double dt) {
 		if(dt<0)
 			dt=0;
-		else
-			this.distanceTravelled+=this.getVelVector().length()*dt;
+		this.distanceTravelled+=this.getVelVector().length()*dt;
+		try{this.setRadius(0.999999*this.getRadius());}
+		catch(IllegalArgumentException e){
+			this.terminate();
+			this.setWorld(null);
+		}
 	}
 	
 	public void collision(Ship ship){
@@ -61,21 +65,5 @@ public class Planetoid extends MinorPlanet {
 			}
 		}
 	}
-	
-	@Override
-	public void move(double time)throws IllegalArgumentException {
-		if(time<0)
-			throw new IllegalArgumentException();
-		else
-			this.setPosX(this.getPosX() + this.getVelX()*time);
-			this.setPosY(this.getPosY() + this.getVelY()*time);
-			this.distanceTravelled+=this.getVelVector().length()*time;
-			try{this.setRadius(0.999999*this.getRadius());}
-			catch(IllegalArgumentException e){
-				this.terminate();
-				this.setWorld(null);
-			}
-	}
-
 	
 }

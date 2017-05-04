@@ -431,26 +431,26 @@ public class World {
 			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
 			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
-		else if(collisionObject2 instanceof Bullet){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			if(collisionObject1 instanceof Ship){
-				if((Ship)collisionObject1 != ((Bullet)collisionObject2).getOwner())
-					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			}
-			else
-				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			((Circle)collisionObject1).collision((Bullet)collisionObject2);
-		}
-		else if(collisionObject2 instanceof Ship){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			if(collisionObject1 instanceof Bullet){
-				if((Ship)collisionObject2 != ((Bullet)collisionObject1).getOwner())
-					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			}
-			else
-				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			((Circle)collisionObject1).collision((Ship)collisionObject2);
-		}
+//		else if(collisionObject2 instanceof Bullet){
+//			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+//			if(collisionObject1 instanceof Ship){
+//				if((Ship)collisionObject1 != ((Bullet)collisionObject2).getOwner())
+//					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+//			}
+//			else
+//				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+//			((Circle)collisionObject1).collision((Bullet)collisionObject2);
+//		}
+//		else if(collisionObject2 instanceof Ship){
+//			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+//			if(collisionObject1 instanceof Bullet){
+//				if((Ship)collisionObject2 != ((Bullet)collisionObject1).getOwner())
+//					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+//			}
+//			else
+//				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+//			((Circle)collisionObject1).collision((Ship)collisionObject2);
+//		}
 		else{
 			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
 			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
