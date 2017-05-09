@@ -1,12 +1,9 @@
-package asteroids.model;
+package asteroids.model.program;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
 
-public class Expression<T> {
+public abstract class Expression<T> {
 	
-	public Expression(T var){
-		this.value = var;
-	}
 	private T value;
 	
 	@Override
@@ -16,6 +13,16 @@ public class Expression<T> {
 	
 	public T getValue(){
 		return value;
+	}
+	
+	public void setValue(T newValue){
+		this.value = newValue;
+	}
+	
+	private Program program;
+	
+	public Program getProgram(){
+		return this.program;
 	}
 	
 	@Override

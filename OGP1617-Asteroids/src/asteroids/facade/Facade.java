@@ -3,9 +3,12 @@ package asteroids.facade;
 import java.util.*;
 
 import asteroids.model.*;
+import asteroids.model.program.Program;
+import asteroids.model.program.ProgramFactory;
 //import asteroids.part1.facade.IFacade;
 //import asteroids.part2.facade.*;
 import asteroids.part3.facade.*;
+import asteroids.part3.programs.IProgramFactory;
 import asteroids.part2.CollisionListener;
 import asteroids.util.ModelException;
 
@@ -641,6 +644,25 @@ public class Facade implements IFacade {
 		return planetoid.getWorld();
 	}
 	
+	//PROGRAM CODE
+	
+	public Program getShipProgram(Ship ship){
+		return ship.getProgram();
+	}
+	
+	public void loadProgramOnShip(Ship ship, Program program){
+		ship.setProgram(program);
+	}
+	
+	public IProgramFactory<?,?,?,? extends Program> createProgramFactory() throws ModelException{
+		return new ProgramFactory();
+	}
+
+	@Override
+	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
+		return ship.getProgram().execute(dt);
+	}
+
 
 	
 	

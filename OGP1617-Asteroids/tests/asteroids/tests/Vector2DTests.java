@@ -30,17 +30,6 @@ public class Vector2DTests {
 	public void ScalarProduct() {
 		assertEquals(200, vector1.scalarProduct(vector2),EPSILON);
 	}
-	
-	@Test
-	public void Equals_TrueCase() {
-		vector2.setY(5);
-		assertTrue(vector1.equals(vector2));
-	}
-	
-	@Test
-	public void Equals_FalseCase() {
-		vector2.setY(10);
-		assertFalse(vector1.equals(vector2));
-	}
+
 
 }

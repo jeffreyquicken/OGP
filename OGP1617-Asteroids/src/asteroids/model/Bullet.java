@@ -291,7 +291,7 @@ public class Bullet extends Circle {
 	 * 
 	 */
 	@Raw
-	public void CircleCollision(Circle other) throws NullPointerException,IllegalArgumentException{
+	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
 		if(other == null){
 			throw new NullPointerException();
 		}
@@ -307,6 +307,14 @@ public class Bullet extends Circle {
 		}
 	}
 	
+	public void collision(MinorPlanet minorPlanet){
+		minorPlanet.collision(this);
+	}
+	
+	public void collision(Bullet bullet){
+		this.collision((Circle)bullet);
+	}
+	
 	
 	
 	/**
@@ -318,24 +326,24 @@ public class Bullet extends Circle {
 	 * 		  The ship collides with this bullet.
 	 */
 	@Raw
-	public void ShipCollision(Ship ship) throws NullPointerException{
+	public void collision(Ship ship) throws NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else
 			ship.collision(this);
 	}
 	
-	public void collision(Object other) throws NullPointerException, IllegalArgumentException{
-		if(other == null)
-			throw new NullPointerException();
-		else if(other == this)
-			throw new IllegalArgumentException();
-		if(other instanceof Ship)
-			this.ShipCollision((Ship)other);
-		else if(other instanceof Circle)
-			this.CircleCollision((Circle)other);
-		//else if(other instanceof World)
-		//	this.collision((World)other);
-	}
+//	public void collision(Object other) throws NullPointerException, IllegalArgumentException{
+//		if(other == null)
+//			throw new NullPointerException();
+//		else if(other == this)
+//			throw new IllegalArgumentException();
+//		if(other instanceof Ship)
+//			this.ShipCollision((Ship)other);
+//		else if(other instanceof Circle)
+//			this.CircleCollision((Circle)other);
+//		//else if(other instanceof World)
+//		//	this.collision((World)other);
+//	}
 	
 }

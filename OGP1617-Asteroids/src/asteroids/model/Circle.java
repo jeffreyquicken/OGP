@@ -635,7 +635,10 @@ public abstract class Circle {
 			this.setVel(this.getVelX(), -this.getVelY());
 	}
 	
-	public abstract void collision(Object other);
+	//public abstract void collision(Object other);
+	public abstract void collision(Ship ship);
+	public abstract void collision(Bullet bullet);
+	public abstract void collision(MinorPlanet minorPlanet);
 	
 	/**
 	 * Returns the 2 dimensional position vector

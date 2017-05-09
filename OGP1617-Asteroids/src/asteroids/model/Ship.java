@@ -3,6 +3,9 @@ import be.kuleuven.cs.som.taglet.*;
 import be.kuleuven.cs.som.annotate.*;
 import java.util.*;
 
+import asteroids.model.Circle;
+import asteroids.model.program.Program;
+
 /**
  * A class of ships.
  * 
@@ -527,7 +530,7 @@ public class Ship extends Circle {
 	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
 	 */
 	@Raw
-	public void BulletCollision(Bullet bullet) throws NullPointerException{
+	public void collision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
 		if(this == bullet.getOwner()){
@@ -561,7 +564,7 @@ public class Ship extends Circle {
 	 * 
 	 */
 	@Raw
-	public void ShipCollision(Ship ship) throws IllegalArgumentException, NullPointerException{
+	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else if(this == ship || this.getWorld() != ship.getWorld())
@@ -578,26 +581,40 @@ public class Ship extends Circle {
 		}
 	}
 	
-	public void collision(Object other) throws IllegalArgumentException, NullPointerException {
-		if(other == null)
-			throw new NullPointerException();
-		else if(this == other)
-			throw new IllegalArgumentException();
-		if(other instanceof Bullet)
-			this.BulletCollision((Bullet)other);
-		else if(other instanceof Ship)
-			this.ShipCollision((Ship)other);
-		else if(other instanceof MinorPlanet)
-			((MinorPlanet)other).collision(this);
-		else if(other instanceof World)
-			this.collision((World)other);
+	public void collision(MinorPlanet minorPlanet){
+		minorPlanet.collision(this);
 	}
+	
+//	public void collision(Object other) throws IllegalArgumentException, NullPointerException {
+//		if(other == null)
+//			throw new NullPointerException();
+//		else if(this == other)
+//			throw new IllegalArgumentException();
+//		if(other instanceof Bullet)
+//			this.BulletCollision((Bullet)other);
+//		else if(other instanceof Ship)
+//			this.ShipCollision((Ship)other);
+//		else if(other instanceof MinorPlanet)
+//			((MinorPlanet)other).collision(this);
+//		else if(other instanceof World)
+//			this.collision((World)other);
+//	}
 	
 	public void teleportToRandomLocation(){
 		if(this.getWorld()!= null){
 			this.setPosX(this.getRadius()+Math.random()*(this.getWorld().getWidth()-2*this.getRadius()));
 			this.setPosY(this.getRadius()+Math.random()*(this.getWorld().getHeight()-2*this.getRadius()));
 		}
+	}
+	
+	private Program program;
+	
+	public void setProgram(Program newProgram){
+		this.program = newProgram;
+	}
+	
+	public Program getProgram(){
+		return this.program;
 	}
 
 }

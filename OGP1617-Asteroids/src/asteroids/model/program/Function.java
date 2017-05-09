@@ -1,4 +1,4 @@
-package asteroids.model;
+package asteroids.model.program;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
 import java.util.*;
@@ -9,10 +9,14 @@ public class Function{
 		this.name = name;
 		this.body = body;
 	}
-	private final String name;
+	private String name;
 	private Statement body;
 	
-	public void execute(List<Object> variables){
-		
+	public String getName(){
+		return this.name;
+	}
+	
+	public void execute(List<Expression<?>> variables){
+		body.evaluate();
 	}
 }
