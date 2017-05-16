@@ -45,14 +45,14 @@ public class World {
 	 */
 	@Raw
 	public World(double height, double width){
-		if(height<0)
+		if(height<0 || Double.isNaN(height))
 			this.height = 0;
 		else if(height >getMaxHeight())
 			this.height = getMaxHeight();
 		else
 			this.height = height;
 		
-		if(width<0)
+		if(width<0 || Double.isNaN(width))
 			this.width = 0;
 		else if(width >getMaxWidth())
 			this.width = getMaxWidth();
@@ -79,11 +79,13 @@ public class World {
 	public void terminate() throws IllegalArgumentException{
 		if(this.isTerminated())
 			throw new IllegalArgumentException();
-		else
+		else{
 			this.terminated = true;
 			for(Object object: this.getWorldEntities()){
 				if(object instanceof Circle)
 					((Circle)object).setWorld(null);
+			}
+			this.circles.clear();
 			}
 	}
 	
@@ -401,6 +403,7 @@ public class World {
 			else if(circle instanceof Planetoid)
 				((Planetoid)circle).updateDistanceTraveled(time);
 		}
+		this.updateCirclesLibrary();
 	}
 	
 	/**
@@ -432,35 +435,20 @@ public class World {
 			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
 		else if(collisionObject2 instanceof Bullet){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			if(collisionObject1 instanceof Ship){
-				if((Ship)collisionObject1 != ((Bullet)collisionObject2).getOwner())
-					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			}
-			else
-				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
 			((Circle)collisionObject1).collision((Bullet)collisionObject2);
 		}
 		else if(collisionObject2 instanceof Ship){
-			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			if(collisionObject1 instanceof Bullet){
-				if((Ship)collisionObject2 != ((Bullet)collisionObject1).getOwner())
-					collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
-			}
-			else
-				collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1]);
+			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
 			((Circle)collisionObject1).collision((Ship)collisionObject2);
 		}
 		else if (collisionObject2 instanceof MinorPlanet){
 			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
+			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
 			((Circle)collisionObject1).collision((MinorPlanet)collisionObject2);
 		}
-//		else{
-//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-//			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
-//			((Circle)collisionObject1).collision(collisionObject2);
-//		}
 	}
 		
 	
@@ -505,6 +493,14 @@ public class World {
 	@Basic
 	private Collection<Circle> getWorldCircles(){
 		return this.circles.values();
+	}
+	
+	public void updateCirclesLibrary(){
+		HashMap<Vector2D,Circle> newCircles = new HashMap<Vector2D,Circle>();
+		for(Circle circle:this.getWorldCircles()){
+			newCircles.put(circle.getPosVector(), circle);
+		}
+		this.circles= newCircles;
 	}
 	
 }

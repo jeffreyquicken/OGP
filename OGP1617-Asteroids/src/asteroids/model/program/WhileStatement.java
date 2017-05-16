@@ -2,20 +2,47 @@ package asteroids.model.program;
 
 public class WhileStatement extends Statement {
 	
-	public WhileStatement(Expression<Boolean> checkExpression,Statement body){
+	public WhileStatement(Expression<?> checkExpression,Statement body){
 		this.checkExpression = checkExpression;
 		this.body = body;
 	}
 	
-	private Expression<Boolean> checkExpression;
+	@Override
+	public void setFunction(Function newFunction){
+		super.setFunction(newFunction);
+		checkExpression.setFunction(newFunction);
+		body.setFunction(newFunction);
+	}
+	
+	@Override
+	public void setProgram(Program newProgram){
+		super.setProgram(newProgram);
+		checkExpression.setProgram(newProgram);
+		body.setProgram(newProgram);
+	}
+	
+	private Expression<?> checkExpression;
 	private Statement body;
 	
-	public boolean evaluate(){
-		while(checkExpression.getValue() == true){
-			if(!body.evaluate())
-				break;
+	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException {
+		if(checkExpression.getValue() instanceof Boolean){
+			if(time<0.2)
+				throw new NotEnoughTimeException(time);
+			while(((Expression<Boolean>)checkExpression).getValue() == true){
+				try{body.evaluate(time);}
+				catch(BreakException b){
+					break;
+				}
+				catch(NotEnoughTimeException n){
+					throw n;
+				}
+				catch(ReturnedException r){
+					throw r;
+				}
+			}
 		}
-		return true;
+		else
+			throw new IllegalArgumentException();
 	}
 
 }

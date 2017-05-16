@@ -135,6 +135,8 @@ public abstract class Circle {
 	 * 		 |new.getMass() == this.massCorrection(newMass)
 	 */
 	public void setMass(double newMass){
+		if(Double.isNaN(newMass))
+			newMass = 0;
 		this.mass = this.massCorrection(newMass);
 	}
 	
@@ -251,6 +253,10 @@ public abstract class Circle {
 	 */
 	@Basic
 	public void setVel(double newVelX, double newVelY){
+		if(Double.isNaN(newVelY))
+			newVelY = 0;
+		if(Double.isNaN(newVelX))
+			newVelX = 0;
 		double totalSpeed = Math.sqrt(Math.pow(newVelX, 2) + Math.pow(newVelY, 2));
 		if(totalSpeed>speedLimit){
 			this.velocity = new Vector2D(speedLimit*newVelX/totalSpeed,speedLimit*newVelY/totalSpeed);
@@ -674,6 +680,11 @@ public abstract class Circle {
 	public boolean collides(Circle circle){
 		return (this.getDistanceBetweenCenter(circle)<=1.01*(this.getRadius()+circle.getRadius())
 				 && this.getDistanceBetweenCenter(circle)>=0.99*(this.getRadius()+circle.getRadius()));
+	}
+	
+	protected boolean withinThisCircle(Circle other){
+		return (other.getPosX()+other.getRadius()<=this.getPosX()+this.getRadius()) && ((other.getPosX()-other.getRadius()<=this.getPosX()-this.getRadius()))
+				&&(other.getPosY()+other.getRadius()<=this.getPosY()+this.getRadius()) && (other.getPosY()-other.getRadius()<=this.getPosY()-this.getRadius());
 	}
 	
 

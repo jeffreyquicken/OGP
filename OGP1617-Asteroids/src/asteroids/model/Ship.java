@@ -501,9 +501,8 @@ public class Ship extends Circle {
 				else{
 					for(Object object:this.getWorld().getWorldEntities()){
 						if(object instanceof Circle){
-							if(bullet.overlaps((Circle)object) && (Circle)object != this){
+							if(bullet.collides((Circle)object) && (Circle)object != this){
 								((Circle)object).collision(bullet);
-								break;
 							}
 						}
 					}
@@ -538,9 +537,9 @@ public class Ship extends Circle {
 				this.getWorld().remove(bullet);
 		}
 		else{
-			if(this.getWorld().getWorldEntities().contains(bullet))
+			if(this.getWorld().getWorldBullets().contains(bullet))
 				this.getWorld().remove(bullet);
-			if(this.getWorld().getWorldEntities().contains(this))
+			if(this.getWorld().getWorldShips().contains(this))
 				this.getWorld().remove(this);
 			bullet.terminate();
 			this.terminate();
@@ -611,10 +610,51 @@ public class Ship extends Circle {
 	
 	public void setProgram(Program newProgram){
 		this.program = newProgram;
+		this.program.setUser(this);
 	}
 	
 	public Program getProgram(){
 		return this.program;
+	}
+	
+	public Object[][] getNearestArray(){
+		Ship ship = null;
+		Bullet bullet = null;
+		Planetoid planetoid = null;
+		Asteroid asteroid = null;
+		double shortestShip = Double.POSITIVE_INFINITY;
+		double shortestBullet = Double.POSITIVE_INFINITY;
+		double shortestPlanetoid = Double.POSITIVE_INFINITY;
+		double shortestAsteroid = Double.POSITIVE_INFINITY;
+		for(Object object: this.getWorld().getWorldEntities()){
+			double time = this.getTimeToCollision((Circle)object);
+			if(object instanceof Ship){
+				if(time<shortestShip){
+					shortestShip = time;
+					ship = (Ship)object;
+				}
+			}
+			if(object instanceof Bullet){
+				if(time<shortestBullet){
+					shortestBullet = time;
+					bullet = (Bullet)object;
+				}
+			}
+			if(object instanceof Planetoid){
+				if(time<shortestPlanetoid){
+					shortestPlanetoid = time;
+					planetoid = (Planetoid)object;
+				}
+			}
+			if(object instanceof Asteroid){
+				if(time<shortestAsteroid){
+					shortestAsteroid = time;
+					asteroid = (Asteroid)object;
+				}
+			}
+		}
+ 		Object[][] returnArray = {{ship,shortestShip},{bullet,shortestBullet},{planetoid,shortestPlanetoid},{asteroid,shortestAsteroid}};
+		return returnArray;
 	}
 
 }

@@ -1,7 +1,7 @@
 package asteroids.model.program;
 
-public class PrintStatement extends Statement {
-	public PrintStatement(Expression<?> expression){
+public class NotExpression extends Expression<Boolean>{
+	public NotExpression(Expression<?> expression){
 		this.expression = expression;
 	}
 	
@@ -19,10 +19,11 @@ public class PrintStatement extends Statement {
 		expression.setProgram(newProgram);
 	}
 	
-	public void evaluate(double time) throws NotEnoughTimeException{
-		if(time<0.2)
-			throw new NotEnoughTimeException(time);
-		System.out.println(expression.toString());
-		this.getProgram().addPrintedValue(this.expression.getValue());
+	@Override
+	public Boolean getValue(){
+		if(this.expression.getValue() instanceof Boolean)
+			return !((Expression<Boolean>)this.expression).getValue();
+		else
+			throw new IllegalArgumentException();
 	}
 }

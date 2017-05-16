@@ -291,28 +291,44 @@ public class Bullet extends Circle {
 	 * 
 	 */
 	@Raw
-	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
+//	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
+//		if(other == null){
+//			throw new NullPointerException();
+//		}
+//		else if (other == this)
+//			throw new IllegalArgumentException();
+//		else{
+//			if(this.getWorld().getWorldEntities().contains(this))
+//				this.getWorld().remove(this);
+//			if(this.getWorld().getWorldEntities().contains(other))
+//				this.getWorld().remove(other);
+//				this.terminate();
+//				other.terminate();
+//		}
+//	}
+	
+	public void collision(MinorPlanet minorPlanet){
+		minorPlanet.collision(this);
+	}
+	
+	public void collision(Bullet other){
 		if(other == null){
 			throw new NullPointerException();
 		}
 		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
-			if(this.getWorld().getWorldEntities().contains(this))
+			if(this.getWorld().getWorldBullets().contains(this))
 				this.getWorld().remove(this);
-			if(this.getWorld().getWorldEntities().contains(other))
+			else
+				this.setWorld(null);
+			if(this.getWorld().getWorldBullets().contains(other))
 				this.getWorld().remove(other);
+			else
+				other.setWorld(null);
 				this.terminate();
 				other.terminate();
 		}
-	}
-	
-	public void collision(MinorPlanet minorPlanet){
-		minorPlanet.collision(this);
-	}
-	
-	public void collision(Bullet bullet){
-		this.collision((Circle)bullet);
 	}
 	
 	

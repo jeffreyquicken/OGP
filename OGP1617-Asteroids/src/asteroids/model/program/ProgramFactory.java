@@ -25,10 +25,7 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 	
 	@Override
 	public Statement createWhileStatement(Expression<?> condition, Statement body, SourceLocation sourceLocation) {
-		if(condition.getValue() instanceof Boolean)
-			return new WhileStatement((Expression<Boolean>)condition,body);
-		else
-			throw new AssertionError();
+		return new WhileStatement((Expression<Boolean>)condition,body);
 	}
 
 	@Override
@@ -44,10 +41,7 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 	@Override
 	public Statement createIfStatement(Expression<?> condition, Statement ifBody, Statement elseBody,
 			SourceLocation sourceLocation) {
-		if(condition.getValue() instanceof Boolean)
-			return new IfElseStatement((Expression<Boolean>)condition,ifBody,elseBody);
-		else
-			throw new AssertionError();
+		return new IfElseStatement(condition,ifBody,elseBody);
 	}
 
 	@Override
@@ -78,14 +72,12 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 
 	@Override
 	public Expression<?> createChangeSignExpression(Expression<?> expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SingleMathematicalExpression(SingleMathematical.NEGATE,expression);
 	}
 
 	@Override
 	public Expression<?> createNotExpression(Expression<?> expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NotExpression(expression);
 	}
 
 	@Override
@@ -95,119 +87,97 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 
 	@Override
 	public Expression<?> createNullExpression(SourceLocation location) {
-		return new LiteralExpression<Object>(null);
+		return new NullExpression();
 	}
 
 	@Override
 	public Expression<?> createSelfExpression(SourceLocation location) {
-		// DOE IETS
-		return null;
+		return new SelfExpression();
 	}
 
 	@Override
 	public Expression<?> createShipExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ShipExpression();
 	}
 
 	@Override
 	public Expression<?> createAsteroidExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AsteroidExpression();
 	}
 
 	@Override
 	public Expression<?> createPlanetoidExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PlanetoidExpression();
 	}
 
 	@Override
 	public Expression<?> createBulletExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BulletExpression();
 	}
 
 	@Override
 	public Expression<?> createPlanetExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PlanetExpression();
 	}
 
 	@Override
 	public Expression<?> createAnyExpression(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AnyExpression();
 	}
 
 	@Override
 	public Expression<?> createGetXExpression(Expression<?> e, SourceLocation location) {
-		return new GetExpression(Getter.GETX);
+		return new GetExpression(Getter.GETX,e);
 	}
 
 	@Override
 	public Expression<?> createGetYExpression(Expression<?> e, SourceLocation location) {
-		return new GetExpression(Getter.GETY);
+		return new GetExpression(Getter.GETY,e);
 	}
 
 	@Override
 	public Expression<?> createGetVXExpression(Expression<?> e, SourceLocation location) {
-		return new GetExpression(Getter.GETVX);
+		return new GetExpression(Getter.GETVX,e);
 	}
 
 	@Override
 	public Expression<?> createGetVYExpression(Expression<?> e, SourceLocation location) {
-		return new GetExpression(Getter.GETVY);
+		return new GetExpression(Getter.GETVY,e);
 	}
 
 	@Override
 	public Expression<?> createGetRadiusExpression(Expression<?> e, SourceLocation location) {
-		return new GetExpression(Getter.GETRADIUS);
+		return new GetExpression(Getter.GETRADIUS,e);
 	}
 
 	@Override
 	public Expression<?> createLessThanExpression(Expression<?> e1, Expression<?> e2, SourceLocation location) {
-		if(e1.getValue() instanceof Double && e2.getValue() instanceof Double)
-			return new LogicalExpression(Logical.SMALLER,(Expression<Double>)e1,(Expression<Double>)e2);
-		else
-			throw new AssertionError();
+		return new SmallerExpression(e1,e2);
 	}
 
 	@Override
 	public Expression<?> createEqualityExpression(Expression<?> e1, Expression<?> e2, SourceLocation location) {
-		if(e1.getValue() instanceof Double && e2.getValue() instanceof Double)
-			return new LogicalExpression(Logical.EQUAL,(Expression<Double>)e1,(Expression<Double>)e2);
-		else
-			throw new AssertionError();
+		return new EqualExpression(e1,e2);
 	}
 
 	@Override
 	public Expression<?> createAdditionExpression(Expression<?> e1, Expression<?> e2, SourceLocation location) {
-		if(e1.getValue() instanceof Double && e2.getValue() instanceof Double)
-			return new MathematicalExpression(Mathematical.ADDITION,(Expression<Double>)e1,(Expression<Double>)e2);
-		else
-			throw new AssertionError();
+		return new MathematicalExpression(Mathematical.ADDITION,e1,e2);
 	}
 
 	@Override
 	public Expression<?> createMultiplicationExpression(Expression<?> e1, Expression<?> e2, SourceLocation location) {
-		if(e1.getValue() instanceof Double && e2.getValue() instanceof Double)
-			return new MathematicalExpression(Mathematical.MULTIPLICATION,(Expression<Double>)e1,(Expression<Double>)e2);
-		else
-			throw new AssertionError();
+		return new MathematicalExpression(Mathematical.MULTIPLICATION,e1,e2);
 	}
 
 	@Override
 	public Expression<?> createSqrtExpression(Expression<?> e, SourceLocation location) {
-		if(e.getValue() instanceof Double)
-			return new MathematicalExpression(Mathematical.SQUAREROOT,(Expression<Double>)e,null);
-		else
-			throw new AssertionError();
+		return new SingleMathematicalExpression(SingleMathematical.SQRT,e);
 	}
 
 	@Override
 	public Expression<?> createGetDirectionExpression(SourceLocation location) {
-		return new GetExpression(Getter.GETDIRECTION);
+		return new DirectionExpression();
 	}
 
 	@Override
@@ -227,15 +197,11 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 
 	@Override
 	public Statement createTurnStatement(Expression<?> angle, SourceLocation location) {
-		if(angle.getValue() instanceof Double)
-			return new TurnStatement((Expression<Double>)angle);
-		else
-			throw new AssertionError();
+		return new TurnStatement(angle);
 	}
 
 	@Override
 	public Statement createSkipStatement(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ActionStatement(Action.SKIP);
 	}
 }

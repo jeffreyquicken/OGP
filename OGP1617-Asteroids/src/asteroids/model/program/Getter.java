@@ -5,6 +5,5 @@ public enum Getter {
 	GETY,
 	GETRADIUS,
 	GETVX,
-	GETVY,
-	GETDIRECTION
+	GETVY
 }

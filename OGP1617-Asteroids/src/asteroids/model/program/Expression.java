@@ -8,7 +8,10 @@ public abstract class Expression<T> {
 	
 	@Override
 	public String toString(){
-		return this.getValue().toString();
+		if(this.getValue() != null)
+			return this.getValue().toString();
+		else
+			return null;
 	}
 	
 	public T getValue(){
@@ -19,10 +22,24 @@ public abstract class Expression<T> {
 		this.value = newValue;
 	}
 	
+	private Function function;
+	
+	public Function getFunction(){
+		return this.function;
+	}
+	
+	public void setFunction(Function newFunction){
+		this.function = newFunction;
+	}
+	
 	private Program program;
 	
 	public Program getProgram(){
 		return this.program;
+	}
+	
+	public void setProgram(Program newProgram){
+		this.program = newProgram;
 	}
 	
 	@Override

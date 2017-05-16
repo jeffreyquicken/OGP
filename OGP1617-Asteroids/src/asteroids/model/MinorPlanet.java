@@ -52,8 +52,8 @@ public abstract class MinorPlanet extends Circle {
 		if(bullet == null){
 			throw new NullPointerException();
 		}
-		else if (bullet.getWorld() != this.getWorld())
-			throw new IllegalArgumentException();
+//		else if (bullet.getWorld() != this.getWorld())
+//			throw new IllegalArgumentException();
 		else{
 			if(this.getWorld().getWorldEntities().contains(this))
 				this.getWorld().remove(this);

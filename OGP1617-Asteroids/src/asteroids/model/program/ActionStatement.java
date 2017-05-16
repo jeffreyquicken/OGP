@@ -4,27 +4,28 @@ import asteroids.model.*;
 public class ActionStatement extends Statement {
 	public ActionStatement(Action action) {
 		this.action = action;
-		this.user=this.getProgram().getUser();
 	}
 	
-	private Ship user;
 	private Action action;
 	
-	public boolean evaluate(){
+	public void evaluate(double time) throws NotEnoughTimeException{
+		if(this.getFunction() != null)
+			throw new AssertionError();
+		if(time<0.2)
+			throw new NotEnoughTimeException(time);
 		switch(action){
 		case FIRE:
-			user.fireBullet();
-			return true;
+			this.getProgram().getUser().fireBullet();
+			break;
 		case THRUST_ON:
-			user.setThruster(true);
-			return true;
+			this.getProgram().getUser().setThruster(true);
+			break;
 		case THRUST_OFF:
-			user.setThruster(false);
-			return true;
+			this.getProgram().getUser().setThruster(false);
+			break;
 		case SKIP:
-			return true;
+			break;
 		}
-		return true;
 	}
 
 }

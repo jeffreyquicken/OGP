@@ -3,7 +3,9 @@ package asteroids.model.program;
 public class BreakStatement extends Statement {
 	
 	@Override
-	public boolean evaluate(){
-		return false;
+	public void evaluate(double time) throws BreakException,NotEnoughTimeException{
+		if(time<0.2)
+			throw new NotEnoughTimeException(time);
+		throw new BreakException();
 	}
 }

@@ -3,7 +3,15 @@ package asteroids.model.program;
 public class ParameterReadExpression extends Expression<Object>{
 
 	public ParameterReadExpression(String name) {
-		this.setValue(this.getProgram().getParameter(name));
+		this.name = name;
+	}
+	
+	private String name;
+	
+	
+	@Override
+	public Object getValue(){
+		return this.getFunction().getVariable(name);
 	}
 
 }

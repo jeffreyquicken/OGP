@@ -11,7 +11,19 @@ public abstract class Statement {
 		return this.program;
 	}
 	
-	public boolean evaluate(){
-		return true;
+	private Function function;
+	
+	public Function getFunction(){
+		return this.function;
 	}
+	
+	public void setFunction(Function newFunction){
+		this.function = newFunction;
+	}
+	
+	public void setProgram(Program newProgram){
+		this.program = newProgram;
+	}
+	
+	public abstract void evaluate(double time) throws NotEnoughTimeException,BreakException,ReturnedException;
 }

@@ -3,31 +3,58 @@ import asteroids.model.*;
 
 public class GetExpression extends Expression<Double> {
 
-	public GetExpression(Getter getter) {
+	public GetExpression(Getter getter, Expression<?> expression) {
 		this.getter = getter;
-		this.user = this.getProgram().getUser();
-		this.setValue(this.determineValue());
+		this.expression = expression;
 	}
 	
-	private Getter getter;
-	private Ship user;
+	@Override
+	public void setFunction(Function newFunction){
+		super.setFunction(newFunction);
+		this.expression.setFunction(newFunction);
+	}
 	
-	public double determineValue(){
-		switch(this.getter){
-		case GETX:
-			return this.user.getPosX();
-		case GETY:
-			return this.user.getPosY();
-		case GETVX:
-			return this.user.getVelX();
-		case GETVY:
-			return this.user.getVelY();
-		case GETDIRECTION:
-			return this.user.getOrientation();
-		case GETRADIUS:
-			return this.user.getRadius();
+	@Override
+	public void setProgram(Program newProgram){
+		super.setProgram(newProgram);
+		this.expression.setProgram(newProgram);
+	}
+	
+	private Expression<?> expression;
+	
+	private Getter getter;
+	
+	@Override
+	public Double getValue(){
+		if(expression.getValue() instanceof Circle && expression.getValue() != null){
+//			switch(this.getter){
+//			case GETX:
+//				return ((Expression<Circle>)expression).getValue().getPosX();
+//			case GETY:
+//				return ((Expression<Circle>)expression).getValue().getPosY();
+//			case GETVX:
+//				return ((Expression<Circle>)expression).getValue().getVelX();
+//			case GETVY:
+//				return ((Expression<Circle>)expression).getValue().getVelY();
+//			case GETRADIUS:
+//				return ((Expression<Circle>)expression).getValue().getRadius();
+//			}
+			switch(this.getter){
+			case GETX:
+				return ((Circle)expression.getValue()).getPosX();
+			case GETY:
+				return ((Circle)expression.getValue()).getPosY();
+			case GETVX:
+				return ((Circle)expression.getValue()).getVelX();
+			case GETVY:
+				return ((Circle)expression.getValue()).getVelY();
+			case GETRADIUS:
+				return ((Circle)expression.getValue()).getRadius();
+			}
+			throw new AssertionError();
 		}
-		throw new AssertionError();
+		else
+			throw new UnsupportedOperationException();
 	}
 	
 	

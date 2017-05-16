@@ -40,8 +40,14 @@ public class Facade implements IFacade {
 		}
 	}
 	
-	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass){
-		return new Ship(x,y,xVelocity,yVelocity,radius,orientation,mass);
+	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass) throws ModelException{
+		try{return new Ship(x,y,xVelocity,yVelocity,radius,orientation,mass);}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
+		catch(Error e){
+			throw new ModelException(e);
+		}
 	}
 	
 	/**
@@ -655,12 +661,18 @@ public class Facade implements IFacade {
 	}
 	
 	public IProgramFactory<?,?,?,? extends Program> createProgramFactory() throws ModelException{
-		return new ProgramFactory();
+		try{return new ProgramFactory();}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	@Override
 	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
-		return ship.getProgram().execute(dt);
+		try{return ship.getProgram().execute(dt);}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 

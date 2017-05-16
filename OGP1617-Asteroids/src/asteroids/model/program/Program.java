@@ -10,7 +10,9 @@ public class Program {
 		this.body = body;
 		for(Function function:functions){
 			this.functions.put(function.getName(), function);
+			function.setProgram(this);
 		}
+		this.body.setProgram(this);
 	}
 	
 	public void setVariable(String name, Expression<?> value){
@@ -21,12 +23,8 @@ public class Program {
 		return this.variables.get(name);
 	}
 	
-	public void setParameter(String name, Expression<?> value){
-		this.parameters.put(name, value);
-	}
-	
-	public Expression<?> getParameter(String name){
-		return this.parameters.get(name);
+	public boolean containsVariable(String name){
+		return this.variables.containsKey(name);
 	}
 	
 	public Function getFunction(String name){
@@ -46,10 +44,8 @@ public class Program {
 	
 	private Statement body;
 	private HashMap<String,Expression<?>> variables = new HashMap<String, Expression<?>>();
-	private HashMap<String,Expression<?>> parameters = new HashMap<String, Expression<?>>();
 	private HashMap<String,Function> functions = new HashMap<String,Function>();
 	private List<Object> printedValues = new ArrayList<Object>();
-	private boolean onHold = false;
 	private double previousTime = 0;
 	
 	public void addPrintedValue(Object value){
@@ -57,13 +53,43 @@ public class Program {
 	}
 	
 	public List<Object> execute(double time){
-		if(time<0.2){
-			this.previousTime+=time;
-			this.onHold = true;
+		time+=previousTime;
+		if(time<0.2)
+			return null;
+		if(this.body instanceof ActionStatement || this.body instanceof TurnStatement){
+			try{this.body.evaluate(time);}
+			catch(NotEnoughTimeException n){
+				this.previousTime=n.getTime();
+				return null;
+			}
+			catch(ReturnedException r){
+				throw new IllegalArgumentException(r);
+			}
+			catch(BreakException b){
+				throw new IllegalArgumentException(b);
+			}
+			catch(AssertionError a){
+				throw new IllegalArgumentException(a);
+			}
+			time-=0.2;
 		}
-		else
-			this.onHold = false;
-		//DOE IETS
-		return new ArrayList<Object>();
+		else{
+			try{this.body.evaluate(time);}
+			catch(NotEnoughTimeException n){
+				this.previousTime=n.getTime();
+				return null;
+			}
+			catch(ReturnedException r){
+				throw new IllegalArgumentException(r);
+			}
+			catch(BreakException b){
+				throw new IllegalArgumentException(b);
+			}
+			catch(AssertionError a){
+				throw new IllegalArgumentException(a);
+			}
+		}
+		this.previousTime = 0;
+		return printedValues;
 		}
 }
