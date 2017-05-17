@@ -11,7 +11,7 @@ public class ParameterReadExpression extends Expression<Object>{
 	
 	@Override
 	public Object getValue(){
-		return this.getFunction().getVariable(name);
+		return this.getFunction().getParameter(name);
 	}
 
 }

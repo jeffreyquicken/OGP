@@ -1,10 +1,6 @@
 package asteroids.model.program;
 
 public class NotEnoughTimeException extends Exception {
-	public NotEnoughTimeException(){
-		super();
-		this.time = 0;
-	}
 	
 	public NotEnoughTimeException(double restingTime){
 		super();

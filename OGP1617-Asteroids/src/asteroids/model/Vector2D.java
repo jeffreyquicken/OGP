@@ -159,5 +159,15 @@ public class Vector2D {
 		else
 			return false;
 	}
+	
+	@Override
+	public String toString(){
+		return this.array().toString();
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hash(this.getX(),this.getY());
+	}
 
 }

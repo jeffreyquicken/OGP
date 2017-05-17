@@ -28,7 +28,8 @@ public class WhileStatement extends Statement {
 		if(checkExpression.getValue() instanceof Boolean){
 			if(time<0.2)
 				throw new NotEnoughTimeException(time);
-			while(((Expression<Boolean>)checkExpression).getValue() == true){
+			boolean check = (Boolean)checkExpression.getValue();
+			while(check == true){
 				try{body.evaluate(time);}
 				catch(BreakException b){
 					break;
@@ -39,6 +40,7 @@ public class WhileStatement extends Statement {
 				catch(ReturnedException r){
 					throw r;
 				}
+				check = (Boolean)checkExpression.getValue();
 			}
 		}
 		else

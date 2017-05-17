@@ -51,6 +51,14 @@ public class Bullet extends Circle {
 		super(x,y,xVelocity,yVelocity,radius,getDensity()*(4.0/3.0)*Math.pow(radius, 3)*Math.PI);
 	}
 	
+	@Override
+	public void terminate(){
+		super.terminate();
+		if(this.getShip() != null){
+			this.getShip().removeBullet(this);
+			this.setShip(null);
+		}
+	}
 	private static double minRadius = 1;
 	
 	/**
@@ -291,47 +299,21 @@ public class Bullet extends Circle {
 	 * 
 	 */
 	@Raw
-//	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
-//		if(other == null){
-//			throw new NullPointerException();
-//		}
-//		else if (other == this)
-//			throw new IllegalArgumentException();
-//		else{
-//			if(this.getWorld().getWorldEntities().contains(this))
-//				this.getWorld().remove(this);
-//			if(this.getWorld().getWorldEntities().contains(other))
-//				this.getWorld().remove(other);
-//				this.terminate();
-//				other.terminate();
-//		}
-//	}
-	
-	public void collision(MinorPlanet minorPlanet){
-		minorPlanet.collision(this);
-	}
-	
-	public void collision(Bullet other){
+	public void circleCollision(Circle other) throws NullPointerException,IllegalArgumentException{
 		if(other == null){
 			throw new NullPointerException();
 		}
 		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
-			if(this.getWorld().getWorldBullets().contains(this))
+			if(this.getWorld().getWorldEntities().contains(this))
 				this.getWorld().remove(this);
-			else
-				this.setWorld(null);
-			if(this.getWorld().getWorldBullets().contains(other))
+			if(this.getWorld().getWorldEntities().contains(other))
 				this.getWorld().remove(other);
-			else
-				other.setWorld(null);
-				this.terminate();
-				other.terminate();
+			this.terminate();
+			other.terminate();
 		}
 	}
-	
-	
 	
 	/**
 	 * Resolves the collision of a bullet with a ship.
@@ -342,24 +324,26 @@ public class Bullet extends Circle {
 	 * 		  The ship collides with this bullet.
 	 */
 	@Raw
-	public void collision(Ship ship) throws NullPointerException{
+	public void shipCollision(Ship ship) throws NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else
 			ship.collision(this);
 	}
 	
-//	public void collision(Object other) throws NullPointerException, IllegalArgumentException{
-//		if(other == null)
-//			throw new NullPointerException();
-//		else if(other == this)
-//			throw new IllegalArgumentException();
-//		if(other instanceof Ship)
-//			this.ShipCollision((Ship)other);
-//		else if(other instanceof Circle)
-//			this.CircleCollision((Circle)other);
-//		//else if(other instanceof World)
-//		//	this.collision((World)other);
-//	}
+	public void collision(Object other) throws NullPointerException, IllegalArgumentException{
+		if(other == null)
+			throw new NullPointerException();
+		else if(other == this)
+			throw new IllegalArgumentException();
+		if(other instanceof Circle){
+			if(this.getWorld() != ((Circle)other).getWorld())
+				throw new IllegalArgumentException();
+			if(other instanceof Ship)
+				this.shipCollision((Ship)other);
+			else
+				this.circleCollision((Circle)other);
+			}
+	}
 	
 }

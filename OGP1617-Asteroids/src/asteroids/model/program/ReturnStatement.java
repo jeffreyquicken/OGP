@@ -20,6 +20,8 @@ public class ReturnStatement extends Statement {
 	private Expression<?> returnExpression;
 	
 	public void evaluate(double time) throws ReturnedException, NotEnoughTimeException{
+		if(this.getFunction() == null)
+			throw new AssertionError();
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);
 		throw new ReturnedException(returnExpression.getValue());

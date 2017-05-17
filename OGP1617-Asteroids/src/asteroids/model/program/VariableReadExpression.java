@@ -12,7 +12,7 @@ public class VariableReadExpression extends Expression<Object>{
 		if(this.getFunction() == null)
 			return this.getProgram().getVariable(name).getValue();
 		else{
-			return this.getFunction().getVariable(this.name).getValue();
+			return this.getFunction().getVariable(name).getValue();
 		}
 	}
 	

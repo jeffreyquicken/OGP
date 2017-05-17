@@ -71,10 +71,13 @@ public class Ship extends Circle {
 	@Basic
 	public void terminate(){
 		this.setTerminated(true);;
-		for(Bullet bullet: this.getBullets()){
+		for(Bullet bullet: this.bullets){
 			bullet.terminate();
 			bullet.setShip(null);
 		}
+		bullets.clear();
+		if(this.getWorld() != null)
+			this.getWorld().remove(this);
 	}
 	
 	private double orientation;
@@ -164,8 +167,8 @@ public class Ship extends Circle {
 	
 	@Override
 	protected double massCorrection(double newMass){
-		if(newMass<	(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
-			return 	(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
+		if(newMass<	(4.0/3.0)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
+			return 	(4.0/3.0)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
 		else
 			return newMass;
 
@@ -289,7 +292,7 @@ public class Ship extends Circle {
 	}
 		
 	
-	private final double thrusterForce = 1.1E18;
+	private double thrusterForce = 1.1E18;
 	
 	/**
 	 * Returns the thruster force.
@@ -319,7 +322,10 @@ public class Ship extends Circle {
 	 */
 	@Basic
 	public double getAcceleration(){
-		return this.getThrusterForce()/this.getTotalMass();
+		if(this.getThrusterStatus())
+			return this.getThrusterForce()/this.getTotalMass();
+		else
+			return 0;
 	}
 	
 	/**
@@ -336,7 +342,7 @@ public class Ship extends Circle {
 	}
 	
 	
-	private Set<Bullet> bullets = new HashSet<>();
+	private Set<Bullet> bullets = new HashSet<Bullet>();
 	
 	/**
 	 * Adds a bullet to the ships collection of bullets.
@@ -385,7 +391,7 @@ public class Ship extends Circle {
 	 * 		  |result ==(!bullet.isTerminated() && !this.isTerminated())
 	 */
 	private boolean canHaveAsBullet(Bullet bullet){
-		return (!bullet.isTerminated() && !this.isTerminated());
+		return (!bullet.isTerminated() && !this.isTerminated() && this.withinThisCircle(bullet));
 	}
 	
 	/**
@@ -499,15 +505,16 @@ public class Ship extends Circle {
 					bullet.terminate();
 				}
 				else{
-					for(Object object:this.getWorld().getWorldEntities()){
-						if(object instanceof Circle){
-							if(bullet.collides((Circle)object) && (Circle)object != this){
-								((Circle)object).collision(bullet);
-							}
+					bullet.setWorld(this.getWorld());
+					try{this.getWorld().add(bullet);}
+					catch(IllegalArgumentException i){
+						for(Object object: this.getWorld().getWorldEntities()){
+							if(bullet.overlaps((Circle)object) && object != this)
+									bullet.collision(object);
+							bullet.setTerminated(false);
 						}
+						bullet.terminate();
 					}
-					if(!bullet.isTerminated())
-						this.getWorld().add(bullet);
 				}
 			}
 		}
@@ -529,7 +536,7 @@ public class Ship extends Circle {
 	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
 	 */
 	@Raw
-	public void collision(Bullet bullet) throws NullPointerException{
+	public void bulletCollision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
 		if(this == bullet.getOwner()){
@@ -563,7 +570,7 @@ public class Ship extends Circle {
 	 * 
 	 */
 	@Raw
-	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
+	public void shipCollision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else if(this == ship || this.getWorld() != ship.getWorld())
@@ -580,24 +587,23 @@ public class Ship extends Circle {
 		}
 	}
 	
-	public void collision(MinorPlanet minorPlanet){
-		minorPlanet.collision(this);
+	public void collision(Object object){
+		if(object == null)
+			throw new NullPointerException();
+		if(object == this)
+			throw new IllegalArgumentException();
+		if(object instanceof Circle){
+			Circle objectCast = (Circle)object;
+			if(this.getWorld() != objectCast.getWorld())
+				throw new IllegalArgumentException();
+			if(objectCast instanceof Ship)
+				this.shipCollision((Ship)objectCast);
+			else if(objectCast instanceof Bullet)
+				this.bulletCollision((Bullet)objectCast);
+			else if(objectCast instanceof MinorPlanet)
+				((MinorPlanet)objectCast).collision(this);
+		}
 	}
-	
-//	public void collision(Object other) throws IllegalArgumentException, NullPointerException {
-//		if(other == null)
-//			throw new NullPointerException();
-//		else if(this == other)
-//			throw new IllegalArgumentException();
-//		if(other instanceof Bullet)
-//			this.BulletCollision((Bullet)other);
-//		else if(other instanceof Ship)
-//			this.ShipCollision((Ship)other);
-//		else if(other instanceof MinorPlanet)
-//			((MinorPlanet)other).collision(this);
-//		else if(other instanceof World)
-//			this.collision((World)other);
-//	}
 	
 	public void teleportToRandomLocation(){
 		if(this.getWorld()!= null){
@@ -617,45 +623,88 @@ public class Ship extends Circle {
 		return this.program;
 	}
 	
-	public Object[][] getNearestArray(){
-		Ship ship = null;
-		Bullet bullet = null;
-		Planetoid planetoid = null;
-		Asteroid asteroid = null;
-		double shortestShip = Double.POSITIVE_INFINITY;
-		double shortestBullet = Double.POSITIVE_INFINITY;
-		double shortestPlanetoid = Double.POSITIVE_INFINITY;
-		double shortestAsteroid = Double.POSITIVE_INFINITY;
-		for(Object object: this.getWorld().getWorldEntities()){
-			double time = this.getTimeToCollision((Circle)object);
-			if(object instanceof Ship){
-				if(time<shortestShip){
-					shortestShip = time;
-					ship = (Ship)object;
-				}
+	public Ship getNearestShip(){
+		double shortest = Double.POSITIVE_INFINITY;
+		Ship returnShip = null;
+		for(Ship ship:this.getWorld().getWorldShips()){
+			double distance = this.getDistanceBetween(ship);
+			if(distance<shortest && ship != this){
+				returnShip = ship;
+				shortest = distance;
 			}
-			if(object instanceof Bullet){
-				if(time<shortestBullet){
-					shortestBullet = time;
-					bullet = (Bullet)object;
-				}
+		}
+		return returnShip;
+	}
+	
+	public Bullet getNearestBullet(){
+		double shortest = Double.POSITIVE_INFINITY;
+		Bullet returnBullet = null;
+		for(Bullet bullet:this.getWorld().getWorldBullets()){
+			double distance = this.getDistanceBetween(bullet);
+			if(distance<shortest && bullet.getOwner() == this){
+				returnBullet = bullet;
+				shortest = distance;
 			}
-			if(object instanceof Planetoid){
-				if(time<shortestPlanetoid){
-					shortestPlanetoid = time;
-					planetoid = (Planetoid)object;
-				}
+		}
+		return returnBullet;
+	}
+	
+	public Asteroid getNearestAsteroid(){
+		double shortest = Double.POSITIVE_INFINITY;
+		Asteroid returnAsteroid = null;
+		for(Asteroid asteroid:this.getWorld().getWorldAsteroids()){
+			double distance  = this.getDistanceBetween(asteroid);
+			if(distance<shortest){
+				returnAsteroid = asteroid;
+				shortest = distance;
 			}
-			if(object instanceof Asteroid){
-				if(time<shortestAsteroid){
-					shortestAsteroid = time;
-					asteroid = (Asteroid)object;
+		}
+		return returnAsteroid;
+	}
+	
+	public Planetoid getNearestPlanetoid(){
+		double shortest = Double.POSITIVE_INFINITY;
+		Planetoid returnPlanetoid = null;
+		for(Planetoid planetoid:this.getWorld().getWorldPlanetoids()){
+			double distance = this.getDistanceBetween(planetoid);
+			if(distance<shortest){
+				returnPlanetoid = planetoid;
+				shortest = distance;
+			}
+		}
+		return returnPlanetoid;
+	}
+	
+	public MinorPlanet getNearestPlanet(){
+		Planetoid planetoid = this.getNearestPlanetoid();
+		Asteroid asteroid = this.getNearestAsteroid();
+		if(asteroid == null && planetoid == null)
+			return null;
+		else if(asteroid == null)
+			return planetoid;
+		else if(planetoid == null)
+			return asteroid;
+		else{
+			if(this.getDistanceBetween(asteroid)<this.getDistanceBetween(planetoid))
+				return asteroid;
+			else
+				return planetoid;
+		}
+	}
+	
+	public Circle getNearestCircle(){
+		Circle returnCircle = null;
+		double shortest = Double.POSITIVE_INFINITY;
+		for(Object object:this.getWorld().getWorldEntities()){
+			if(object instanceof Circle){
+				double distance = this.getDistanceBetween((Circle)object);
+				if(distance<shortest){
+					returnCircle = (Circle)object;
+					shortest = distance;
 				}
 			}
 		}
- 		Object[][] returnArray = {{ship,shortestShip},{bullet,shortestBullet},{planetoid,shortestPlanetoid},{asteroid,shortestAsteroid}};
-		return returnArray;
+		return returnCircle;
 	}
-
 }
 

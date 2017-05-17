@@ -317,7 +317,7 @@ public class World {
 		if((y<0) || (y>this.getHeight()))
 			return null;
 		Vector2D posVector = new Vector2D(x,y);
-		return circles.get(posVector);
+		return this.circles.get(posVector);
 	}
 	
 	/**
@@ -333,6 +333,8 @@ public class World {
 	 */
 	@Raw
 	private void collision(Circle circle){
+		if(circle == null)
+			throw new NullPointerException();
 		circle.bounce(this);
 		if(circle instanceof Bullet){
 			((Bullet)circle).increaseAmountOfBounces();
@@ -428,27 +430,41 @@ public class World {
 	 * 
 	 */
 	@Raw
+//	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
+//		if(collisionObject2 instanceof World){
+//			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
+//			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+//			((World)collisionObject2).collision((Circle)collisionObject1);
+//		}
+//		else if(collisionObject2 instanceof Bullet){
+//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+//			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
+//			((Circle)collisionObject1).collision((Bullet)collisionObject2);
+//		}
+//		else if(collisionObject2 instanceof Ship){
+//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+//			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
+//			((Circle)collisionObject1).collision((Ship)collisionObject2);
+//		}
+//		else if (collisionObject2 instanceof MinorPlanet){
+//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+//			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
+//			((Circle)collisionObject1).collision((MinorPlanet)collisionObject2);
+//		}
+//	}
 	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
-			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
+			if(collisionListener != null)
+				collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
 			((World)collisionObject2).collision((Circle)collisionObject1);
 		}
-		else if(collisionObject2 instanceof Bullet){
-			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
-			((Circle)collisionObject1).collision((Bullet)collisionObject2);
-		}
-		else if(collisionObject2 instanceof Ship){
-			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
-			((Circle)collisionObject1).collision((Ship)collisionObject2);
-		}
-		else if (collisionObject2 instanceof MinorPlanet){
-			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
-			((Circle)collisionObject1).collision((MinorPlanet)collisionObject2);
-		}
+		else if(collisionObject2 instanceof Circle){
+			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
+			if(collisionListener != null)
+				collisionListener.objectCollision(collisionObject1, collisionObject2, collisionPosition[0], collisionPosition[1]);
+			((Circle)collisionObject1).collision(collisionObject2);
+		}		
 	}
 		
 	

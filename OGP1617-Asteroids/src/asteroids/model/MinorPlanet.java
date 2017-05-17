@@ -4,11 +4,11 @@ import be.kuleuven.cs.som.taglet.*;
 
 public abstract class MinorPlanet extends Circle {
 	
-	public MinorPlanet(double x, double y, double xVel, double yVel, double radius) throws IllegalArgumentException{
-		super(x,y,xVel,yVel,radius,(4/3)*Math.PI*Math.pow(radius, 3)*getDensity());
+	public MinorPlanet(double x, double y, double xVel, double yVel, double radius,double mass) throws IllegalArgumentException{
+		super(x,y,xVel,yVel,radius,mass);
 	}
 	
-	private static double minRadius = 5;
+	private static double minRadius = 5.0;
 	
 	public static double getMinRadius(){
 		return minRadius;
@@ -17,21 +17,10 @@ public abstract class MinorPlanet extends Circle {
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=getMinRadius();
 	}
-	
-	private static double density = 0.917E12;
-	
-	public static double getDensity(){
-		return density;
-	}
-	
-	public static void setDensity(double newDensity){
-		density = newDensity;
-	}
-	
-	/**
+		/**
 	 * Resolves the collision between two MinorPlanets
 	 */
-	public void collision(MinorPlanet otherMinor){
+	public void planetCollision(MinorPlanet otherMinor){
 		if(otherMinor == null)
 			throw new NullPointerException();
 		else if(this.getWorld() != otherMinor.getWorld() || this == otherMinor)
@@ -48,36 +37,23 @@ public abstract class MinorPlanet extends Circle {
 		}
 	}
 	
-	public void collision(Bullet bullet){
-		if(bullet == null){
+	public void collision(Object object){
+		if(object == null)
 			throw new NullPointerException();
-		}
-//		else if (bullet.getWorld() != this.getWorld())
-//			throw new IllegalArgumentException();
-		else{
-			if(this.getWorld().getWorldEntities().contains(this))
-				this.getWorld().remove(this);
-			if(this.getWorld().getWorldEntities().contains(bullet))
-				this.getWorld().remove(bullet);
-				this.terminate();
-				bullet.terminate();
-		}
-	}
-	
-	public void collision(Object other) throws IllegalArgumentException,NullPointerException{
-		if(other == null)
-			throw new NullPointerException();
-		else if(other == this)
+		if(this == object)
 			throw new IllegalArgumentException();
-		if(other instanceof Bullet)
-			((Bullet)other).collision(this);
-		else if(other instanceof Ship)
-			this.collision((Ship)other);
-		else if(other instanceof MinorPlanet)
-			this.collision((MinorPlanet)other);
-		else if(other instanceof World)
-			this.collision((World)other);
+		if(object instanceof Circle){
+			Circle objectCast = (Circle)object;
+			if(this.getWorld() != objectCast.getWorld())
+				throw new IllegalArgumentException();
+			if(objectCast instanceof Ship)
+				this.shipCollision((Ship)objectCast);
+			else if(objectCast instanceof Bullet)
+				((Bullet)objectCast).collision(this);
+			else if(objectCast instanceof MinorPlanet)
+				this.planetCollision((MinorPlanet)objectCast);
+		}
 	}
 	
-	public abstract void collision(Ship ship);
+	public abstract void shipCollision(Ship ship);
 }

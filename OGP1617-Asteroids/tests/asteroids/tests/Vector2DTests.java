@@ -30,6 +30,12 @@ public class Vector2DTests {
 	public void ScalarProduct() {
 		assertEquals(200, vector1.scalarProduct(vector2),EPSILON);
 	}
+	
+	@Test
+	public void test(){
+		vector1 = vector1.add(new Vector2D(0,15));
+		assertEquals(vector1,vector2);
+	}
 
 
 }

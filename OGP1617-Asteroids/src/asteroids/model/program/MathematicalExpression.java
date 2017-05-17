@@ -31,11 +31,11 @@ public class MathematicalExpression extends Expression<Double> {
 		if(firstArgument.getValue() instanceof Double && secondArgument.getValue() instanceof Double){
 		switch (type){
 			case MULTIPLICATION:
-				return ((Expression<Double>)firstArgument).getValue()*((Expression<Double>)secondArgument).getValue();
+				return (Double)firstArgument.getValue()*(Double)secondArgument.getValue();
 			case SUSTRACTION:
-				return ((Expression<Double>)firstArgument).getValue()-((Expression<Double>)secondArgument).getValue();
+				return (Double)firstArgument.getValue()-(Double)secondArgument.getValue();
 			case ADDITION:
-				return ((Expression<Double>)firstArgument).getValue()+((Expression<Double>)secondArgument).getValue();
+				return (Double)firstArgument.getValue()+(Double)secondArgument.getValue();
 		}
 		throw new AssertionError();
 		}

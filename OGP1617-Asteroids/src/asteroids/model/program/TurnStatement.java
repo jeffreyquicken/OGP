@@ -23,10 +23,10 @@ public class TurnStatement extends Statement {
 	public void evaluate(double time)throws NotEnoughTimeException,UnsupportedOperationException{
 		if(turnExpression.getValue() instanceof Double){
 			if(this.getFunction() != null)
-				throw new UnsupportedOperationException();
+				throw new AssertionError();
 			if(time<0.2)
 				throw new NotEnoughTimeException(time);
-			this.getProgram().getUser().turn(((Expression<Double>)this.turnExpression).getValue());
+			this.getProgram().getUser().turn((Double)this.turnExpression.getValue());
 			}
 		else
 			throw new IllegalArgumentException();

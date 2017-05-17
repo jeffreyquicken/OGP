@@ -14,6 +14,7 @@ public class IfElseStatement extends Statement {
 	@Override
 	public void setFunction(Function newFunction){
 		super.setFunction(newFunction);
+		condition.setFunction(newFunction);
 		ifStatement.setFunction(newFunction);
 		if(elseStatement != null)
 			elseStatement.setFunction(newFunction);
@@ -22,6 +23,7 @@ public class IfElseStatement extends Statement {
 	@Override
 	public void setProgram(Program newProgram){
 		super.setProgram(newProgram);
+		condition.setProgram(newProgram);
 		ifStatement.setProgram(newProgram);
 		if(elseStatement != null)
 			elseStatement.setProgram(newProgram);

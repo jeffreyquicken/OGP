@@ -26,6 +26,8 @@ public class GetExpression extends Expression<Double> {
 	
 	@Override
 	public Double getValue(){
+		this.expression.setFunction(this.getFunction());
+		this.expression.setProgram(this.getProgram());
 		if(expression.getValue() instanceof Circle && expression.getValue() != null){
 //			switch(this.getter){
 //			case GETX:

@@ -25,8 +25,8 @@ public class SingleMathematicalExpression extends Expression<Double> {
 	public Double getValue(){
 		if(expression.getValue() instanceof Double){
 			switch(this.type){
-			case SQRT: return Math.sqrt(((Expression<Double>)this.expression).getValue());
-			case NEGATE: return -((Expression<Double>)this.expression).getValue();
+			case SQRT: return Math.sqrt((Double)this.expression.getValue());
+			case NEGATE: return -(Double)this.expression.getValue();
 				}
 			throw new AssertionError();
 		}

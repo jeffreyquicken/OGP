@@ -26,7 +26,7 @@ public class SmallerExpression extends Expression<Boolean> {
 	@Override
 	public Boolean getValue(){
 		if(firstExpression.getValue() instanceof Double && secondExpression.getValue() instanceof Double)
-			return ((Expression<Double>)firstExpression).getValue()<((Expression<Double>)secondExpression).getValue();
+			return (Double)firstExpression.getValue()<(Double)secondExpression.getValue();
 		else
 			throw new IllegalArgumentException();
 	}

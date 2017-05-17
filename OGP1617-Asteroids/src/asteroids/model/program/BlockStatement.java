@@ -22,6 +22,12 @@ public class BlockStatement extends Statement{
 		}
 	}
 	
+	private double usedTime = 0;
+	
+	public double getUsedTime(){
+		return this.usedTime;
+	}
+	
 	private int stoppedStatementIndex = 0;
 	
 	private List<Statement> statements;
@@ -45,8 +51,16 @@ public class BlockStatement extends Statement{
 			catch(UnsupportedOperationException u){
 				break;
 			}
-			if(statement instanceof ActionStatement || statement instanceof TurnStatement)
+			catch(AssertionError a){
+				throw a;
+			}
+			if(statement instanceof ActionStatement || statement instanceof TurnStatement){
 				time-=0.2;
+				usedTime+=0.2;
+			}
+			else if(statement instanceof BlockStatement){
+				time-=((BlockStatement)statement).getUsedTime();
+			}
 		}
 		stoppedStatementIndex = 0;
 	}

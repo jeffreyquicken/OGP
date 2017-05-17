@@ -606,8 +606,8 @@ public class Facade implements IFacade {
 	
 	public Planetoid createPlanetoid(double x, double y, double xVelocity, double yVelocity, double radius,
 			double totalTraveledDistance) throws ModelException{
-		try{return new Planetoid(x,y,xVelocity,yVelocity,radius);}
-		catch(IllegalArgumentException e){
+		try{return new Planetoid(x,y,xVelocity,yVelocity,radius,totalTraveledDistance);}
+		catch(Exception e){
 			throw new ModelException(e);
 		}
 	}

@@ -22,7 +22,7 @@ public class NotExpression extends Expression<Boolean>{
 	@Override
 	public Boolean getValue(){
 		if(this.expression.getValue() instanceof Boolean)
-			return !((Expression<Boolean>)this.expression).getValue();
+			return !(Boolean)this.expression.getValue();
 		else
 			throw new IllegalArgumentException();
 	}

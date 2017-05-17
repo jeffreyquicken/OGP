@@ -4,10 +4,16 @@ import be.kuleuven.cs.som.taglet.*;
 
 public class Asteroid extends MinorPlanet{
 	public Asteroid(double x, double y, double xVel,double yVel,double radius)throws IllegalArgumentException{
-		super(x,y,xVel,yVel,radius);
+		super(x,y,xVel,yVel,radius,(4.0/3.0)*Math.PI*Math.pow(radius, 3)*getDensity());
 	}
 	
-	public void collision(Ship ship){
+	private static double density = 2.65E12;
+	
+	public static double getDensity(){
+		return density;
+	}
+	
+	public void shipCollision(Ship ship){
 		if(ship == null){
 			throw new NullPointerException();
 		}

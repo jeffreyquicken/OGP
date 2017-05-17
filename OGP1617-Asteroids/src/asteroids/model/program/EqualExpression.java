@@ -25,8 +25,13 @@ public class EqualExpression extends Expression<Boolean> {
 	
 	@Override
 	public Boolean getValue(){
-		if(firstExpression.getClass().equals(secondExpression.getClass()))
-			return firstExpression.getValue().equals(secondExpression.getValue());
+		firstExpression.setFunction(this.getFunction());
+		secondExpression.setFunction(this.getFunction());
+		firstExpression.setProgram(this.getProgram());
+		secondExpression.setProgram(this.getProgram());
+		if(firstExpression.getClass().equals(secondExpression.getClass()) 
+				|| (firstExpression.getValue() == null && secondExpression.getValue() == null))
+			return firstExpression.getValue() == (secondExpression.getValue());
 		else
 			return false;
 	}

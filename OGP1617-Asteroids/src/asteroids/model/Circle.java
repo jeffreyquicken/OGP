@@ -7,9 +7,9 @@ import be.kuleuven.cs.som.annotate.*;
  * @author Senne Gielen & Jeffrey Quicken
  *
  * @invar The X-coordinate of the circle is a valid coordinate.
- * 		  |isValidPos(posX)
+ * 		  |isValidPosX(posX)
  * @invar The Y-coordinate of the circle is a valid coordinate.
- * 		  |isValidPos(posY)
+ * 		  |isValidPosY(posY)
  * @invar The total velocity of the circle does not exceed the speedLimit.
  * 		  |speedLimit>=(Math.sqrt(Math.pow(velX,2)+Math.pow(velY,2)))
  * @invar The radius of the circle is a valid radius.
@@ -50,7 +50,7 @@ public abstract class Circle {
 	 * 		   valid radius.
 	 * @throws IllegalArgumentException
 	 * 		   Throws IllegalArgumentException if the x coordinate,y coordinate or the radius are not valid.
-	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
+	 * 		   |((!isValidPosX(x)) || (!isValidPosY(y)) || (!isValidRadius(radius)))
 	 * 
 	 */
 	@Raw
@@ -149,13 +149,13 @@ public abstract class Circle {
 	 * 		   The new X position for the circle.
 	 * @throws IllegalArgumentException
 	 * 		   The given newPos is not a valid position.
-	 * 		   |!isValidPos(newPos)
+	 * 		   |!isValidPosX(newPos)
 	 * @post   If the newPos is a valid position , posX will be set to newPos.
 	 * 		   |new.getPosX() == newPos
 	 */
 	@Basic
 	public void setPosX(double newPos) throws IllegalArgumentException{
-		if(!isValidPos(newPos))
+		if(!isValidPosX(newPos))
 			throw new IllegalArgumentException();
 		else
 			this.position = new Vector2D(newPos,this.getPosY());
@@ -181,13 +181,13 @@ public abstract class Circle {
 	 * 		   The new Y position for this circle.
 	 * @throws IllegalArgumentException
 	 * 		   The given newPos is not a valid position.
-	 * 		   |!isValidPos(newPos)
+	 * 		   |!isValidPosY(newPos)
 	 * @post   If the newPos is a valid position , posY will be set to newPos.
 	 * 		   |new.getPosY() == newPos
 	 */
 	@Basic
 	public void setPosY(double newPos) throws IllegalArgumentException{
-		if(!isValidPos(newPos))
+		if(!isValidPosY(newPos))
 			throw new IllegalArgumentException();
 		else
 			this.position = new Vector2D(this.getPosX(),newPos);
@@ -214,8 +214,22 @@ public abstract class Circle {
 	 * 		   Returns true if the position is a positive number.
 	 * 		   | result == pos>=0
 	 */
-	private static boolean isValidPos(double pos){
-		return (pos>=0);
+	private boolean isValidPosX(double posX){
+		if(Double.isNaN(posX))
+			return false;
+		if(this.getWorld() == null)
+			return true;
+		else
+			return (posX>=0) && (posX<=this.getWorld().getWidth());
+	}
+	
+	private boolean isValidPosY(double posY){
+		if(Double.isNaN(posY))
+			return false;
+		if(this.getWorld() == null)
+			return true;
+		else
+			return (posY>=0) && (posY<=this.getWorld().getHeight());
 	}
 	
 	private Vector2D velocity = new Vector2D(0,0);
@@ -361,7 +375,7 @@ public abstract class Circle {
 	 */
 	private boolean canHaveAsWorld(World newWorld){
 		if(newWorld != null)
-			return !newWorld.isTerminated();
+			return !newWorld.isTerminated() && this.getWorld() == null;
 		else 
 			return true;
 	}
@@ -550,7 +564,7 @@ public abstract class Circle {
 	 */
 	public double getTimeToCollision(World world) throws NullPointerException{
 		if (world == null)
-			throw new NullPointerException();
+			return Double.POSITIVE_INFINITY;
 		
 		if(this.getVelX()<0){
 			double time = -(this.getPosX()-this.getRadius())/this.getVelX();
@@ -599,14 +613,31 @@ public abstract class Circle {
 			double distance = this.getDistanceBetween(world);
 			Vector2D centerPosition = this.getPosVector().add(this.getVelVector().multiply(collisionTime));
 			Vector2D radiusVector = new Vector2D(0,0);
-			if(distance == world.getHeight()-this.getPosY()-this.getRadius())
-				radiusVector = new Vector2D(0,this.getRadius());
-			else if(distance == this.getPosY()-this.getRadius())
-				radiusVector = new Vector2D(0,-this.getRadius());
-			else if(distance == this.getPosX()-this.getRadius())
-				radiusVector = new Vector2D(-this.getRadius(),0);
-			else
-				radiusVector = new Vector2D(this.getRadius(),0);
+			if(this.getVelX()<0){
+				if(collisionTime == -(this.getPosY()-this.getRadius())/this.getVelY())
+					radiusVector = new Vector2D(0,-this.getRadius());
+				else if(collisionTime == (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+					radiusVector = new Vector2D(0,this.getRadius());
+				else
+					radiusVector = new Vector2D(-this.getRadius(),0);
+			}
+			else{
+				if(collisionTime == -(this.getPosY()-this.getRadius())/this.getVelY())
+					radiusVector = new Vector2D(0,-this.getRadius());
+				else if(collisionTime == (world.getHeight()-this.getPosY()-this.getRadius())/this.getVelY())
+					radiusVector = new Vector2D(0,this.getRadius());
+					
+				else
+					radiusVector = new Vector2D(this.getRadius(),0);
+			}
+//			if(distance == world.getHeight()-this.getPosY()-this.getRadius())
+//				radiusVector = new Vector2D(0,this.getRadius());
+//			else if(distance == this.getPosY()-this.getRadius())
+//				radiusVector = new Vector2D(0,-this.getRadius());
+//			else if(distance == this.getPosX()-this.getRadius())
+//				radiusVector = new Vector2D(-this.getRadius(),0);
+//			else
+//				radiusVector = new Vector2D(this.getRadius(),0);
 			return centerPosition.add(radiusVector).array();
 			}
 	}
@@ -633,18 +664,15 @@ public abstract class Circle {
 	public void bounce(World world) throws NullPointerException, IllegalArgumentException{
 		if(world == null)
 			throw new NullPointerException();
-		if(this.getWorld() != world)
-			throw new IllegalArgumentException();
+//		if(this.getWorld() != world)
+//			throw new IllegalArgumentException();
 		if(this.getDistanceBetween(world) == Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()))
 			this.setVel(-this.getVelX(), this.getVelY());
 		if(this.getDistanceBetween(world) == Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()))
 			this.setVel(this.getVelX(), -this.getVelY());
 	}
 	
-	//public abstract void collision(Object other);
-	public abstract void collision(Ship ship);
-	public abstract void collision(Bullet bullet);
-	public abstract void collision(MinorPlanet minorPlanet);
+	public abstract void collision(Object object);
 	
 	/**
 	 * Returns the 2 dimensional position vector
@@ -683,8 +711,8 @@ public abstract class Circle {
 	}
 	
 	protected boolean withinThisCircle(Circle other){
-		return (other.getPosX()+other.getRadius()<=this.getPosX()+this.getRadius()) && ((other.getPosX()-other.getRadius()<=this.getPosX()-this.getRadius()))
-				&&(other.getPosY()+other.getRadius()<=this.getPosY()+this.getRadius()) && (other.getPosY()-other.getRadius()<=this.getPosY()-this.getRadius());
+		return (other.getPosX()+other.getRadius()<=this.getPosX()+this.getRadius()) && ((other.getPosX()-other.getRadius()>=this.getPosX()-this.getRadius()))
+				&&(other.getPosY()+other.getRadius()<=this.getPosY()+this.getRadius()) && (other.getPosY()-other.getRadius()>=this.getPosY()-this.getRadius());
 	}
 	
 

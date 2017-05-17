@@ -31,6 +31,10 @@ public class Program {
 		return this.functions.get(name);
 	}
 	
+	public boolean containsFunction(String name){
+		return this.functions.containsKey(name);
+	}
+	
 	private Ship user;
 	
 	public Ship getUser(){

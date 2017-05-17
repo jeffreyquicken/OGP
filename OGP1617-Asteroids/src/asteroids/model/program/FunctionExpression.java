@@ -22,16 +22,20 @@ public class FunctionExpression extends Expression<Object>{
 	@Override
 	public void setFunction(Function newFunction){
 		super.setFunction(newFunction);
-		for(Expression<?> e: this.arguments){
-			e.setFunction(newFunction);
+		if(this.arguments != null){
+			for(Expression<?> e: this.arguments){
+				e.setFunction(newFunction);
+			}
 		}
 	}
 	
 	@Override
 	public void setProgram(Program newProgram){
 		super.setProgram(newProgram);
-		for(Expression<?> e: this.arguments){
-			e.setProgram(newProgram);
+		if(this.arguments!=null){
+			for(Expression<?> e: this.arguments){
+				e.setProgram(newProgram);
+			}
 		}
 	}
 	
@@ -43,6 +47,9 @@ public class FunctionExpression extends Expression<Object>{
 		}
 		catch(BreakException b){
 			throw new UnsupportedOperationException(b);
+		}
+		catch(AssertionError a){
+			throw a;
 		}
 		throw new AssertionError();
 	}
