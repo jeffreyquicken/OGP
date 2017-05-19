@@ -8,14 +8,15 @@ public class Function{
 	public Function(String name, Statement body){
 		this.name = name;
 		this.body = body;
+		this.body.setFunction(this);
 	}
 	private String name;
 	private Statement body;
 	private Program program;
 	private List<Expression<?>> arguments = new ArrayList<Expression<?>>();
-	private Map<String,Expression<?>> localVariables = new HashMap<String,Expression<?>>();
-	private Map<String,Expression<?>> parameters= new HashMap<String,Expression<?>>();
-	
+	private Map<String,Object> localVariables = new HashMap<String,Object>();
+	private Map<String,Object> parameters= new HashMap<String,Object>();
+		
 	public void setProgram(Program newProgram){
 		this.program = newProgram;
 		this.body.setProgram(newProgram);
@@ -30,10 +31,10 @@ public class Function{
 	}
 	
 	public void setParameter(String name, Expression<?> value){
-		this.parameters.put(name, value);
+		this.parameters.put(name, value.getValue());
 	}
 	
-	public Expression<?> getParameter(String name){
+	public Object getParameter(String name){
 		return this.parameters.get(name);
 	}
 	
@@ -42,24 +43,21 @@ public class Function{
 		if(name.startsWith("$"))
 			this.setParameter(name, value);
 		else
-			this.localVariables.put(name, value);
+			this.localVariables.put(name, value.getValue());
 	}
 	
-	public Expression<?> getVariable(String name){
+	public Object getVariable(String name){
 		if(this.localVariables.containsKey(name))
-				return this.localVariables.get(name);
+			return this.localVariables.get(name);
 		else
 			return this.getProgram().getVariable(name);
 	}
 	
 	public void evaluate(List<Expression<?>> variables) throws ReturnedException,BreakException{
-		this.body.setFunction(this);
-		this.body.setProgram(this.getProgram());
-		for(int i=0;i<this.parameters.size();i++){
-			String name = "$" + (i+1);
-			variables.get(i).setFunction(this);
+		for(int i=0;i<variables.size();i++){
+			String name = "$" + Integer.toString((i+1));
 			variables.get(i).setProgram(this.getProgram());
-			this.parameters.put(name,variables.get(i));
+			this.parameters.put(name,variables.get(i).getValue());
 		}
 		try{body.evaluate(Double.POSITIVE_INFINITY);}
 		catch(BreakException b){

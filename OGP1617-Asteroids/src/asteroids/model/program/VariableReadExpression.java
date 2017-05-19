@@ -9,10 +9,15 @@ public class VariableReadExpression extends Expression<Object>{
 	private String name;
 	
 	public Object getValue(){
-		if(this.getFunction() == null)
-			return this.getProgram().getVariable(name).getValue();
+		if(this.getFunction() == null){
+			if(this.getProgram().getVariable(name) == null)
+				throw new IllegalArgumentException();
+			return this.getProgram().getVariable(name);
+		}
 		else{
-			return this.getFunction().getVariable(name).getValue();
+			if(this.getFunction().getVariable(name) == null)
+				throw new IllegalArgumentException();
+			return this.getFunction().getVariable(name);
 		}
 	}
 	

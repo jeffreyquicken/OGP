@@ -17,7 +17,6 @@ public class Planetoid extends MinorPlanet {
 				double direction = Math.random();
 				double otherDirection = Math.sqrt(1-Math.pow(direction,2));
 				world.remove(this);
-				this.setTerminated(true);
 				world.add(
 						new Asteroid(this.getPosX()+direction*this.getRadius()/2,this.getPosY()+otherDirection*this.getRadius()/2,
 								1.5*this.getVelVector().length()*direction,1.5*this.getVelVector().length()*otherDirection,this.getRadius()/2));
@@ -25,13 +24,10 @@ public class Planetoid extends MinorPlanet {
 						new Asteroid(this.getPosX()-direction*this.getRadius()/2,this.getPosY()-otherDirection*this.getRadius()/2,
 								-1.5*this.getVelVector().length()*direction,-1.5*this.getVelVector().length()*otherDirection,this.getRadius()/2));
 			}
-			else{
+			else
 				world.remove(this);
-				this.setTerminated(true);
-			}
 		}
-		else
-			this.setTerminated(true);
+		this.setTerminated(true);
 	}
 	
 	private static double density = 0.917E12;
@@ -49,7 +45,7 @@ public class Planetoid extends MinorPlanet {
 	private double distanceTravelled;
 	
 	private boolean canHaveAsDistance(double newDistance){
-		return getMinRadius()>=(this.getInitialRadius()-0.000001*newDistance);
+		return getMinRadius()<=(this.getInitialRadius()-0.000001*newDistance);
 	}
 	
 	public void setDistanceTraveled(double newDistance){

@@ -29,7 +29,7 @@ public class IfElseStatement extends Statement {
 			elseStatement.setProgram(newProgram);
 	}
 	
-	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException{
+	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException,BreakException{
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);
 		if(condition.getValue() instanceof Boolean){
@@ -39,7 +39,7 @@ public class IfElseStatement extends Statement {
 					throw n;
 				}
 				catch(BreakException b){
-					throw new IllegalArgumentException(b);
+					throw b;
 				}
 				catch(ReturnedException r){
 					throw r;
@@ -53,7 +53,7 @@ public class IfElseStatement extends Statement {
 						throw n;
 					}
 					catch(BreakException b){
-						throw new IllegalArgumentException(b);
+						throw b;
 					}
 					catch(ReturnedException r){
 						throw r;

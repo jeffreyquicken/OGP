@@ -8,7 +8,7 @@ public abstract class MinorPlanet extends Circle {
 		super(x,y,xVel,yVel,radius,mass);
 	}
 	
-	private static double minRadius = 5.0;
+	private static double minRadius = 5;
 	
 	public static double getMinRadius(){
 		return minRadius;
@@ -26,14 +26,14 @@ public abstract class MinorPlanet extends Circle {
 		else if(this.getWorld() != otherMinor.getWorld() || this == otherMinor)
 			throw new IllegalArgumentException();
 		else{
-			Vector2D deltaV = this.getPosVector().substract(otherMinor.getPosVector());
-			Vector2D deltaR = this.getVelVector().substract(otherMinor.getVelVector());
-			double sigma = deltaR.length();
+			Vector2D deltaV = this.getVelVector().substract(otherMinor.getVelVector());
+			Vector2D deltaR = this.getPosVector().substract(otherMinor.getPosVector());
+			double sigma = this.getRadius() + otherMinor.getRadius();
 			double J = 2*this.getMass()*otherMinor.getMass()*deltaV.scalarProduct(deltaR)/((this.getMass()+otherMinor.getMass())*sigma);
 			double Jx = J*(deltaR.getX())/sigma;
 			double Jy = J*(deltaR.getY())/sigma;
-			this.setVel(this.getVelX()+(Jx/this.getMass()), this.getVelY()+(Jy/this.getMass()));
-			otherMinor.setVel(otherMinor.getVelX()-(Jx/otherMinor.getMass()), otherMinor.getVelY()-(Jy/otherMinor.getMass()));
+			this.setVel(this.getVelX()-(Jx/this.getMass()), this.getVelY()-(Jy/this.getMass()));
+			otherMinor.setVel(otherMinor.getVelX()+(Jx/otherMinor.getMass()), otherMinor.getVelY()+(Jy/otherMinor.getMass()));
 		}
 	}
 	

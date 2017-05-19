@@ -4,6 +4,7 @@ import java.util.*;
 public class BlockStatement extends Statement{
 	public BlockStatement(List<Statement> statements){
 		this.statements = statements;
+		this.stoppedStatementIndex = 0;
 	}
 	
 	@Override
@@ -22,22 +23,23 @@ public class BlockStatement extends Statement{
 		}
 	}
 	
-	private double usedTime = 0;
+	private double remainingTime = 0;
 	
-	public double getUsedTime(){
-		return this.usedTime;
+	public double getRemainingTime(){
+		return this.remainingTime;
 	}
 	
-	private int stoppedStatementIndex = 0;
+	private int stoppedStatementIndex;
 	
 	private List<Statement> statements;
 	
 	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException,BreakException{
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);
+		this.remainingTime = time;
 		for(int i=stoppedStatementIndex;i<statements.size();i++){
 			Statement statement = statements.get(i);
-			try{statement.evaluate(time);}
+			try{statement.evaluate(remainingTime);}
 			catch(NotEnoughTimeException n){
 				stoppedStatementIndex = i;
 				throw n;
@@ -55,11 +57,10 @@ public class BlockStatement extends Statement{
 				throw a;
 			}
 			if(statement instanceof ActionStatement || statement instanceof TurnStatement){
-				time-=0.2;
-				usedTime+=0.2;
+				remainingTime-=0.2;
 			}
 			else if(statement instanceof BlockStatement){
-				time-=((BlockStatement)statement).getUsedTime();
+				remainingTime=((BlockStatement)statement).getRemainingTime();
 			}
 		}
 		stoppedStatementIndex = 0;

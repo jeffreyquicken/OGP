@@ -25,6 +25,10 @@ public class WhileStatement extends Statement {
 	private Statement body;
 	
 	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException {
+		checkExpression.setFunction(this.getFunction());
+		body.setFunction(this.getFunction());
+		checkExpression.setProgram(this.getProgram());
+		body.setProgram(this.getProgram());
 		if(checkExpression.getValue() instanceof Boolean){
 			if(time<0.2)
 				throw new NotEnoughTimeException(time);

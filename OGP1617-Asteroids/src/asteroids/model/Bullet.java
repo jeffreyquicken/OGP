@@ -54,10 +54,10 @@ public class Bullet extends Circle {
 	@Override
 	public void terminate(){
 		super.terminate();
-		if(this.getShip() != null){
+		if(this.getWorld() != null)
+			this.getWorld().remove(this);
+		if(this.getShip() != null)
 			this.getShip().removeBullet(this);
-			this.setShip(null);
-		}
 	}
 	private static double minRadius = 1;
 	
@@ -273,7 +273,6 @@ public class Bullet extends Circle {
 		this.setAmountOfBounces(this.getAmountOfBounces()+1);
 		if(this.getAmountOfBounces()>=maxBounces){
 			this.terminate();
-			this.getWorld().remove(this);
 		}
 	}
 	
@@ -306,10 +305,6 @@ public class Bullet extends Circle {
 		else if (other == this)
 			throw new IllegalArgumentException();
 		else{
-			if(this.getWorld().getWorldEntities().contains(this))
-				this.getWorld().remove(this);
-			if(this.getWorld().getWorldEntities().contains(other))
-				this.getWorld().remove(other);
 			this.terminate();
 			other.terminate();
 		}

@@ -56,7 +56,7 @@ public class GetExpression extends Expression<Double> {
 			throw new AssertionError();
 		}
 		else
-			throw new UnsupportedOperationException();
+			throw new IllegalArgumentException();
 	}
 	
 	

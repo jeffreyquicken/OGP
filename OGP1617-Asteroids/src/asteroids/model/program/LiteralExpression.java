@@ -1,7 +1,7 @@
 package asteroids.model.program;
 
-public class LiteralExpression<T> extends Expression<T> {
-	public LiteralExpression(T value){
+public class LiteralExpression extends Expression<Double> {
+	public LiteralExpression(double value){
 		this.setValue(value);
 	}
 }

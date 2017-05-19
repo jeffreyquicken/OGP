@@ -233,7 +233,7 @@ public abstract class Circle {
 	}
 	
 	private Vector2D velocity = new Vector2D(0,0);
-	private double speedLimit = 300000;
+	private double speedLimit = 300000.0;
 	
 	/**
 	 * Returns the velocity in the X direction of this circle.
@@ -394,11 +394,10 @@ public abstract class Circle {
 	 * 		   Sets the Y position to sum of the current y position and the added distance in the y direction.
 	 */
 	public void move(double time)throws IllegalArgumentException {
-		if(time<0)
+		if(time<0 || Double.isNaN(time))
 			throw new IllegalArgumentException();
 		else
-			this.setPosX(this.getPosX() + this.getVelX()*time);
-			this.setPosY(this.getPosY() + this.getVelY()*time);
+			this.position = this.position.add(this.velocity.multiply(time));
 	}
 	
 	/**
@@ -601,9 +600,9 @@ public abstract class Circle {
 	 * 		   The world is null;
 	 * 		   |world == null;
 	 */
-	public double[]  getCollisionPosition(World world) throws NullPointerException{
+	public double[]  getCollisionPosition(World world){
 		if(world == null)
-			throw new NullPointerException();
+			return null;
 		
 		double collisionTime = this.getTimeToCollision(world);
 		

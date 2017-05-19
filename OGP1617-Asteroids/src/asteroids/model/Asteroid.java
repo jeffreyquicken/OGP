@@ -7,6 +7,14 @@ public class Asteroid extends MinorPlanet{
 		super(x,y,xVel,yVel,radius,(4.0/3.0)*Math.PI*Math.pow(radius, 3)*getDensity());
 	}
 	
+	@Override
+	public void terminate(){
+		this.setTerminated(true);
+		if(this.getWorld() != null){
+			this.getWorld().remove(this);
+		}
+	}
+	
 	private static double density = 2.65E12;
 	
 	public static double getDensity(){
@@ -20,8 +28,7 @@ public class Asteroid extends MinorPlanet{
 		else if (this.getWorld() != ship.getWorld())
 			throw new IllegalArgumentException();
 		else{
-			if(this.getWorld().getWorldEntities().contains(ship))
-				this.getWorld().remove(ship);
+			if(this.getWorld().getWorldShips().contains(ship))
 				ship.terminate();
 		}
 	}

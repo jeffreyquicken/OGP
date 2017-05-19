@@ -11,7 +11,10 @@ public class ParameterReadExpression extends Expression<Object>{
 	
 	@Override
 	public Object getValue(){
-		return this.getFunction().getParameter(name);
+		if(this.getFunction().getParameter(name) == null)
+			return null;
+		else
+			return this.getFunction().getParameter(name);
 	}
 
 }

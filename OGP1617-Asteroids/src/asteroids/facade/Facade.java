@@ -357,7 +357,7 @@ public class Facade implements IFacade {
 	
 	
 	public Set<? extends Bullet> getBulletsOnShip(Ship ship) {
-		return ship.getBullets();
+		return (HashSet<Bullet>)ship.getBullets().clone();
 	}
 	
 	public int getNbBulletsOnShip(Ship ship) {

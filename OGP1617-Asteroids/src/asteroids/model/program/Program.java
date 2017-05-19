@@ -16,10 +16,10 @@ public class Program {
 	}
 	
 	public void setVariable(String name, Expression<?> value){
-		this.variables.put(name, value);
+		this.variables.put(name, value.getValue());
 	}
 	
-	public Expression<?> getVariable(String name){
+	public Object getVariable(String name){
 		return this.variables.get(name);
 	}
 	
@@ -47,7 +47,7 @@ public class Program {
 	
 	
 	private Statement body;
-	private HashMap<String,Expression<?>> variables = new HashMap<String, Expression<?>>();
+	private HashMap<String,Object> variables = new HashMap<String, Object>();
 	private HashMap<String,Function> functions = new HashMap<String,Function>();
 	private List<Object> printedValues = new ArrayList<Object>();
 	private double previousTime = 0;
@@ -58,8 +58,10 @@ public class Program {
 	
 	public List<Object> execute(double time){
 		time+=previousTime;
-		if(time<0.2)
+		if(time<0.2){
+			this.previousTime = time;
 			return null;
+		}
 		if(this.body instanceof ActionStatement || this.body instanceof TurnStatement){
 			try{this.body.evaluate(time);}
 			catch(NotEnoughTimeException n){
@@ -74,6 +76,9 @@ public class Program {
 			}
 			catch(AssertionError a){
 				throw new IllegalArgumentException(a);
+			}
+			catch(UnsupportedOperationException u){
+				return printedValues;
 			}
 			time-=0.2;
 		}
@@ -91,6 +96,9 @@ public class Program {
 			}
 			catch(AssertionError a){
 				throw new IllegalArgumentException(a);
+			}
+			catch(UnsupportedOperationException u){
+				return printedValues;
 			}
 		}
 		this.previousTime = 0;

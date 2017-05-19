@@ -82,7 +82,7 @@ public class ProgramFactory implements IProgramFactory<Expression<?>,Statement,F
 
 	@Override
 	public Expression<?> createDoubleLiteralExpression(double value, SourceLocation location) {
-		return new LiteralExpression<Double>(value);
+		return new LiteralExpression(value);
 	}
 
 	@Override

@@ -25,17 +25,17 @@ public class AssignmentStatement extends Statement {
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);
 		if(this.getFunction() == null){
-			if( (this.getProgram().getVariable(name) == null || this.getProgram().getVariable(this.name).getValue().getClass().equals(this.expression.getValue().getClass())
-					&& !this.getProgram().containsFunction(name)))
+			if( (this.getProgram().getVariable(name) == null || this.getProgram().getVariable(this.name).getClass().equals(this.expression.getValue().getClass()))
+					&& !this.getProgram().containsFunction(name))
 				this.getProgram().setVariable(name,expression);
 			else
-				throw new AssertionError();
+				throw new IllegalArgumentException();
 			}
 		else{
-			if(this.getFunction().getParameter(name) == null||this.getFunction().getVariable(name) == null || this.getFunction().getVariable(this.name).getValue().getClass().equals(this.expression.getValue().getClass()))
+			if(this.getFunction().getParameter(name) == null||this.getFunction().getVariable(name) == null || this.getFunction().getVariable(this.name).getClass().equals(this.expression.getValue().getClass()))
 				this.getFunction().setVariable(name,expression);
 			else
-				throw new AssertionError();
+				throw new IllegalArgumentException();
 			}
 	}
 }
