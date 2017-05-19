@@ -406,6 +406,10 @@ public class Ship extends Circle {
 	@Raw
 	public void addBullet(Collection<Bullet> bulletCollection){
 		for(Bullet bullet:bulletCollection){
+			if(!canHaveAsBullet(bullet))
+				throw new IllegalArgumentException();
+		}
+		for(Bullet bullet:bulletCollection){
 			this.addBullet(bullet);
 		}
 	}

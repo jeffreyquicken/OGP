@@ -19,7 +19,7 @@ public class PrintStatement extends Statement {
 		expression.setProgram(newProgram);
 	}
 	
-	public void evaluate(double time) throws NotEnoughTimeException{
+	public void evaluate(double time) throws NotEnoughTimeException,BreakException{
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);
 		System.out.println(expression.toString());

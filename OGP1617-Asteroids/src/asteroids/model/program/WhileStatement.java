@@ -24,7 +24,7 @@ public class WhileStatement extends Statement {
 	private Expression<?> checkExpression;
 	private Statement body;
 	
-	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException {
+	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException, BreakException {
 		checkExpression.setFunction(this.getFunction());
 		body.setFunction(this.getFunction());
 		checkExpression.setProgram(this.getProgram());
@@ -34,6 +34,8 @@ public class WhileStatement extends Statement {
 				throw new NotEnoughTimeException(time);
 			boolean check = (Boolean)checkExpression.getValue();
 			while(check == true){
+				if(time<0.2)
+					throw new NotEnoughTimeException(time);
 				try{body.evaluate(time);}
 				catch(BreakException b){
 					break;
@@ -44,6 +46,13 @@ public class WhileStatement extends Statement {
 				catch(ReturnedException r){
 					throw r;
 				}
+				catch(UnsupportedOperationException u){
+					break;
+				}
+				if(body instanceof ActionStatement || body instanceof TurnStatement)
+					time-=0.2;
+				else if(body instanceof BlockStatement)
+					time= ((BlockStatement)body).getRemainingTime();
 				check = (Boolean)checkExpression.getValue();
 			}
 		}

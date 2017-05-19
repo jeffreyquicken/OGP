@@ -33,6 +33,10 @@ public class BlockStatement extends Statement{
 	
 	private List<Statement> statements;
 	
+	public boolean hasFunctionCall(Function f){
+		return true;
+	}
+	
 	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException,BreakException{
 		if(time<0.2)
 			throw new NotEnoughTimeException(time);

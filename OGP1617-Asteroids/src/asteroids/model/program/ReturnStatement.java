@@ -19,7 +19,7 @@ public class ReturnStatement extends Statement {
 	
 	private Expression<?> returnExpression;
 	
-	public void evaluate(double time) throws ReturnedException, NotEnoughTimeException{
+	public void evaluate(double time) throws ReturnedException, NotEnoughTimeException,BreakException{
 		if(this.getFunction() == null)
 			throw new AssertionError();
 		if(time<0.2)

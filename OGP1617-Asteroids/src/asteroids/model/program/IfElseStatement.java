@@ -44,7 +44,6 @@ public class IfElseStatement extends Statement {
 				catch(ReturnedException r){
 					throw r;
 				}
-				
 			}
 			else{
 				if(elseStatement != null){

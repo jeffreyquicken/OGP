@@ -721,6 +721,8 @@ public class Part3TestFull {
         fail();
       } catch (ModelException exc) {
       }
+      System.out.println(bullet1);
+      System.out.println(ship.getBullets().toString());
       assertEquals(0, facade.getNbBulletsOnShip(ship));
       score += 7;
     }
@@ -1735,6 +1737,7 @@ public class Part3TestFull {
       score += 3;
     }
   }
+  
 
   @Test
   public void testThrusterOnStatement_InFunctionBody() throws ModelException {
@@ -1975,20 +1978,20 @@ public class Part3TestFull {
   }
 
   
-//  @Test
-//  public void testBreakStatement_InFunctionBody() throws ModelException {
-//    if (nbStudentsInTeam > 1) {
-//      max_score += 16;
-//      String code = "def f { " + "  break; " + "  return 0.0;" + "}" + "a := 10; " + "while a < 20.5 { " + "  print a; "
-//          + "  if 14.5 < a { " + "    b := f(); " + "  }" + "  a := a + 2.0; " + "}" + "print 0.0; ";
-//      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-//      facade.loadProgramOnShip(ship1, program);
-//      List<Object> results = facade.executeProgram(ship1, 1.0);
-//      Object[] expecteds = { 10.0, 12.0, 14.0, 16.0, 0.0 };
-//      assertArrayEquals(expecteds, results.toArray());
-//      score += 16;
-//    }
-//  }
+  @Test
+  public void testBreakStatement_InFunctionBody() throws ModelException {
+    if (nbStudentsInTeam > 1) {
+      max_score += 16;
+      String code = "def f { " + "  break; " + "  return 0.0;" + "}" + "a := 10; " + "while a < 20.5 { " + "  print a; "
+          + "  if 14.5 < a { " + "    b := f(); " + "  }" + "  a := a + 2.0; " + "}" + "print 0.0; ";
+      Program program = ProgramParser.parseProgramFromString(code, programFactory);
+      facade.loadProgramOnShip(ship1, program);
+      List<Object> results = facade.executeProgram(ship1, 1.0);
+      Object[] expecteds = { 10.0, 12.0, 14.0, 16.0, 0.0 };
+      assertArrayEquals(expecteds, results.toArray());
+      score += 16;
+    }
+  }
 
   // Read Variable
 

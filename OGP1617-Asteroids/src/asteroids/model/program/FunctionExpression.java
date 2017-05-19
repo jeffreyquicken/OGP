@@ -10,9 +10,13 @@ public class FunctionExpression extends Expression<Object>{
 	
 	private String functionName;
 	private List<Expression<?>> arguments;
+	private boolean recursiveCall = false;
 	
 	public Function getFunction(){
-		return this.getProgram().getFunction(this.functionName);
+		if(this.recursiveCall == false)
+			return this.getProgram().getFunction(this.functionName);
+		else
+			return super.getFunction();
 	}
 	
 	public List<Expression<?>> getArguments(){
@@ -40,13 +44,19 @@ public class FunctionExpression extends Expression<Object>{
 	}
 	
 	@Override
-	public Object getValue(){
+	public Object getValue() throws BreakException{
+//		if(super.getFunction() == this.getFunction()){
+//			this.recursiveCall = true;
+//			this.setFunction((Function)super.getFunction().clone());
+//		}
+//		else
+//			this.recursiveCall = false;
 		try{this.getFunction().evaluate(arguments);}
 		catch(ReturnedException r){
 			return r.getValue();
 		}
 		catch(BreakException b){
-			throw new UnsupportedOperationException(b);
+			throw b;
 		}
 		catch(AssertionError a){
 			throw a;
