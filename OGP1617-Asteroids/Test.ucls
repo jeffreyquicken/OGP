@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class-diagram version="1.2.0" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
-  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+<class-diagram version="1.2.0" icons="true" automaticImage="JPEG" always-add-relationships="false" 
+  generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true" 
+  router="FAN">  
   <class id="1" language="java" name="asteroids.model.Asteroid" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Asteroid.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="198" y="95"/>    
+    <position height="-1" width="-1" x="606" y="1473"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -12,7 +13,7 @@
   </class>  
   <class id="2" language="java" name="asteroids.model.Bullet" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Bullet.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1102" y="503"/>    
+    <position height="389" width="267" x="1021" y="736"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -21,7 +22,7 @@
   </class>  
   <class id="3" language="java" name="asteroids.model.Circle" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Circle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="632" y="639"/>    
+    <position height="659" width="257" x="665" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -30,7 +31,7 @@
   </class>  
   <class id="4" language="java" name="asteroids.model.MinorPlanet" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/MinorPlanet.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="648" y="103"/>    
+    <position height="173" width="343" x="282" y="736"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -39,7 +40,7 @@
   </class>  
   <class id="5" language="java" name="asteroids.model.Planetoid" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Planetoid.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1171" y="139"/>    
+    <position height="-1" width="-1" x="262" y="1530"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -48,7 +49,7 @@
   </class>  
   <class id="6" language="java" name="asteroids.model.Ship" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Ship.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1652" y="904"/>    
+    <position height="-1" width="-1" x="1278" y="1757"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -57,7 +58,7 @@
   </class>  
   <class id="7" language="java" name="asteroids.model.Vector2D" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/Vector2D.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="109" y="489"/>    
+    <position height="-1" width="-1" x="288" y="330"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -66,7 +67,7 @@
   </class>  
   <class id="8" language="java" name="asteroids.model.World" project="OGP1617-Asteroids" 
     file="/OGP1617-Asteroids/src/asteroids/model/World.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="649" y="1500"/>    
+    <position height="-1" width="-1" x="821" y="1073"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -83,7 +84,9 @@
   </generalization>  
   <association id="11">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="12" name="ship"/>      
+      <attribute id="12" name="ship">        
+        <position height="19" width="31" x="1199" y="1234"/>      
+      </attribute>      
       <multiplicity id="13" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="6" navigable="true"/>    
@@ -92,7 +95,7 @@
   <association id="14">    
     <end type="SOURCE" refId="6" navigable="false">      
       <attribute id="15" name="bullets">        
-        <position height="19" width="44" x="1258" y="582"/>      
+        <position height="19" width="44" x="1231" y="1223"/>      
       </attribute>      
       <multiplicity id="16" minimum="0" maximum="2147483647"/>    
     </end>    
@@ -100,12 +103,15 @@
     <display labels="true" multiplicity="true"/>  
   </association>  
   <generalization id="17">    
+    <bendpoint x="1318" y="736"/>    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
   <association id="18">    
     <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="19" name="world"/>      
+      <attribute id="19" name="world">        
+        <position height="19" width="38" x="743" y="735"/>      
+      </attribute>      
       <multiplicity id="20" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="8" navigable="true"/>    
@@ -113,15 +119,21 @@
   </association>  
   <association id="21">    
     <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="22" name="velocity"/>      
-      <multiplicity id="23" minimum="0" maximum="1"/>    
+      <attribute id="22" name="velocity">        
+        <position height="19" width="49" x="496" y="382"/>      
+      </attribute>      
+      <multiplicity id="23" minimum="0" maximum="1">        
+        <position height="17" width="25" x="397" y="354"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="24">    
     <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="25" name="circles"/>      
+      <attribute id="25" name="circles">        
+        <position height="19" width="43" x="811" y="737"/>      
+      </attribute>      
       <multiplicity id="26" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
@@ -137,16 +149,24 @@
   </generalization>  
   <association id="29">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="30" name="owner"/>      
-      <multiplicity id="31" minimum="0" maximum="1"/>    
+      <attribute id="30" name="owner">        
+        <position height="19" width="42" x="1128" y="1234"/>      
+      </attribute>      
+      <multiplicity id="31" minimum="0" maximum="1">        
+        <position height="17" width="25" x="1182" y="1320"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="6" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="32">    
     <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="33" name="position"/>      
-      <multiplicity id="34" minimum="0" maximum="1"/>    
+      <attribute id="33" name="position">        
+        <position height="19" width="51" x="500" y="329"/>      
+      </attribute>      
+      <multiplicity id="34" minimum="0" maximum="1">        
+        <position height="17" width="25" x="397" y="318"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
