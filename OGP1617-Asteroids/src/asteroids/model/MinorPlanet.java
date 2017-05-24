@@ -2,25 +2,94 @@ package asteroids.model;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
 
+/**
+ * A class of minor planets.
+ * 
+ * @author Senne Gielen & Jeffrey Quicken
+ *
+ */
 public abstract class MinorPlanet extends Circle {
 	
-	public MinorPlanet(double x, double y, double xVel, double yVel, double radius,double mass) throws IllegalArgumentException{
+	/**
+	 * Creates a new minor planet with a given position,velocity,radius and mass.
+	 * 
+	 * @param x
+	 * 		  The x coordinate of the minor planet.
+	 * @param y
+	 * 		  The y coordinate of the minor planet.
+	 * @param xVel
+	 * 		  The x velocity of the minor planet.
+	 * @param yVel
+	 * 		  The y velocity of the minor planet.
+	 * @param radius
+	 * 		  The radius of the minor planet.
+	 * @param mass
+	 * 		  The mass of the minor planet.
+	 * @effect Creates a new Circle with a given position,velocity,radius and mass.
+	 * 		  |Circle(x,y,xVel,yVel,radius,mass)
+	 */
+	public MinorPlanet(double x, double y, double xVel, double yVel, double radius,double mass){
 		super(x,y,xVel,yVel,radius,mass);
 	}
 	
 	private static double minRadius = 5;
 	
+	/**
+	 * Returns the minimum radius of the minor planets.
+	 * 
+	 * @return The minimum radius of the minor planets.
+	 * 		   |result == minRadius
+	 */
 	public static double getMinRadius(){
 		return minRadius;
 	}
 	
+	/**
+	 * Sets the minimum radius of the minor planets to a new minimum radius.
+	 * 
+	 * @param newRadius 
+	 *		  The new minimum radius of the minor planets.
+	 * @post If the new minimum radius is greater then zero and not NaN, 
+	 * 		 the minimum density of the asteroids is set to new minimum radius.
+	 * 		 |getMinRadius() == newRadius
+	 * 	
+	 */
+	public static void setMinRadius(double newRadius){
+		if(newRadius>0 && !Double.isNaN(newRadius))
+			minRadius = newRadius;
+	}
+	
+	/**
+	 * Checks if the radius is a valid radius.
+	 * 
+	 * @param newRadius
+	 * 		  The radius to be checked.
+	 * @return True if the radius is greater then or equal to the minimum radius.
+	 * 		   |result == newRadius>=getMinRadius()
+	 */
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=getMinRadius();
 	}
-		/**
-	 * Resolves the collision between two MinorPlanets
+	/**
+	 * Do a collision between two MinorPlanets
+	 * 
+	 * @param otherMinor
+	 * 		  The minor planet that collides with this minor planet.
+	 * 
+	 * @post The velocities of both the minor planets are adjusted.
+	 * 		 |@see implementation
+	 * 
+	 * @throws NullPointerException
+	 * 		   The other minor planet is null
+	 * 		   |otherMinor == null
+	 * @throws IllegalArgumentException
+	 * 		   This minor planet is not in the same world as this minor planet 
+	 * 		   or the other minor planet is this minor planet.
+	 * 		   |this.getWorld() != otherMinor.getWorld() || this == otherMinor
+	 * 		
+	 * 
 	 */
-	public void planetCollision(MinorPlanet otherMinor){
+	public void planetCollision(MinorPlanet otherMinor) throws NullPointerException,IllegalArgumentException{
 		if(otherMinor == null)
 			throw new NullPointerException();
 		else if(this.getWorld() != otherMinor.getWorld() || this == otherMinor)
@@ -55,5 +124,10 @@ public abstract class MinorPlanet extends Circle {
 		}
 	}
 	
+	/**
+	 * Do the collision between a minor planet and a ship.
+	 * @param ship
+	 * 		  The ship that collides with this minor planet.
+	 */
 	public abstract void shipCollision(Ship ship);
 }

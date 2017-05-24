@@ -131,8 +131,11 @@ public abstract class Circle {
 	 * Sets the mass of the circle to a new mass.
 	 * @param newMass
 	 * 		  The new mass of the circle.
-	 * @post The mass of the circle is equal to the corrected newMass.
-	 * 		 |new.getMass() == this.massCorrection(newMass)
+	 * @post If the corrected mass is not NaN, 
+	 * 		 the mass of the circle is equal to the corrected newMass.
+	 * 		 else the mass set to 0.
+	 * 		 |if(!Double.isNaN(newMass) then new.getMass() == this.massCorrection(newMass)
+	 * 		 |else new.getMass() == 0
 	 */
 	public void setMass(double newMass){
 		if(Double.isNaN(newMass))
@@ -166,7 +169,7 @@ public abstract class Circle {
 	 * 
 	 * @return 
 	 * 		  The X position of this circle.
-	 * 		  |result == this.posX
+	 * 		  |result == this.getPosVector().getX()
 	 * 		
 	 */
 	@Basic
@@ -198,7 +201,7 @@ public abstract class Circle {
 	 * 
 	 * @return 
 	 * 		  The Y position of this circle.
-	 * 		  |result == this.posY
+	 * 		  |result == this.getPosVector().getY()
 	 */
 	@Basic
 	public double getPosY(){
@@ -206,13 +209,14 @@ public abstract class Circle {
 	}
 	
 	/**
-	 * Checks if a given position is a valid position.
+	 * Checks if a given x position is a valid position.
 	 * 
-	 * @param pos 
+	 * @param posX 
 	 * 		  The position to be validated
 	 * @return 
-	 * 		   Returns true if the position is a positive number.
-	 * 		   | result == pos>=0
+	 * 		   Returns true if the position not NaN and if the circle is located in a world,
+	 * 		   the position must be larger then 0 and smaller then the width of the world.
+	 * 		   | @see implementation
 	 */
 	private boolean isValidPosX(double posX){
 		if(Double.isNaN(posX))
@@ -223,6 +227,16 @@ public abstract class Circle {
 			return (posX>=0) && (posX<=this.getWorld().getWidth());
 	}
 	
+	/**
+	 * Checks if a given y position is a valid position.
+	 * 
+	 * @param posY 
+	 * 		  The position to be validated
+	 * @return 
+	 * 		   Returns true if the position not NaN and if the circle is located in a world,
+	 * 		   the position must be larger then 0 and smaller then the height of the world.
+	 * 		   | @see implementation
+	 */
 	private boolean isValidPosY(double posY){
 		if(Double.isNaN(posY))
 			return false;
@@ -234,6 +248,26 @@ public abstract class Circle {
 	
 	private Vector2D velocity = new Vector2D(0,0);
 	private double speedLimit = 300000.0;
+	
+	/**
+	 * Returns the speed limit of the circle.
+	 * @return The speed limit of the circle.
+	 * 		  |result == this.speedLimit
+	 */
+	public double getSpeedLimit(){
+		return this.speedLimit;
+	}
+	
+	/**
+	 * Sets the speedlimit of the circle to a new limit
+	 * @param newLimit
+	 * 		  The new speed limit.
+	 * @post The speed limit is the new speed limit.
+	 * 		 |this.getSpeedLimit == newLimit
+	 */
+	public void setSpeedLimit(double newLimit){
+		this.speedLimit = newLimit;
+	}
 	
 	/**
 	 * Returns the velocity in the X direction of this circle.
@@ -370,8 +404,8 @@ public abstract class Circle {
 	 * @param newWorld
 	 * 		  The world that has to be validated.
 	 * @return
-	 * 		  True if the world is null or if the world is not terminated.
-	 * 		  |result == (newWorld == null || !newWorld.isTerminated())
+	 * 		  True if the world is null or if the world is not terminated and the current world is null.
+	 * 		  |result == (newWorld == null || (!newWorld.isTerminated() && this.getWorld() == null))
 	 */
 	private boolean canHaveAsWorld(World newWorld){
 		if(newWorld != null)
@@ -406,9 +440,8 @@ public abstract class Circle {
 	 * @param circle 
 	 * 		  The circle between which the distance must be calculated.
 	 * @return 
-	 * 		  Returns the distance in kilometers between the center of this circle and the center of the given circle.
-	 * 		  |result == Math.sqrt(Math.pow(this.getPosX()-circle.getPosX(),2)+
-	 * 		  |			 Math.pow(this.getPosY()-circle.getPosY(), 2))-this.getRadius()-circle.getRadius()
+	 * 		  Returns the distance in kilometers between between this circle and the given circle.
+	 * 		  |result == this.getDistanceBetweenCenter(circle)-this.getRadius()-circle.getRadius()
 	 * @throws NullPointerException
 	 * 		   The circle doesn't exist.
 	 * 		   |(circle == null)
@@ -428,8 +461,8 @@ public abstract class Circle {
 	 * @param circle
 	 * 		  The other circle.
 	 * @return
-	 * 		 The distance between the other two circles.
-	 * 		 |result == this.getPosVector().substract(circle.getPosVector())).length()
+	 * 		 The distance between this and the other circle.
+	 * 		 |result == this.getPosVector().subtract(circle.getPosVector())).length()
 	 * @throws NullPointerException
 	 * 		  The other circle is null
 	 * 		  |circle == null
@@ -629,14 +662,6 @@ public abstract class Circle {
 				else
 					radiusVector = new Vector2D(this.getRadius(),0);
 			}
-//			if(distance == world.getHeight()-this.getPosY()-this.getRadius())
-//				radiusVector = new Vector2D(0,this.getRadius());
-//			else if(distance == this.getPosY()-this.getRadius())
-//				radiusVector = new Vector2D(0,-this.getRadius());
-//			else if(distance == this.getPosX()-this.getRadius())
-//				radiusVector = new Vector2D(-this.getRadius(),0);
-//			else
-//				radiusVector = new Vector2D(this.getRadius(),0);
 			return centerPosition.add(radiusVector).array();
 			}
 	}
@@ -663,8 +688,8 @@ public abstract class Circle {
 	public void bounce(World world) throws NullPointerException, IllegalArgumentException{
 		if(world == null)
 			throw new NullPointerException();
-//		if(this.getWorld() != world)
-//			throw new IllegalArgumentException();
+		if(this.getWorld() != world)
+			throw new IllegalArgumentException();
 		if(this.getDistanceBetween(world) == Math.min(this.getPosX()-this.getRadius(), world.getWidth()-this.getPosX()-this.getRadius()))
 			this.setVel(-this.getVelX(), this.getVelY());
 		if(this.getDistanceBetween(world) == Math.min(world.getHeight()-this.getPosY()-this.getRadius(), this.getPosY()-this.getRadius()))
@@ -709,6 +734,13 @@ public abstract class Circle {
 				 && this.getDistanceBetweenCenter(circle)>=0.99*(this.getRadius()+circle.getRadius()));
 	}
 	
+	/**
+	 * Checks if the other circle lies within this circle.
+	 * @param other
+	 * 		  The other circle.
+	 * @return True if the other circle lies within this circle.
+	 * 		  @see implementation
+	 */
 	protected boolean withinThisCircle(Circle other){
 		return (other.getPosX()+other.getRadius()<=this.getPosX()+this.getRadius()) && ((other.getPosX()-other.getRadius()>=this.getPosX()-this.getRadius()))
 				&&(other.getPosY()+other.getRadius()<=this.getPosY()+this.getRadius()) && (other.getPosY()-other.getRadius()>=this.getPosY()-this.getRadius());

@@ -51,6 +51,16 @@ public class Bullet extends Circle {
 		super(x,y,xVelocity,yVelocity,radius,getDensity()*(4.0/3.0)*Math.pow(radius, 3)*Math.PI);
 	}
 	
+	/**
+	 * Terminates the bullet
+	 * 
+	 * @post The bullet is terminated.
+	 * 		 |this.isTerminated() == true
+	 * @effect If the bullet is located in a world, it is removed from the world.
+	 * 		  |if(this.getWorld() != null) then this.getWorld().remove(this);
+	 * @effect If the bullet is located in a ship, it is removed from the ship.
+	 * 		  |if(this.getShip() != null) then this.getShip().removeBullet(this)
+	 */
 	@Override
 	public void terminate(){
 		super.terminate();
@@ -59,13 +69,14 @@ public class Bullet extends Circle {
 		if(this.getShip() != null)
 			this.getShip().removeBullet(this);
 	}
+	
 	private static double minRadius = 1;
 	
 	/**
 	 * Returns the minimum radius of the bullets.
 	 * 
-	 * @return
-	 * 		 The minimum radius of the bullets.
+	 * @return The minimum radius of the bullets.
+	 * 	      |result == minRadius
 	 */
 	@Immutable
 	public static double getMinRadius(){
@@ -77,6 +88,8 @@ public class Bullet extends Circle {
 	 * 
 	 * @param newMinRadius
 	 * 		  The new minimum radius of the bullets.
+	 * @post The minimum radius of the bullets is set to newMinRadius.
+	 * 		 |getMinRadius() == newMinRadius
 	 */
 	@Basic
 	public static void setMinRadius(double newMinRadius){
@@ -95,8 +108,9 @@ public class Bullet extends Circle {
 	protected boolean isValidRadius(double newRadius){
 		return newRadius>=getMinRadius();
 	}
-	private Ship owner = null;
-	private Ship ship = null;
+	
+	private Ship owner;
+	private Ship ship;
 	
 	/**
 	 * Returns the owner ship of the bullet.
@@ -130,17 +144,15 @@ public class Bullet extends Circle {
 	 * 
 	 * @param newOwner
 	 * 		  The new owner of the ship.
-	 * 
+	 * @post   The new owner of the ship is newOwner.
+	 * 		   |new.getOwner() == newOwner
 	 * @throws IllegalArgumentException
 	 * 		   The bullet can not have newOwner as owner.
 	 * 		   |!canHaveAsOwner(newOwner)
-	 * 
 	 * @throws NullPointerException
 	 * 		   The new owner of the ship is null.
 	 * 		   |newOwner == null
 	 * 
-	 * @post   The new owner of the ship is newOwner.
-	 * 		   |new.getOwner() == newOwner
 	 */
 	@Basic
 	public void setOwner(Ship newOwner) throws IllegalArgumentException,NullPointerException{
@@ -216,20 +228,22 @@ public class Bullet extends Circle {
 	public static double getDensity(){
 		return density;
 	}
-	
-//	/**
-//	 * Returns the mass of the bullet
-//	 * @return
-//	 * 		 The mass of the bullet.
-//	 * 		 |result == this.mass
-//	 */
-//	@Basic
-//	public double getMass(){
-//		return this.mass;
-//	}
+	/**
+	 * Sets the density of the bullets to a new density.
+	 * 
+	 * @param newDensity
+	 * 		  The new density of the bullets.
+	 * @post If the new density is greater then zero and not NaN, 
+	 * 		 the density of the bullets is set to new density.
+	 * 		 |getDensity() == newDensity
+	 */
+	public static void setDensity(double newDensity){
+		if(newDensity>0 && !Double.isNaN(newDensity))
+			density = newDensity;
+	}
 	
 	private double amountOfBounces = 0;
-	private final double maxBounces = 3;
+	private double maxBounces = 3;
 	
 	/**
 	 * Returns the amount of times the bullet has bounced against the world.
@@ -289,13 +303,8 @@ public class Bullet extends Circle {
 	 * 		  The other circle is this bullet.
 	 * 		  |other == this
 	 * 
-	 * @post The world of this bullet and the other circle is set to null.
-	 * 		  |new.getWorld() == null && newOther.getWorld() == null
-	 * @post The world doesn't contain this and the other circle
-	 * 		  |!this.getWorld().getWorldBullets().contains(this) && other.getWorld().getWorldBullets().contains(other)
-	 * @post Both the circle and the bullet are terminated.
-	 * 		  |this.isTerminated() && other.isTerminated()
-	 * 
+	 * @effect The circle and the bullet are terminated.
+	 * 		   |this.terminate() && other.terminate()
 	 */
 	@Raw
 	public void circleCollision(Circle other) throws NullPointerException,IllegalArgumentException{

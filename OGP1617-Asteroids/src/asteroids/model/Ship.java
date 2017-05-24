@@ -4,7 +4,6 @@ import be.kuleuven.cs.som.annotate.*;
 import java.util.*;
 
 import asteroids.model.Circle;
-import asteroids.model.program.Program;
 
 /**
  * A class of ships.

@@ -3,8 +3,6 @@ package asteroids.facade;
 import java.util.*;
 
 import asteroids.model.*;
-import asteroids.model.program.Program;
-import asteroids.model.program.ProgramFactory;
 //import asteroids.part1.facade.IFacade;
 //import asteroids.part2.facade.*;
 import asteroids.part3.facade.*;

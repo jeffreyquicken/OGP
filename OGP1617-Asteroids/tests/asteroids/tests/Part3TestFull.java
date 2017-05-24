@@ -19,10 +19,11 @@ import org.junit.Test;
 import asteroids.model.Asteroid;
 import asteroids.model.Bullet;
 import asteroids.model.Planetoid;
+import asteroids.model.Program;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part3.facade.IFacade;
-import asteroids.model.program.*;
+import asteroids.model.*;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.part3.programs.internal.ProgramParser;
 import asteroids.util.ModelException;
@@ -1909,6 +1910,7 @@ public class Part3TestFull {
     String code = "def sumfac { " + "  a := $1; " + "  t := 1.0; " + "  while 1.5 < a { "
         + "    t := t + (a*sumfac(a + -1.0));" + "    a := a + -1.0; " + "  }" + "  return t; " + "} "
         + "print sumfac(4.0); ";
+    
     Program program = ProgramParser.parseProgramFromString(code, programFactory);
     facade.loadProgramOnShip(ship1, program);
     List<Object> results = facade.executeProgram(ship1, 0.3);
@@ -2490,7 +2492,7 @@ public class Part3TestFull {
   @Test
   public void testFunctionCall_RecursiveFunction() throws ModelException {
     max_score += 20;
-    String code = "def fac { " + "  if $1 < 1.5 { " + "    return 1.0; " + "  }" + "  else { "
+    String code = "def fac { " + "  if $1 < 1.5{ " + "    return 1.0; " + "  }" + "  else { "
         + "    return $1 * fac($1+-1.0); " + "  }" + "}" + "print fac(4.0); ";
     Program program = ProgramParser.parseProgramFromString(code, programFactory);
     facade.loadProgramOnShip(ship1, program);
