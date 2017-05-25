@@ -34,16 +34,6 @@ public abstract class Expression<T> {
 		this.program = newProgram;
 	}
 	
-	private int index = 0;
-	
-	public void setIndex(int i){
-		this.index = i;
-	}
-	
-	public int getIndex(){
-		return this.index;
-	}
-	
 	@Override
 	public boolean equals(Object other){
 		if(other == null && this != null)

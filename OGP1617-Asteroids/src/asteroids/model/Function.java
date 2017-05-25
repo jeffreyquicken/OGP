@@ -10,11 +10,9 @@ public class Function{
 		this.body = body;
 		this.body.setFunction(this);
 	}
-	private String name;
-	private Statement body;
+	private final String name;
+	private final Statement body;
 	private Program program;
-	private HashMap<String,Object> localVariables = new HashMap<String,Object>();
-	private HashMap<String,Object> parameters= new HashMap<String,Object>();
 		
 	public void setProgram(Program newProgram){
 		this.program = newProgram;
@@ -31,11 +29,11 @@ public class Function{
 	}
 	
 	public HashMap<String,Object> getParameters(){
-		return this.expressionList.get(recursiveIndex-1).getParameters();
+		return this.expressionList.get(this.expressionList.size()-1).getParameters();
 	}
 	
 	public HashMap<String,Object> getLocalVariables(){
-		return this.expressionList.get(recursiveIndex-1).getLocalVariables();
+		return this.expressionList.get(this.expressionList.size()-1).getLocalVariables();
 	}
 	
 	public void setParameter(String name, Expression<?> value){
@@ -48,10 +46,6 @@ public class Function{
 	
 	public Object getParameter(String name){
 		return this.getParameters().get(name);
-	}
-	
-	public Object getParameter(String name, int index){
-		return this.expressionList.get(index).getParameter(name);
 	}
 	
 	public void setVariable(String name, Expression<?> value){
@@ -79,57 +73,42 @@ public class Function{
 			return this.getProgram().getVariable(name);
 	}
 	
-	public Object getVariable(String name,int i){
-		if(this.expressionList.get(i).getLocalVariables().containsKey(name))
-			return this.expressionList.get(i).getLocalVariables().get(name);
-		else
-			return this.getProgram().getVariable(name);
-	}
-	
 	private ArrayList<FunctionExpression> expressionList = new ArrayList<FunctionExpression>();
 	
-	private int recursiveIndex = 0;
-	
-	public int getRecursiveIndex(){
-		return this.recursiveIndex;
-	}
-	public void increaseRecursiveIndex(){
-		this.recursiveIndex+=1;
-	}
-	
-	public void decreaseRecursiveIndex(){
-		this.recursiveIndex-=1;
-	}
-	
+
 	public void addExpression(FunctionExpression exp){
-		this.increaseRecursiveIndex();
-		if(this.expressionList.size()<=this.getRecursiveIndex())
-			this.expressionList.add(exp);
-		else	
-			this.expressionList.set(recursiveIndex-1, exp);
+		this.expressionList.add(exp);
 	}
 	
+	public void removeLastExp(){
+		this.expressionList.remove(this.expressionList.size()-1);
+	}
 	
-	public void evaluate(List<Expression<?>> variables) throws ReturnedException,BreakException{
+	public void evaluate(List<Expression<?>> arguments) throws ReturnedException,BreakException{
 		this.body.setFunction(this);
 		try{body.evaluate(Double.POSITIVE_INFINITY);}
 		catch(BreakException b){
-			this.decreaseRecursiveIndex();
+//			this.decreaseRecursiveIndex();
+			this.removeLastExp();
 			throw b;
 		}
 		catch(ReturnedException r){
-			this.decreaseRecursiveIndex();
+//			this.decreaseRecursiveIndex();
+			this.removeLastExp();
 			throw r;
 		}
 		catch(NotEnoughTimeException n){
-			this.decreaseRecursiveIndex();
+//			this.decreaseRecursiveIndex();
+			this.removeLastExp();
 			throw new UnsupportedOperationException(n);
 		}
 		catch(AssertionError a){
-			this.decreaseRecursiveIndex();
+//			this.decreaseRecursiveIndex();
+			this.removeLastExp();
 			throw a;
 		}
-		this.decreaseRecursiveIndex();
+//		this.decreaseRecursiveIndex();
+		this.removeLastExp();
 		throw new AssertionError();
 	}
 }

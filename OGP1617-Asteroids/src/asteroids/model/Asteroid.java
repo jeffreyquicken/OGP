@@ -83,7 +83,7 @@ public class Asteroid extends MinorPlanet{
 	 * 		   The ship and asteroid are not positioned in the same world.
 	 * 		   |this.getWorld() != ship.getWorld()
 	 */
-	public void shipCollision(Ship ship) throws NullPointerException,IllegalArgumentException{
+	public void collision(Ship ship) throws NullPointerException,IllegalArgumentException{
 		if(ship == null){
 			throw new NullPointerException();
 		}

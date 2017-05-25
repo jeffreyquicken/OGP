@@ -89,7 +89,7 @@ public abstract class MinorPlanet extends Circle {
 	 * 		
 	 * 
 	 */
-	public void planetCollision(MinorPlanet otherMinor) throws NullPointerException,IllegalArgumentException{
+	public void collision(MinorPlanet otherMinor) throws NullPointerException,IllegalArgumentException{
 		if(otherMinor == null)
 			throw new NullPointerException();
 		else if(this.getWorld() != otherMinor.getWorld() || this == otherMinor)
@@ -106,6 +106,10 @@ public abstract class MinorPlanet extends Circle {
 		}
 	}
 	
+	/**
+	 * Do a collision between an minorplanet and an object
+	 * @ see implementation
+	 */
 	public void collision(Object object){
 		if(object == null)
 			throw new NullPointerException();
@@ -116,11 +120,11 @@ public abstract class MinorPlanet extends Circle {
 			if(this.getWorld() != objectCast.getWorld())
 				throw new IllegalArgumentException();
 			if(objectCast instanceof Ship)
-				this.shipCollision((Ship)objectCast);
+				this.collision((Ship)objectCast);
 			else if(objectCast instanceof Bullet)
 				((Bullet)objectCast).collision(this);
 			else if(objectCast instanceof MinorPlanet)
-				this.planetCollision((MinorPlanet)objectCast);
+				this.collision((MinorPlanet)objectCast);
 		}
 	}
 	
@@ -129,5 +133,5 @@ public abstract class MinorPlanet extends Circle {
 	 * @param ship
 	 * 		  The ship that collides with this minor planet.
 	 */
-	public abstract void shipCollision(Ship ship);
+	public abstract void collision(Ship ship);
 }

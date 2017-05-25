@@ -189,7 +189,7 @@ public class Planetoid extends MinorPlanet {
 	 * 		   The ship and planetoid are not positioned in the same world.
 	 * 		   |this.getWorld() != ship.getWorld()
 	 */
-	public void shipCollision(Ship ship){
+	public void collision(Ship ship){
 		if(ship == null){
 			throw new NullPointerException();
 		}

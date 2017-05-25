@@ -5,7 +5,7 @@ public class NotExpression extends Expression<Boolean>{
 		this.expression = expression;
 	}
 	
-	private Expression<?> expression;
+	private final Expression<?> expression;
 	
 	@Override
 	public void setFunction(Function newFunction){
@@ -17,12 +17,6 @@ public class NotExpression extends Expression<Boolean>{
 	public void setProgram(Program newProgram){
 		super.setProgram(newProgram);
 		expression.setProgram(newProgram);
-	}
-	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		expression.setIndex(i);
 	}
 	
 	@Override

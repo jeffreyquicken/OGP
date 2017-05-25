@@ -101,10 +101,6 @@ public class Vector2D {
 	}
 	
 	
-	public double angle(){
-		return Math.atan2(this.getY(), this.getX());
-	}
-	
 	/**
 	 * Subtracts another vector from this vector.
 	 * 
@@ -160,11 +156,19 @@ public class Vector2D {
 			return false;
 	}
 	
+	/**
+	 * Returns the string version of the vector
+	 * @see implementation
+	 */
 	@Override
 	public String toString(){
 		return this.array().toString();
 	}
 	
+	/**
+	 * Calculates the hashcode of the vector
+	 * @ see implementation
+	 */
 	@Override
 	public int hashCode(){
 		return Objects.hash(this.getX(),this.getY());

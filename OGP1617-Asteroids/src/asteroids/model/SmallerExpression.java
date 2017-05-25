@@ -6,8 +6,8 @@ public class SmallerExpression extends Expression<Boolean> {
 		this.secondExpression = e2;
 	}
 	
-	private Expression<?> firstExpression;
-	private Expression<?> secondExpression;
+	private final Expression<?> firstExpression;
+	private final Expression<?> secondExpression;
 	
 	@Override
 	public void setFunction(Function newFunction){
@@ -23,12 +23,6 @@ public class SmallerExpression extends Expression<Boolean> {
 		secondExpression.setProgram(newProgram);
 	}
 	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		firstExpression.setIndex(i);
-		secondExpression.setIndex(i);
-	}
 	
 	@Override
 	public Boolean getValue(){

@@ -28,30 +28,19 @@ public class GetExpression extends Expression<Double> {
 	public Double getValue(){
 		this.expression.setFunction(this.getFunction());
 		this.expression.setProgram(this.getProgram());
-		if(expression.getValue() instanceof Circle && expression.getValue() != null){
-//			switch(this.getter){
-//			case GETX:
-//				return ((Expression<Circle>)expression).getValue().getPosX();
-//			case GETY:
-//				return ((Expression<Circle>)expression).getValue().getPosY();
-//			case GETVX:
-//				return ((Expression<Circle>)expression).getValue().getVelX();
-//			case GETVY:
-//				return ((Expression<Circle>)expression).getValue().getVelY();
-//			case GETRADIUS:
-//				return ((Expression<Circle>)expression).getValue().getRadius();
-//			}
+		Object value = expression.getValue();
+		if(value instanceof Circle && value != null){
 			switch(this.getter){
 			case GETX:
-				return ((Circle)expression.getValue()).getPosX();
+				return ((Circle)value).getPosX();
 			case GETY:
-				return ((Circle)expression.getValue()).getPosY();
+				return ((Circle)value).getPosY();
 			case GETVX:
-				return ((Circle)expression.getValue()).getVelX();
+				return ((Circle)value).getVelX();
 			case GETVY:
-				return ((Circle)expression.getValue()).getVelY();
+				return ((Circle)value).getVelY();
 			case GETRADIUS:
-				return ((Circle)expression.getValue()).getRadius();
+				return ((Circle)value).getRadius();
 			}
 			throw new AssertionError();
 		}

@@ -8,8 +8,8 @@ public class FunctionExpression extends Expression<Object>{
 		this.arguments = arguments;
 	}
 	
-	private String functionName;
-	private List<Expression<?>> arguments;
+	private final String functionName;
+	private final List<Expression<?>> arguments;
 	
 	public Function getFunction(){
 		return this.getProgram().getFunction(this.functionName);
@@ -45,10 +45,6 @@ public class FunctionExpression extends Expression<Object>{
 		return this.localVariables;
 	}
 	
-	public void setParameter(String name, Expression<?> value){
-		this.parameters.put(name, value.getValue());
-	}
-	
 	public void setParameter(String name, Object value){
 		this.parameters.put(name, value);
 	}
@@ -68,20 +64,25 @@ public class FunctionExpression extends Expression<Object>{
 		return this.getParameters().get(name);
 	}
 	
+	private FunctionExpression previous;
+	
+	public FunctionExpression getPrevious(){
+		return this.previous;
+	}
+	
 	@Override
 	public Object getValue() throws BreakException{
 		for(int i=0;i<arguments.size();i++){
 			String name = "$" + Integer.toString((i+1));
 			arguments.get(i).setProgram(this.getProgram());
-			arguments.get(i).setFunction(this.getFunction());
+			arguments.get(i).setFunction(super.getFunction());
 			this.setParameter(name, arguments.get(i).getValue());
 		}
 		this.getFunction().addExpression(this);
 		try{this.getFunction().evaluate(arguments);}
 		catch(ReturnedException r){
-			System.out.println(this.getFunction().getRecursiveIndex());
 			Object value = r.getValue();
-			System.out.println(value);
+			System.out.println("t = " + value);
 			return value;
 		}
 		catch(BreakException b){

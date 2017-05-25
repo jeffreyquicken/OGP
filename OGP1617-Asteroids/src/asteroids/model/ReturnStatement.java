@@ -17,7 +17,7 @@ public class ReturnStatement extends Statement {
 		returnExpression.setProgram(newProgram);
 	}
 	
-	private Expression<?> returnExpression;
+	private final Expression<?> returnExpression;
 	
 	public void evaluate(double time) throws ReturnedException, NotEnoughTimeException,BreakException{
 		if(this.getFunction() == null)

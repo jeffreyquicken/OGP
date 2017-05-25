@@ -2,6 +2,7 @@ package asteroids.model;
 import be.kuleuven.cs.som.annotate.*;
 import be.kuleuven.cs.som.taglet.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import asteroids.part2.CollisionListener;
 /**
@@ -174,12 +175,7 @@ public class World {
 	 */
 	@Basic
 	public Set<Ship> getWorldShips(){
-		Set<Ship> ships = new HashSet<>();
-		for(Circle circle:circles.values()){
-			if(circle instanceof Ship)
-				ships.add((Ship)circle);
-		}
-		return ships;
+		return this.circles.values().stream().filter(i-> i instanceof Ship).map(i->(Ship)i).collect(Collectors.toSet());
 	}
 	
 	/**
@@ -189,32 +185,27 @@ public class World {
 	 */
 	@Basic
 	public Set<Bullet> getWorldBullets(){
-		Set<Bullet> bullets = new HashSet<>();
-		for(Circle circle:circles.values()){
-			if(circle instanceof Bullet)
-				bullets.add((Bullet)circle);
-		}
-		return bullets;
+		return this.circles.values().stream().filter(i-> i instanceof Bullet).map(i->(Bullet)i).collect(Collectors.toSet());
 	}
 	
+	/**
+	 * Returns a set of all the asteroids of the world
+	 * @return
+	 * 		  A set of asteroids of the world.
+	 */
 	@Basic
 	public Set<Asteroid> getWorldAsteroids(){
-		Set<Asteroid> asteroids = new HashSet<>();
-		for(Circle circle:circles.values()){
-			if(circle instanceof Asteroid)
-				asteroids.add((Asteroid)circle);
-		}
-		return asteroids;
+		return this.circles.values().stream().filter(i-> i instanceof Asteroid).map(i->(Asteroid)i).collect(Collectors.toSet());
 	}
 	
+	/**
+	 * Returns a set of all the planetoids of the world
+	 * @return
+	 * 		  A set of planetoids of the world.
+	 */
 	@Basic
 	public Set<Planetoid> getWorldPlanetoids(){
-		Set<Planetoid> planetoids = new HashSet<>();
-		for(Circle circle:circles.values()){
-			if(circle instanceof Planetoid)
-				planetoids.add((Planetoid)circle);
-		}
-		return planetoids;
+		return this.circles.values().stream().filter(i-> i instanceof Planetoid).map(i->(Planetoid)i).collect(Collectors.toSet());
 	}
 	
 	/**
@@ -247,11 +238,9 @@ public class World {
 	 * 		   |newCircle.isTerminated()
 	 * @throws IllegalArgumentException
 	 * 		   The circle overlaps with a circle that already belongs to this world.
-	 * 		   |if newCircle.overlaps(bullet) for Bullet bullet in this.getWorldBullets()
-	 * 		   | || if newCircle.overlaps(ship) for Ship ship in this.getWorldShips()
+	 * 		   |newCircle.overlaps(circle) for Circle circle in this.getWorldCircles()
 	 * @post The circle is added to the world.
-	 * 		 |if(newCircle instanceof Bullet) then new.getWorldBullets().contains(newCircle)
-	 * 		 |else if(newCircle instanceof Ship) then new.getWorldShips().contains(newCircle)
+	 * 		 |this.getWorldCircles.contains(circle)
 	 * @post The world of the circle is this world.
 	 * 		 |newCircle.getWorld() == this
 	 */
@@ -264,10 +253,8 @@ public class World {
 			throw new IllegalArgumentException();
 		else if(newCircle.isTerminated())
 			throw new IllegalArgumentException();
-		for(Circle circle :circles.values()){
-			if(circle.overlaps(newCircle))
-				throw new IllegalArgumentException();
-		}
+		if(this.getWorldCircles().stream().anyMatch(i->i.overlaps(newCircle)))
+			throw new IllegalArgumentException();
 		newCircle.setWorld(this);
 		circles.put(newCircle.getPosVector(), newCircle);
 	}
@@ -387,10 +374,10 @@ public class World {
 	 * 		   The amount of time is negative.
 	 * @effect circle.move(time) for Circle circle in this.getWorldCircles()
 	 * 		   The circle moves forward during the time.
-	 * @effect ((Ship)circle).accelerate(time) for Circle circle in this.getWorldCircles()
-	 * 		   if(circle instanceof Ship && ((Ship)circle).getThrusterStatus())
-	 * 		   If the circle is a ship and the thruster is active,
-	 * 		   the ship accelerates during the time.
+	 * @effect The ships accelerate during the time.
+	 * 		   ship.accelerate(time) for Ship ship in this.getWorldShips()
+	 * @effect The distance the planetoids have traveled is updated.
+	 * 		   |planetoid.updateDistanceTraveled(time) for Planetoid planetoid in this.getWorldPlanetoids()
 	 */
 	@Raw
 	public void moveForward(double time) throws IllegalArgumentException{
@@ -412,46 +399,21 @@ public class World {
 	 * Resolves a collision between two objects with a given collisionListener and a given collisionPosition.
 	 * 
 	 * @param collisionObject1
-	 * 		  The first colliding object. It can be either a Circle or null.
+	 * 		  The first colliding object. It can only be a Circle.
 	 * @param collisionObject2
-	 * 		  The second colliding object. It can be either a Circle, a World or null.
+	 * 		  The second colliding object. It can be either a Circle or a World.
 	 * @param collisionListener
 	 * 		  The collisionListener used by the GUI.
-	 * @effect if(collisionObject2 instanceof World) then ((World)collisionObject2).collision((Circle)collisionObject1)
-	 * 		  If the second collision object is a world then there is a boundary collision.
-	 * @effect if(collisionObject2 instanceof Bullet) then ((Circle)collisionObject1).collision((Bullet)collisionObject2);
-	 * 		  If the second collision object is a bullet then there is a collision between a circle and a bullet.
-	 * @effect if(collisionObject2 instanceof Ship) then ((Circle)collisionObject1).collision((Ship)collisionObject2)
-	 * 		   If the second collision object is a bullet then there is a collision between a circle and a ship.
-	 * @effect If (collisionObject2 instanceof World) then collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1])
-	 * 		   If the second collision object is a world then the collisionListener gets a boundary collision.
-	 * @effect If(collisionObject2 instanceof Circle) then collisionListener.objectCollision(collisionObject1, collisionObject2,collisionPosition[0], collisionPosition[1])
-	 * 		   If the second collision object is a circle then the collisionListener gets an object collision.
-	 * 
+	 * @effect The two objects collide
+	 * 		  |collisionObject1.collision(collisionObject2)
+	 * @effect If the collision is between a world and a circle , a boundary collision is requested.
+	 * 		  |if(collisionObject2 instanceof World) 
+	 * 		  |then collisionListener.boundaryCollision(collisionObject1,collisionPos[0],collisionPos[1])
+	 * @effect If the collision is between two Circles, an object collision is requested.
+	 * 		  |If(collisionObject2 instanceof Circle) 
+	 * 		  |then collisionListener.objectCollision(collisionObject1,collisionObject2,collisionPos[0],collisionPos[1])
 	 */
 	@Raw
-//	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
-//		if(collisionObject2 instanceof World){
-//			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
-//			collisionListener.boundaryCollision(collisionObject1, collisionPosition[0], collisionPosition[1]);
-//			((World)collisionObject2).collision((Circle)collisionObject1);
-//		}
-//		else if(collisionObject2 instanceof Bullet){
-//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-//			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
-//			((Circle)collisionObject1).collision((Bullet)collisionObject2);
-//		}
-//		else if(collisionObject2 instanceof Ship){
-//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-//			collisionListener.objectCollision(collisionObject2, collisionObject2, collPos[0], collPos[1]);
-//			((Circle)collisionObject1).collision((Ship)collisionObject2);
-//		}
-//		else if (collisionObject2 instanceof MinorPlanet){
-//			double[] collPos = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-//			collisionListener.objectCollision(collisionObject1, collisionObject2, collPos[0], collPos[1]);
-//			((Circle)collisionObject1).collision((MinorPlanet)collisionObject2);
-//		}
-//	}
 	private void resolveCollision(Object collisionObject1, Object collisionObject2, CollisionListener collisionListener){
 		if(collisionObject2 instanceof World){
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((World)collisionObject2);
@@ -461,8 +423,19 @@ public class World {
 		}
 		else if(collisionObject2 instanceof Circle){
 			double[] collisionPosition = ((Circle)collisionObject1).getCollisionPosition((Circle)collisionObject2);
-			if(collisionListener != null)
-				collisionListener.objectCollision(collisionObject1, collisionObject2, collisionPosition[0], collisionPosition[1]);
+			if(collisionListener != null){
+				if(collisionObject1 instanceof Bullet){
+					if(((Bullet)collisionObject1).getOwner() != collisionObject2)
+						collisionListener.objectCollision(collisionObject1, collisionObject2, collisionPosition[0], collisionPosition[1]);
+				}
+				else if(collisionObject2 instanceof Bullet){
+					if(((Bullet)collisionObject2).getOwner() != collisionObject1)
+					collisionListener.objectCollision(collisionObject1, collisionObject2, collisionPosition[0], collisionPosition[1]);
+				}
+				else{
+					collisionListener.objectCollision(collisionObject1, collisionObject2, collisionPosition[0], collisionPosition[1]);
+				}
+			}
 			((Circle)collisionObject1).collision(collisionObject2);
 		}		
 	}
@@ -511,6 +484,11 @@ public class World {
 		return this.circles.values();
 	}
 	
+	/**
+	 * Updates the circles map
+	 * @post The key of each circle is its position.
+	 * 		 |this.circles.get(circle.getPosVector) == circle for Circle circle in this.getWorldCircles()
+	 */
 	public void updateCirclesLibrary(){
 		HashMap<Vector2D,Circle> newCircles = new HashMap<Vector2D,Circle>();
 		for(Circle circle:this.getWorldCircles()){

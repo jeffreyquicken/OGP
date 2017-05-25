@@ -23,12 +23,6 @@ public class EqualExpression extends Expression<Boolean> {
 		secondExpression.setProgram(newProgram);
 	}
 	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		this.firstExpression.setIndex(i);
-		this.secondExpression.setIndex(i);
-	}
 	
 	@Override
 	public Boolean getValue(){

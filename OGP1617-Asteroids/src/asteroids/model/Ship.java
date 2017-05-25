@@ -2,6 +2,8 @@ package asteroids.model;
 import be.kuleuven.cs.som.taglet.*;
 import be.kuleuven.cs.som.annotate.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import asteroids.model.Circle;
 
@@ -33,23 +35,13 @@ public class Ship extends Circle {
 	 * 		  The initial velocity in the Y direction of this ship.
 	 * @param radius
 	 * 		  The initial radius of this ship.
+	 * @param orientation
+	 * 		  The initial orientation of the ship.
 	 * 
-	 * @effect setPosX(x)
-	 * 		   Sets the X-coordinates of this ship to x. It may also throw an IllegalExceptionError if the position is not a
-	 * 		   valid position.
-	 * @effect setPosY(y)
-	 * 		   Sets the Y-coordinates of this ship to y. It may also throw an IllegalExceptionError if the position is not a
-	 * 		   valid position.
-	 * @effect setVelX(xVelocity)
-	 * 		   Sets the velocity in the X direction of this ship to xVelocity.
-	 * @effect setVelY(yVelocity)
-	 * 		   Sets the velocity in the Y direction of this ship to yVelocity.
-	 * @effect setRadius(radius)
-	 * 		   Sets the radius of this ship to radius. It may also throw an IllegalExceptionError if the radius is not a
-	 * 		   valid radius.
-	 * @throws IllegalArgumentException
-	 * 		   Throws IllegalArgumentException if the x coordinate,y coordinate or the radius are not valid.
-	 * 		   |((!isValidPos(x)) || (!isValidPos(y)) || (!isValidRadius(radius)))
+	 * @effect Creates a new Circle with a given position,velocity, radius and mass.
+	 * 		  |return new Circle(x,y,xVelocity,yVelocity,radius,mass)
+	 * @effect The orientation of the ship is set to orientation.
+	 * 		  |setOrientation(orientation)
 	 * 
 	 */
 	
@@ -62,9 +54,11 @@ public class Ship extends Circle {
 	/**
 	 * Terminate the ship and all of its bullets.
 	 * @post The ship is terminated.
-	 * 		 |this.isTerminated()
+	 * 		 |new.isTerminated()
 	 * @post All of the ships bullets are terminated and they don't have a ship.
-	 * 		 |(bullet.isTerminated() && bullet.getShip() == null) for Bullet bullet in this.getBullets() 
+	 * 		 |(bullet.isTerminated() && bullet.getShip() == null) for Bullet bullet in this.getBullets()
+	 * @post The collection of bullets of the ship is empty.
+	 * 		 |new.getBullets().isEmpty()
 	 */
 	@Override
 	@Basic
@@ -163,8 +157,13 @@ public class Ship extends Circle {
 		return minRadius;
 	}
 	
-//	private double mass;
-	
+	/**
+	 * Corrects the mass of the ship.
+	 * @param newMass
+	 * 		  The mass that has to be corrected.
+	 * @return The corrected mass.
+	 * 		   |@see implementation
+	 */
 	@Override
 	protected double massCorrection(double newMass){
 		if(newMass<	(4.0/3.0)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
@@ -174,24 +173,6 @@ public class Ship extends Circle {
 
 	}
 	private static double density = 1.42E12;
-	
-//	/**
-//	 * Sets the mass of the ship to newMass
-//	 * @param newMass
-//	 * 		  The new mass of the ship.
-//	 * @post If the mass of the ship is smaller then the minimum mass, the mass is set to the minimum mass.
-//	 * 		 Otherwise the mass is set to newMass
-//	 * 		 |if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*density)
-//			 |then new.getMass()  == (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
-//		     |else then new.getMass() == newMass;
-//	 */
-//	@Basic
-//	public void setMass(double newMass){
-//		if(newMass<(4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity())
-//			this.mass = (4/3)*Math.PI*Math.pow(this.getRadius(),3)*getDensity();
-//		else
-//			this.mass = newMass;
-//	}
 	
 	/**
 	 * Returns the minimum density of the ships.
@@ -216,24 +197,14 @@ public class Ship extends Circle {
 		density = newDensity;
 	}
 	
-//	/**
-//	 * Returns the mass of the ship.
-//	 * @return
-//	 * 		  The mass of the ship.
-//	 * 		  |result == this.mass
-//	 */
-//	@Basic
-//	public double getMass(){
-//		return this.mass;
-//	}
-	
 	/**
 	 * Returns the total mass of the ship (including all loaded bullets)
 	 * @return
 	 * 	     The total mass of the ship.
 	 * 		 | result == this.getMass() + bullet.getMass() for Bullet bullet in this.getBullets()
 	 */
-	public double getTotalMass(){
+	 @Basic
+	 public double getTotalMass(){
 		double totalMass = this.getMass();
 		if(!this.getBullets().isEmpty()){
 			for(Bullet bullet:this.getBullets()){
@@ -268,8 +239,8 @@ public class Ship extends Circle {
 	 * @post If the amount is a negative number, the amount is set to zero.
 	 * 		 Then the X-velocity and Y-velocity of this ship is increased with a given amount of acceleration.
 	 * 		 |if(amount<0) then amount = 0
-	 * @effect this.setVelX(this.getVelX()+acceleration*Math.cos(this.getOrientation()))
-	 * @effect this.setVelY(this.getVelY()+acceleration*Math.sin(this.getOrientation()))
+	 * @effect this.setVel(this.getVelX()+acceleration*Math.cos(this.getOrientation()),this.getVelY()+acceleration*Math.sin(this.getOrientation()))
+	 *
 	 */
 	public void thrust(double amount){
 		if(amount < 0)
@@ -305,6 +276,18 @@ public class Ship extends Circle {
 	}
 	
 	/**
+	 * Sets the thruster force to a new Force
+	 * @param newForce
+	 * 		  The new Thruster force.
+	 * @post The thruster force is the new thruster force.
+	 * 		 |this.getThrusterForce() == newForce
+	 */
+	@Basic
+	public void setThrusterForce(double newForce){
+		this.thrusterForce = newForce;
+	}
+	
+	/**
 	 * Returns the thruster status.
 	 * 
 	 * @see implementation
@@ -317,8 +300,9 @@ public class Ship extends Circle {
 	/**
 	 * Returns the amount of acceleration of the ship.
 	 * @return
-	 * 		  The amount of acceleration of the ship.
-	 * 		  |result == this.getThrusterForce()/this.getTotalMass()
+	 * 		  The amount of acceleration of the ship. It is 0 if the thruster is not activated.
+	 * 		  |if(thrusterStatus()) then result == this.getThrusterForce()/this.getTotalMass()
+	 * 		  |else then result == 0
 	 */
 	@Basic
 	public double getAcceleration(){
@@ -386,9 +370,7 @@ public class Ship extends Circle {
 	 * 
 	 * @param bullet
 	 * 		  The bullet to be validated.
-	 * @return
-	 * 		  True if both the ship and bullet are not terminated.
-	 * 		  |result ==(!bullet.isTerminated() && !this.isTerminated())
+	 * @see implementation
 	 */
 	private boolean canHaveAsBullet(Bullet bullet){
 		return (!bullet.isTerminated() && !this.isTerminated()
@@ -474,6 +456,17 @@ public class Ship extends Circle {
 	}
 	
 	/**
+	 * Sets the initial bullet speed to a new speed.
+	 * @param newSpeed
+	 * 		  The new speed of the bullets.
+	 * @see implementation
+	 */
+	@Basic
+	public static void setInitialBulletSpeed(double newSpeed){
+		initialBulletSpeed = newSpeed;
+	}
+	
+	/**
 	 * Picks a random bullet of this ship and fires it.
 	 * @effect this.removeBullet(bullet)
 	 * 		 Removes the bullet from this ship
@@ -488,8 +481,8 @@ public class Ship extends Circle {
 	 * 		 |if(this.getWorld().isWithinWorldBounds(bullet) && !circle.overlaps(bullet) for Circle circle in this.getWorld().getWorldCircles())
 	 * 		 |then bullet.getWorld() == this.getWorld() && this.getWorld().getWorldEntities().contains(bullet)
 	 * @effect if(bullet.overlaps(circle) for Circle circle in this.getWorld().getWorldCircles()
-	 * 		   then circle.collision(bullet) 
-	 * 		  If the bullet overlaps with any of the world circles. It collides with that circle.
+	 * 		   then bullet.terminate() && this.getWorld().remove((Circle)object) && ((Circle)object).terminate();
+	 * 		  If the bullet overlaps with any of the world circles. The bullet and the circle are terminated.
 	 * @post If the bullet doesn't lie within the world bounds, it is terminated and its ship is set to null.
 	 * 		 |if(!this.getWorld().isWithinWorldBounds(bullet))
 	 * 		 |then bullet.isTerminated() && bullet.getShip() == null
@@ -541,7 +534,7 @@ public class Ship extends Circle {
 	 * 		 |!this.getWorld().getWorldShips().contains(this) && this.getWorld() == null
 	 */
 	@Raw
-	public void bulletCollision(Bullet bullet) throws NullPointerException{
+	public void collision(Bullet bullet) throws NullPointerException{
 		if (bullet == null)
 			throw new NullPointerException();
 		if(bullet.getWorld() != this.getWorld())
@@ -576,7 +569,7 @@ public class Ship extends Circle {
 	 * 
 	 */
 	@Raw
-	public void shipCollision(Ship ship) throws IllegalArgumentException, NullPointerException{
+	public void collision(Ship ship) throws IllegalArgumentException, NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else if(this == ship || this.getWorld() != ship.getWorld())
@@ -593,6 +586,10 @@ public class Ship extends Circle {
 		}
 	}
 	
+	/**
+	 * Resolves the collision between a ship and a object.
+	 * @see implementation
+	 */
 	public void collision(Object object){
 		if(object == null)
 			throw new NullPointerException();
@@ -603,114 +600,104 @@ public class Ship extends Circle {
 			if(this.getWorld() != objectCast.getWorld())
 				throw new IllegalArgumentException();
 			if(objectCast instanceof Ship)
-				this.shipCollision((Ship)objectCast);
+				this.collision((Ship)objectCast);
 			else if(objectCast instanceof Bullet)
-				this.bulletCollision((Bullet)objectCast);
+				this.collision((Bullet)objectCast);
 			else if(objectCast instanceof MinorPlanet)
 				((MinorPlanet)objectCast).collision(this);
 		}
 	}
 	
+	/**
+	 * Teleports the ship to a random location in the world
+	 * @see implementation
+	 */
 	public void teleportToRandomLocation(){
 		if(this.getWorld()!= null){
 			this.setPosX(this.getRadius()+Math.random()*(this.getWorld().getWidth()-2*this.getRadius()));
 			this.setPosY(this.getRadius()+Math.random()*(this.getWorld().getHeight()-2*this.getRadius()));
+			this.getWorld().updateCirclesLibrary();
 		}
 	}
 	
 	private Program program;
 	
+	/**
+	 * Sets the program to a new program
+	 * @param newProgram
+	 * 		  The new program of the ship
+	 * @post The program is the new program.
+	 * 		 |new.getProgram() == newProgram
+	 */
 	public void setProgram(Program newProgram){
 		this.program = newProgram;
 		this.program.setUser(this);
 	}
 	
+	/**
+	 * Returns the program of the ship.
+	 * @return The program of the ship.
+	 * 		  |result == this.program
+	 */
 	public Program getProgram(){
 		return this.program;
 	}
 	
+	/**
+	 * Searches the nearest ship of this ship in the world
+	 * @return The nearest ship in the world, null if there are no other ships.
+	 * 		  |@see implementation
+	 */
 	public Ship getNearestShip(){
-		double shortest = Double.POSITIVE_INFINITY;
-		Ship returnShip = null;
-		for(Ship ship:this.getWorld().getWorldShips()){
-			double distance = this.getDistanceBetween(ship);
-			if(distance<shortest && ship != this){
-				returnShip = ship;
-				shortest = distance;
-			}
-		}
-		return returnShip;
+		return this.getWorld().getWorldShips().stream().filter(s -> s != this).min(Comparator.comparing((Ship i) -> i.getDistanceBetween(this))).orElse(null);
+
 	}
 	
+	/**
+	 * Searches the nearest bullet this ship has fired of this ship in the world
+	 * @return The nearest bullet in the world, null if there are no bullets it has fired.
+	 * 		  |@see implementation
+	 */
 	public Bullet getNearestBullet(){
-		double shortest = Double.POSITIVE_INFINITY;
-		Bullet returnBullet = null;
-		for(Bullet bullet:this.getWorld().getWorldBullets()){
-			double distance = this.getDistanceBetween(bullet);
-			if(distance<shortest && bullet.getOwner() == this){
-				returnBullet = bullet;
-				shortest = distance;
-			}
-		}
-		return returnBullet;
+		return this.getWorld().getWorldBullets().stream().filter(s -> s.getOwner()==this).min(Comparator.comparing((Bullet i) -> i.getDistanceBetween(this))).orElse(null);
 	}
 	
+	/**
+	 * Searches the nearest asteroid to this ship in the world
+	 * @return The nearest asteroid in the world, null if there are no asteroids.
+	 * 		  |@see implementation
+	 */
 	public Asteroid getNearestAsteroid(){
-		double shortest = Double.POSITIVE_INFINITY;
-		Asteroid returnAsteroid = null;
-		for(Asteroid asteroid:this.getWorld().getWorldAsteroids()){
-			double distance  = this.getDistanceBetween(asteroid);
-			if(distance<shortest){
-				returnAsteroid = asteroid;
-				shortest = distance;
-			}
-		}
-		return returnAsteroid;
+		return this.getWorld().getWorldAsteroids().stream().min(Comparator.comparing((Asteroid i) -> i.getDistanceBetween(this))).orElse(null);
 	}
 	
+	/**
+	 * Searches the nearest planetoid to this ship in the world
+	 * @return The nearest planetoid in the world, null if there are no planetoids.
+	 * 		  |@see implementation
+	 */
 	public Planetoid getNearestPlanetoid(){
-		double shortest = Double.POSITIVE_INFINITY;
-		Planetoid returnPlanetoid = null;
-		for(Planetoid planetoid:this.getWorld().getWorldPlanetoids()){
-			double distance = this.getDistanceBetween(planetoid);
-			if(distance<shortest){
-				returnPlanetoid = planetoid;
-				shortest = distance;
-			}
-		}
-		return returnPlanetoid;
+		return this.getWorld().getWorldPlanetoids().stream().min(Comparator.comparing((Planetoid i) -> i.getDistanceBetween(this))).orElse(null);
 	}
 	
+	/**
+	 * Searches the nearest minorplanet to this ship in the world
+	 * @return The nearest minorplanet in the world, null if there are no other minorplanets.
+	 * 		  |@see implementation
+	 */
 	public MinorPlanet getNearestPlanet(){
-		Planetoid planetoid = this.getNearestPlanetoid();
-		Asteroid asteroid = this.getNearestAsteroid();
-		if(asteroid == null && planetoid == null)
-			return null;
-		else if(asteroid == null)
-			return planetoid;
-		else if(planetoid == null)
-			return asteroid;
-		else{
-			if(this.getDistanceBetween(asteroid)<this.getDistanceBetween(planetoid))
-				return asteroid;
-			else
-				return planetoid;
-		}
+		return this.getWorld().getWorldEntities().stream().filter(i->i instanceof MinorPlanet).map(i -> (MinorPlanet)i).min(Comparator.comparing((MinorPlanet i) -> i.getDistanceBetween(this))).orElse(null);
+
 	}
 	
+	/**
+	 * Searches the nearest circle to this ship in the world
+	 * @return The nearest circle in the world, null if there are no other circles.
+	 * 		  |@see implementation
+	 */
 	public Circle getNearestCircle(){
-		Circle returnCircle = null;
-		double shortest = Double.POSITIVE_INFINITY;
-		for(Object object:this.getWorld().getWorldEntities()){
-			if(object instanceof Circle){
-				double distance = this.getDistanceBetween((Circle)object);
-				if(distance<shortest){
-					returnCircle = (Circle)object;
-					shortest = distance;
-				}
-			}
-		}
-		return returnCircle;
+		return this.getWorld().getWorldEntities().stream().map(i -> (Circle)i).min(Comparator.comparing((Circle i) -> i.getDistanceBetween(this))).orElse(null);
+
 	}
 }
 

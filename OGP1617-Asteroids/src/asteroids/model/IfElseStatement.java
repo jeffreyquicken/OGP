@@ -7,9 +7,9 @@ public class IfElseStatement extends Statement {
 		this.elseStatement = elseStatement;
 	}
 	
-	private Expression<?> condition;
-	private Statement ifStatement;
-	private Statement elseStatement;
+	private final Expression<?> condition;
+	private final Statement ifStatement;
+	private final Statement elseStatement;
 	
 	@Override
 	public void setFunction(Function newFunction){
@@ -27,15 +27,6 @@ public class IfElseStatement extends Statement {
 		ifStatement.setProgram(newProgram);
 		if(elseStatement != null)
 			elseStatement.setProgram(newProgram);
-	}
-	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		condition.setIndex(i);
-		ifStatement.setIndex(i);
-		if(elseStatement != null)
-			elseStatement.setIndex(i);
 	}
 	
 	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException,BreakException{

@@ -23,14 +23,6 @@ public class BlockStatement extends Statement{
 		}
 	}
 	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		for(Statement s: this.getStatements()){
-			s.setIndex(i);
-		}
-	}
-	
 	private double remainingTime = 0;
 	
 	public double getRemainingTime(){

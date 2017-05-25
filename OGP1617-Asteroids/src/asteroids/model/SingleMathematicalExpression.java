@@ -6,8 +6,8 @@ public class SingleMathematicalExpression extends Expression<Double> {
 		this.expression = expression;
 	}
 	
-	private Expression<?> expression;
-	private SingleMathematical type;
+	private final  Expression<?> expression;
+	private final SingleMathematical type;
 	
 	@Override
 	public void setFunction(Function newFunction){
@@ -21,11 +21,6 @@ public class SingleMathematicalExpression extends Expression<Double> {
 		expression.setProgram(newProgram);
 	}
 	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		expression.setIndex(i);
-	}
 	
 	@Override
 	public Double getValue(){

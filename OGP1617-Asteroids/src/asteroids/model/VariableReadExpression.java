@@ -6,7 +6,7 @@ public class VariableReadExpression extends Expression<Object>{
 		this.name = name;
 	}
 	
-	private String name;
+	private final String name;
 	
 	public Object getValue(){
 		if(this.getFunction() == null){

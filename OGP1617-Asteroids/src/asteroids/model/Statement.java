@@ -25,15 +25,5 @@ public abstract class Statement {
 		this.program = newProgram;
 	}
 	
-	private int index = 0;
-	
-	public void setIndex(int i){
-		this.index = i;
-	}
-	
-	public int getIndex(){
-		return this.index;
-	}
-	
 	public abstract void evaluate(double time) throws NotEnoughTimeException,BreakException,ReturnedException;
 }

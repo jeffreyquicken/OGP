@@ -21,15 +21,8 @@ public class WhileStatement extends Statement {
 		body.setProgram(newProgram);
 	}
 	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		body.setIndex(i);
-		checkExpression.setIndex(i);
-	}
-	
-	private Expression<?> checkExpression;
-	private Statement body;
+	private final Expression<?> checkExpression;
+	private final Statement body;
 	
 	public void evaluate(double time) throws NotEnoughTimeException,ReturnedException, BreakException {
 		checkExpression.setFunction(this.getFunction());

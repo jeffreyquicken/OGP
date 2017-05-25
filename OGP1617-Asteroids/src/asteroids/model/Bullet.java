@@ -307,7 +307,7 @@ public class Bullet extends Circle {
 	 * 		   |this.terminate() && other.terminate()
 	 */
 	@Raw
-	public void circleCollision(Circle other) throws NullPointerException,IllegalArgumentException{
+	public void collision(Circle other) throws NullPointerException,IllegalArgumentException{
 		if(other == null){
 			throw new NullPointerException();
 		}
@@ -328,7 +328,7 @@ public class Bullet extends Circle {
 	 * 		  The ship collides with this bullet.
 	 */
 	@Raw
-	public void shipCollision(Ship ship) throws NullPointerException{
+	public void collision(Ship ship) throws NullPointerException{
 		if(ship == null)
 			throw new NullPointerException();
 		else
@@ -344,9 +344,9 @@ public class Bullet extends Circle {
 			if(this.getWorld() != ((Circle)other).getWorld())
 				throw new IllegalArgumentException();
 			if(other instanceof Ship)
-				this.shipCollision((Ship)other);
+				this.collision((Ship)other);
 			else
-				this.circleCollision((Circle)other);
+				this.collision((Circle)other);
 			}
 	}
 	

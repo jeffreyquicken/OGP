@@ -6,7 +6,7 @@ public class TurnStatement extends Statement {
 		this.turnExpression = turnExpression;
 	}
 
-	private Expression<?> turnExpression;
+	private final Expression<?> turnExpression;
 	
 	@Override
 	public void setFunction(Function newFunction){

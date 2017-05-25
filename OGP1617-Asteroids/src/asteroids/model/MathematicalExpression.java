@@ -9,9 +9,9 @@ public class MathematicalExpression extends Expression<Double> {
 	}
 	
 	
-	private Mathematical type;
-	private Expression<?> firstArgument;
-	private Expression<?> secondArgument;
+	private final Mathematical type;
+	private final Expression<?> firstArgument;
+	private final Expression<?> secondArgument;
 	
 	@Override
 	public void setFunction(Function newFunction){
@@ -25,13 +25,6 @@ public class MathematicalExpression extends Expression<Double> {
 		super.setProgram(newProgram);
 		firstArgument.setProgram(newProgram);
 		secondArgument.setProgram(newProgram);
-	}
-	
-	@Override
-	public void setIndex(int i){
-		super.setIndex(i);
-		firstArgument.setIndex(i);
-		secondArgument.setIndex(i);
 	}
 	
 	public Double getValue(){
