@@ -82,7 +82,6 @@ public class FunctionExpression extends Expression<Object>{
 		try{this.getFunction().evaluate(arguments);}
 		catch(ReturnedException r){
 			Object value = r.getValue();
-			System.out.println("t = " + value);
 			return value;
 		}
 		catch(BreakException b){

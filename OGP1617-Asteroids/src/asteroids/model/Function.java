@@ -88,26 +88,21 @@ public class Function{
 		this.body.setFunction(this);
 		try{body.evaluate(Double.POSITIVE_INFINITY);}
 		catch(BreakException b){
-//			this.decreaseRecursiveIndex();
 			this.removeLastExp();
 			throw b;
 		}
 		catch(ReturnedException r){
-//			this.decreaseRecursiveIndex();
 			this.removeLastExp();
 			throw r;
 		}
 		catch(NotEnoughTimeException n){
-//			this.decreaseRecursiveIndex();
 			this.removeLastExp();
 			throw new UnsupportedOperationException(n);
 		}
 		catch(AssertionError a){
-//			this.decreaseRecursiveIndex();
 			this.removeLastExp();
 			throw a;
 		}
-//		this.decreaseRecursiveIndex();
 		this.removeLastExp();
 		throw new AssertionError();
 	}
